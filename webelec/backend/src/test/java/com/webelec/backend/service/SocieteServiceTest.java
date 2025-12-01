@@ -1,5 +1,6 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.repository.SocieteRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,16 +101,27 @@ class SocieteServiceTest {
     @Test
     @DisplayName("delete should call repository deleteById")
     void testDelete() {
-        // Arrange
         Long societeId = 1L;
+        when(repository.existsById(societeId)).thenReturn(true);
         doNothing().when(repository).deleteById(societeId);
 
-        // Act
         service.delete(societeId);
 
-        // Assert
+        verify(repository).existsById(societeId);
         ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
-        verify(repository, times(1)).deleteById(captor.capture());
+        verify(repository).deleteById(captor.capture());
         assertThat(captor.getValue()).isEqualTo(societeId);
+    }
+
+    @Test
+    @DisplayName("delete should throw when societe does not exist")
+    void testDeleteNotFound() {
+        Long societeId = 99L;
+        when(repository.existsById(societeId)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class, () -> service.delete(societeId));
+
+        verify(repository).existsById(societeId);
+        verify(repository, never()).deleteById(any());
     }
 }

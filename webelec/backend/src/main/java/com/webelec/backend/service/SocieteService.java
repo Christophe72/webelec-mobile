@@ -1,5 +1,6 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.repository.SocieteRepository;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,9 @@ public class SocieteService {
     }
 
     public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Societe non trouvée");
+        }
         repository.deleteById(id);
     }
 }

@@ -40,8 +40,57 @@ mvnw.cmd test
 - **Chantiers** : `/api/chantiers` pour lister, créer, filtrer par société (`/societe/{id}`) et supprimer.
 - **Produits (stock)** : `/api/produits` avec filtres par société, création, mise à jour et suppression.
 - **Clients** : `/api/clients` avec les mêmes opérations (GET/POST/PUT/DELETE) et filtre `/societe/{id}`.
+  _Toutes ces ressources utilisent désormais des DTOs validés côté backend pour garantir des contrats stables (voir dossier `dto/`)._
+- **Interventions** : `/api/interventions` + filtres `/societe/{id}` et `/chantier/{id}` avec PUT/DELETE.
+- **Produits avancés** : `/api/produits-avances` pour gérer le catalogue enrichi (prix achat/vente, fournisseur).
+- **Devis** : `/api/devis` avec filtres `/societe/{id}`/`/client/{id}`, gestion des lignes (`DevisLigne`).
+- **Factures** : `/api/factures` similaires aux devis mais avec échéance/statut d'encaissement.
 
-Chaque entité est composée d'une couche **Repository** (Spring Data JPA), **Service** (logique métier/testable) et **Controller** REST. Les relations sont câblées via `@ManyToOne` vers `Societe` pour préparer les regroupements et future facturation.
+👉 Spec OpenAPI (Next.js friendly) : `src/main/resources/api-spec.yaml`
+
+### Contrat API Société (`/api/societes`)
+**DTOs exposés**
+- `SocieteRequest` (payload entrant)
+  - `nom` *(string, obligatoire, ≤255)*
+  - `tva` *(string, obligatoire, ≤32)*
+  - `email` *(string, optionnel, format email, ≤255)*
+  - `telephone` *(string, optionnel, regex `^[0-9+().\\/\\-\\s]{6,30}$`)*
+  - `adresse` *(string, optionnel, ≤512)*
+- `SocieteResponse` (payload sortant)
+  - `id`, `nom`, `tva`, `email`, `telephone`, `adresse`
+
+**Endpoints**
+1. `GET /api/societes` → `200 OK` avec `List<SocieteResponse>`
+2. `GET /api/societes/{id}` → `200 OK` avec un `SocieteResponse` ou `404` si introuvable
+3. `POST /api/societes`
+   ```json
+   {
+     "nom": "WebElec",
+     "tva": "BE0123456789",
+     "email": "contact@webelec.be",
+     "telephone": "0470/00.00.00",
+     "adresse": "Rue des Artisans 12, Liège"
+   }
+   ```
+   Réponse `200 OK` (pour l’instant) contenant le `SocieteResponse`
+4. `DELETE /api/societes/{id}` → `204 No Content` si la suppression réussit, `404 Not Found` si l'identifiant n'existe pas
+
+**Format d’erreur global** (`ApiError`)
+```json
+{
+  "timestamp": "2025-12-01T22:15:37.123Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Requête invalide",
+  "details": [
+    "nom: Le nom de la société est obligatoire",
+    "tva: La TVA est obligatoire"
+  ]
+}
+```
+- `400 Bad Request` : violations Bean Validation (liste dans `details`)
+- `404 Not Found` : identifiant inexistant (`message` contient la raison via `ResourceNotFoundException`)
+- `500 Internal Server Error` : erreur inattendue côté serveur
 
 ## Exemples de payloads
 ```json
@@ -50,7 +99,7 @@ POST /api/chantiers
   "nom": "Installation nouvelle cuisine",
   "adresse": "Rue du Four 15, 4000 Liège",
   "description": "Tableau secondaire + circuit prises + éclairage LED",
-  "societe": { "id": 1 }
+  "societeId": 1
 }
 ```
 
@@ -62,7 +111,7 @@ POST /api/produits
   "description": "Courbe C",
   "quantiteStock": 25,
   "prixUnitaire": 14.90,
-  "societe": { "id": 1 }
+  "societeId": 1
 }
 ```
 
@@ -74,7 +123,55 @@ POST /api/clients
   "email": "alice.dupont@example.com",
   "telephone": "0470/11.22.33",
   "adresse": "Rue des Artisans 12, 4000 Liège",
-  "societe": { "id": 1 }
+  "societeId": 1
+}
+```
+
+```json
+POST /api/interventions
+{
+  "titre": "Dépannage tableau",
+  "description": "Remplacement disjoncteur",
+  "dateIntervention": "2025-01-15",
+  "societe": { "id": 1 },
+  "chantier": { "id": 3 },
+  "client": { "id": 5 }
+}
+```
+
+```json
+POST /api/devis
+{
+  "numero": "DEV-2025-001",
+  "dateEmission": "2025-01-02",
+  "dateExpiration": "2025-01-31",
+  "montantHT": 1200.00,
+  "montantTVA": 252.00,
+  "montantTTC": 1452.00,
+  "statut": "DRAFT",
+  "societe": { "id": 1 },
+  "client": { "id": 5 },
+  "lignes": [
+    { "description": "Tableau électrique", "quantite": 1, "prixUnitaire": 900, "total": 900 }
+  ]
+}
+```
+
+```json
+POST /api/factures
+{
+  "numero": "FAC-2025-015",
+  "dateEmission": "2025-02-10",
+  "dateEcheance": "2025-03-10",
+  "montantHT": 2000.00,
+  "montantTVA": 420.00,
+  "montantTTC": 2420.00,
+  "statut": "SENT",
+  "societe": { "id": 1 },
+  "client": { "id": 5 },
+  "lignes": [
+    { "description": "Câblage IT", "quantite": 2, "prixUnitaire": 1000, "total": 2000 }
+  ]
 }
 ```
 
@@ -84,6 +181,6 @@ POST /api/clients
 - `pom.xml` : gestion des dépendances et configuration Java 21
 
 ## Prochaines étapes suggérées
-- Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.
-- Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.
+- ~~Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.~~ ✅
+- ~~Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.~~ ✅
 - Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.

@@ -1,5 +1,6 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.repository.ClientRepository;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class ClientService {
 
     public Client update(Long id, Client client) {
         Client existing = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Client non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"));
         existing.setNom(client.getNom());
         existing.setPrenom(client.getPrenom());
         existing.setEmail(client.getEmail());
@@ -45,6 +46,9 @@ public class ClientService {
     }
 
     public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Client non trouvé");
+        }
         repository.deleteById(id);
     }
 }

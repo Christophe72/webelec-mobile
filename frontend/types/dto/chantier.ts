@@ -1,9 +1,9 @@
 export interface ChantierDTO {
-  id: string;
+  id: number;
   nom: string;
-  clientId: string;
   adresse?: string;
-  status?: string;
+  description?: string;
+  societeId: number;
 }
 
 export type ChantierCreateDTO = Omit<ChantierDTO, "id">;

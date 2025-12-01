@@ -1,8 +1,13 @@
 import { api } from "./base";
 import { ProduitDTO, ProduitCreateDTO, StockMouvementDTO } from "@/types";
 
-export function getProduits(): Promise<ProduitDTO[]> {
-  return api("/produits");
+export function getProduits(societeId?: number | string): Promise<ProduitDTO[]> {
+  const endpoint = societeId ? `/produits/societe/${societeId}` : "/produits";
+  return api(endpoint);
+}
+
+export function getProduit(id: number | string): Promise<ProduitDTO> {
+  return api(`/produits/${id}`);
 }
 
 export function createProduit(data: ProduitCreateDTO): Promise<ProduitDTO> {
@@ -12,15 +17,15 @@ export function createProduit(data: ProduitCreateDTO): Promise<ProduitDTO> {
   });
 }
 
-export function getProduit(id: string): Promise<ProduitDTO> {
-  return api(`/produits/${id}`);
-}
-
-export function updateProduit(id: string, data: Partial<ProduitCreateDTO>): Promise<ProduitDTO> {
+export function updateProduit(id: number | string, data: ProduitCreateDTO): Promise<ProduitDTO> {
   return api(`/produits/${id}`, {
-    method: "PATCH",
+    method: "PUT",
     body: JSON.stringify(data)
   });
+}
+
+export function deleteProduit(id: number | string): Promise<void> {
+  return api(`/produits/${id}`, { method: "DELETE" });
 }
 
 export function mouvementStock(data: StockMouvementDTO): Promise<StockMouvementDTO> {

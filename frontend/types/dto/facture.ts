@@ -1,12 +1,23 @@
+export interface FactureLigneDTO {
+  description: string;
+  quantite: number;
+  prixUnitaire: number;
+  total: number;
+}
+
 export interface FactureDTO {
-  id: string;
-  clientId: string;
-  devisId?: string;
-  totalHT: number;
-  totalTTC: number;
-  statut?: string;
-  dateEmise?: string;
-  echeance?: string;
+  id: number;
+  numero: string;
+  dateEmission: string;
+  dateEcheance: string;
+  montantHT: number;
+  montantTVA: number;
+  montantTTC: number;
+  statut: string;
+  societeId: number;
+  clientId: number;
+  devisId?: number;
+  lignes?: FactureLigneDTO[];
 }
 
 export type FactureCreateDTO = Omit<FactureDTO, "id">;

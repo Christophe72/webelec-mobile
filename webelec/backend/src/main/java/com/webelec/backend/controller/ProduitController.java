@@ -1,7 +1,12 @@
 package com.webelec.backend.controller;
 
+import com.webelec.backend.dto.ProduitRequest;
+import com.webelec.backend.dto.ProduitResponse;
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Produit;
 import com.webelec.backend.service.ProduitService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,33 +23,37 @@ public class ProduitController {
     }
 
     @GetMapping
-    public List<Produit> getAll() {
-        return service.findAll();
+    public List<ProduitResponse> getAll() {
+        return service.findAll().stream().map(ProduitResponse::from).toList();
     }
 
     @GetMapping("/societe/{societeId}")
-    public List<Produit> getBySociete(@PathVariable Long societeId) {
-        return service.findBySociete(societeId);
+    public List<ProduitResponse> getBySociete(@PathVariable Long societeId) {
+        return service.findBySociete(societeId).stream().map(ProduitResponse::from).toList();
     }
 
     @GetMapping("/{id}")
-    public Produit getById(@PathVariable Long id) {
+    public ProduitResponse getById(@PathVariable Long id) {
         return service.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
+                .map(ProduitResponse::from)
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé"));
     }
 
     @PostMapping
-    public Produit create(@RequestBody Produit produit) {
-        return service.create(produit);
+    public ProduitResponse create(@Valid @RequestBody ProduitRequest request) {
+        var created = service.create(request.toEntity());
+        return ProduitResponse.from(created);
     }
 
     @PutMapping("/{id}")
-    public Produit update(@PathVariable Long id, @RequestBody Produit produit) {
-        return service.update(id, produit);
+    public ProduitResponse update(@PathVariable Long id, @Valid @RequestBody ProduitRequest request) {
+        var updated = service.update(id, request.toEntity());
+        return ProduitResponse.from(updated);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

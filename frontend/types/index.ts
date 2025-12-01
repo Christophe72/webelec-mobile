@@ -9,3 +9,5 @@ export * from "./dto/piece";
 export * from "./dto/rgie";
 export * from "./dto/peppol";
 export * from "./dto/notification";
+export * from "./dto/societe";
+export * from "./dto/produit-avance";

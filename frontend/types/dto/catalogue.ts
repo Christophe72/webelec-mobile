@@ -1,15 +1,17 @@
 export interface ProduitDTO {
-  id: string;
+  id: number;
+  reference: string;
   nom: string;
-  prixHT: number;
-  stock?: number;
   description?: string;
+  quantiteStock: number;
+  prixUnitaire: number;
+  societeId: number;
 }
 
 export type ProduitCreateDTO = Omit<ProduitDTO, "id">;
 
 export interface StockMouvementDTO {
-  produitId: string;
+  produitId: number;
   quantite: number;
   type: "in" | "out";
   raison?: string;

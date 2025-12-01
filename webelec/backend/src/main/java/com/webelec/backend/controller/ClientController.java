@@ -1,7 +1,11 @@
 package com.webelec.backend.controller;
 
-import com.webelec.backend.model.Client;
+import com.webelec.backend.dto.ClientRequest;
+import com.webelec.backend.dto.ClientResponse;
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.service.ClientService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,33 +30,37 @@ public class ClientController {
     }
 
     @GetMapping
-    public List<Client> getAll() {
-        return service.findAll();
+    public List<ClientResponse> getAll() {
+        return service.findAll().stream().map(ClientResponse::from).toList();
     }
 
     @GetMapping("/societe/{societeId}")
-    public List<Client> getBySociete(@PathVariable Long societeId) {
-        return service.findBySociete(societeId);
+    public List<ClientResponse> getBySociete(@PathVariable Long societeId) {
+        return service.findBySociete(societeId).stream().map(ClientResponse::from).toList();
     }
 
     @GetMapping("/{id}")
-    public Client getById(@PathVariable Long id) {
+    public ClientResponse getById(@PathVariable Long id) {
         return service.findById(id)
-                .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+                .map(ClientResponse::from)
+                .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"));
     }
 
     @PostMapping
-    public Client create(@RequestBody Client client) {
-        return service.create(client);
+    public ClientResponse create(@Valid @RequestBody ClientRequest request) {
+        var created = service.create(request.toEntity());
+        return ClientResponse.from(created);
     }
 
     @PutMapping("/{id}")
-    public Client update(@PathVariable Long id, @RequestBody Client client) {
-        return service.update(id, client);
+    public ClientResponse update(@PathVariable Long id, @Valid @RequestBody ClientRequest request) {
+        var updated = service.update(id, request.toEntity());
+        return ClientResponse.from(updated);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

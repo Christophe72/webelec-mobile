@@ -1,11 +1,12 @@
 import { api } from "./base";
 import { ClientDTO, ClientCreateDTO, ClientUpdateDTO } from "@/types";
 
-export function getClients(): Promise<ClientDTO[]> {
-  return api("/clients");
+export function getClients(societeId?: number | string): Promise<ClientDTO[]> {
+  const endpoint = societeId ? `/clients/societe/${societeId}` : "/clients";
+  return api(endpoint);
 }
 
-export function getClient(id: string): Promise<ClientDTO> {
+export function getClient(id: number | string): Promise<ClientDTO> {
   return api(`/clients/${id}`);
 }
 
@@ -16,13 +17,13 @@ export function createClient(data: ClientCreateDTO): Promise<ClientDTO> {
   });
 }
 
-export function updateClient(id: string, data: ClientUpdateDTO): Promise<ClientDTO> {
+export function updateClient(id: number | string, data: ClientUpdateDTO): Promise<ClientDTO> {
   return api(`/clients/${id}`, {
-    method: "PATCH",
+    method: "PUT",
     body: JSON.stringify(data)
   });
 }
 
-export function deleteClient(id: string): Promise<void> {
+export function deleteClient(id: number | string): Promise<void> {
   return api(`/clients/${id}`, { method: "DELETE" });
 }

@@ -1,34 +1,29 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { SocieteRequest, SocieteResponse } from "@/types";
+import { createSociete, deleteSociete, getSocietes } from "@/lib/api/societe";
 
-type Societe = {
-  id?: string | number;
-  name: string;
-  description?: string;
-  city?: string;
+const emptyForm: SocieteRequest = {
+  nom: "",
+  tva: "",
+  email: "",
+  telephone: "",
+  adresse: ""
 };
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE?.replace(/\/+$/, "") ??
-  "http://localhost:8080";
-
 export function SocietesPanel() {
-  const [societes, setSocietes] = useState<Societe[]>([]);
+  const [societes, setSocietes] = useState<SocieteResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", city: "", description: "" });
+  const [form, setForm] = useState<SocieteRequest>(emptyForm);
 
   async function load() {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${API_BASE}/api/societes`, {
-        cache: "no-store",
-      });
-      if (!res.ok) throw new Error(`GET failed (${res.status})`);
-      const data = (await res.json()) as Societe[];
-      setSocietes(data);
+      const data = await getSocietes();
+      setSocietes(data ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
     } finally {
@@ -42,32 +37,24 @@ export function SocietesPanel() {
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!form.name.trim()) {
-      setError("Le nom est requis");
+    if (!form.nom.trim() || !form.tva.trim()) {
+      setError("Le nom et la TVA sont requis");
       return;
     }
     try {
       setError(null);
-      const res = await fetch(`${API_BASE}/api/societes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) throw new Error(`POST failed (${res.status})`);
-      setForm({ name: "", city: "", description: "" });
+      await createSociete(form);
+      setForm(emptyForm);
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
     }
   };
 
-  const onDelete = async (id: string) => {
+  const onDelete = async (id: number) => {
     try {
       setError(null);
-      const res = await fetch(`${API_BASE}/api/societes/${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(`DELETE failed (${res.status})`);
+      await deleteSociete(id);
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
@@ -95,25 +82,41 @@ export function SocietesPanel() {
       <form onSubmit={onSubmit} className="mt-6 grid gap-3 sm:grid-cols-3">
         <input
           type="text"
-          value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          placeholder="Nom"
+          value={form.nom}
+          onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
+          placeholder="Nom*"
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-[var(--foreground)] shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
           type="text"
-          value={form.city}
-          onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-          placeholder="Ville"
+          value={form.tva}
+          onChange={(e) => setForm((f) => ({ ...f, tva: e.target.value }))}
+          placeholder="TVA*"
+          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-[var(--foreground)] shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+        />
+        <input
+          type="email"
+          value={form.email || ""}
+          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+          placeholder="Email"
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-[var(--foreground)] shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
           type="text"
-          value={form.description}
+          value={form.telephone || ""}
           onChange={(e) =>
-            setForm((f) => ({ ...f, description: e.target.value }))
+            setForm((f) => ({ ...f, telephone: e.target.value }))
           }
-          placeholder="Description"
+          placeholder="Téléphone"
+          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-[var(--foreground)] shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+        />
+        <input
+          type="text"
+          value={form.adresse || ""}
+          onChange={(e) =>
+            setForm((f) => ({ ...f, adresse: e.target.value }))
+          }
+          placeholder="Adresse"
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-[var(--foreground)] shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60 sm:col-span-3"
         />
         <div className="sm:col-span-3 flex justify-end">
@@ -139,33 +142,32 @@ export function SocietesPanel() {
           <p className="py-4 text-[var(--muted)]">Aucune société pour le moment.</p>
         ) : (
           societes.map((societe, index) => {
-            const idStr =
-              societe.id !== undefined && societe.id !== null
-                ? String(societe.id)
-                : "";
+            const id = societe.id ?? index;
             return (
               <div
-                key={idStr || `${societe.name}-${index}`}
+                key={id || `${societe.nom}-${index}`}
                 className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
                   <p className="font-medium text-[var(--foreground)]">
-                    {societe.name}
+                    {societe.nom}
                   </p>
                   <p className="text-[var(--muted)]">
-                    {societe.city || "Ville inconnue"} ·{" "}
-                    {societe.description || "Pas de description"}
+                    TVA {societe.tva} ·{" "}
+                    {societe.telephone || "Téléphone indisponible"}
                   </p>
+                  {(societe.email || societe.adresse) && (
+                    <p className="text-[var(--muted)]">
+                      {societe.email ?? "Email non renseigné"} ·{" "}
+                      {societe.adresse ?? "Adresse non renseignée"}
+                    </p>
+                  )}
                 </div>
                 <button
                   type="button"
-                  onClick={() =>
-                    idStr
-                      ? onDelete(idStr)
-                      : setError("Impossible de supprimer : id manquant")
-                  }
+                  onClick={() => onDelete(Number(id))}
                   className="self-start rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:-translate-y-[1px] hover:shadow-sm dark:border-red-700/60 dark:text-red-100 disabled:opacity-50"
-                  disabled={!idStr}
+                  disabled={!societe.id}
                 >
                   Supprimer
                 </button>

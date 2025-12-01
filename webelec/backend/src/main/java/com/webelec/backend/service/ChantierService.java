@@ -1,5 +1,6 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Chantier;
 import com.webelec.backend.repository.ChantierRepository;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,20 @@ public class ChantierService {
         return repository.save(chantier);
     }
 
+    public Chantier update(Long id, Chantier payload) {
+        Chantier existing = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Chantier non trouvé"));
+        existing.setNom(payload.getNom());
+        existing.setAdresse(payload.getAdresse());
+        existing.setDescription(payload.getDescription());
+        existing.setSociete(payload.getSociete());
+        return repository.save(existing);
+    }
+
     public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Chantier non trouvé");
+        }
         repository.deleteById(id);
     }
 }

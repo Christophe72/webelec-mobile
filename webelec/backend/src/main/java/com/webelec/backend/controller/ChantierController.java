@@ -1,12 +1,17 @@
 package com.webelec.backend.controller;
 
-import com.webelec.backend.model.Chantier;
+import com.webelec.backend.dto.ChantierRequest;
+import com.webelec.backend.dto.ChantierResponse;
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.service.ChantierService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,28 +30,37 @@ public class ChantierController {
     }
 
     @GetMapping
-    public List<Chantier> getAll() {
-        return service.findAll();
+    public List<ChantierResponse> getAll() {
+        return service.findAll().stream().map(ChantierResponse::from).toList();
     }
 
     @GetMapping("/societe/{societeId}")
-    public List<Chantier> getBySociete(@PathVariable Long societeId) {
-        return service.findBySociete(societeId);
+    public List<ChantierResponse> getBySociete(@PathVariable Long societeId) {
+        return service.findBySociete(societeId).stream().map(ChantierResponse::from).toList();
     }
 
     @GetMapping("/{id}")
-    public Chantier getById(@PathVariable Long id) {
+    public ChantierResponse getById(@PathVariable Long id) {
         return service.findById(id)
-                .orElseThrow(() -> new RuntimeException("Chantier non trouvé"));
+                .map(ChantierResponse::from)
+                .orElseThrow(() -> new ResourceNotFoundException("Chantier non trouvé"));
     }
 
     @PostMapping
-    public Chantier create(@RequestBody Chantier chantier) {
-        return service.create(chantier);
+    public ChantierResponse create(@Valid @RequestBody ChantierRequest request) {
+        var created = service.create(request.toEntity());
+        return ChantierResponse.from(created);
+    }
+
+    @PutMapping("/{id}")
+    public ChantierResponse update(@PathVariable Long id, @Valid @RequestBody ChantierRequest request) {
+        var updated = service.update(id, request.toEntity());
+        return ChantierResponse.from(updated);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

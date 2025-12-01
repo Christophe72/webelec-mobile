@@ -1,5 +1,6 @@
 package com.webelec.backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,14 +15,19 @@ public class Societe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 255)
     private String nom;
 
+    @Column(nullable = false, length = 32)
     private String tva;
 
+    @Column(length = 255)
     private String email;
 
+    @Column(length = 30)
     private String telephone;
 
+    @Column(length = 512)
     private String adresse;
 
     public Societe() {

@@ -1,5 +1,6 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.repository.ClientRepository;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 class ClientServiceTest {
 
@@ -128,20 +130,32 @@ class ClientServiceTest {
     void testUpdateNotFound() {
         when(repository.findById(77L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.update(77L, buildClient(null)));
+        assertThrows(ResourceNotFoundException.class, () -> service.update(77L, buildClient(null)));
         verify(repository, times(1)).findById(77L);
     }
 
     @Test
     @DisplayName("delete supprime via le repository")
     void testDelete() {
+        when(repository.existsById(12L)).thenReturn(true);
         doNothing().when(repository).deleteById(12L);
 
         service.delete(12L);
 
+        verify(repository).existsById(12L);
         ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
-        verify(repository, times(1)).deleteById(captor.capture());
+        verify(repository).deleteById(captor.capture());
         assertThat(captor.getValue()).isEqualTo(12L);
+    }
+
+    @Test
+    @DisplayName("delete lève une exception quand client inexistant")
+    void testDeleteNotFound() {
+        when(repository.existsById(55L)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class, () -> service.delete(55L));
+        verify(repository).existsById(55L);
+        verify(repository, times(0)).deleteById(any());
     }
 
     private Client buildClient(Long id) {

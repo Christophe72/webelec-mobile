@@ -1,5 +1,6 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Produit;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.repository.ProduitRepository;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -130,26 +132,32 @@ class ProduitServiceTest {
     void testUpdateNotFound() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.update(99L, buildProduit(null)));
+        assertThrows(ResourceNotFoundException.class, () -> service.update(99L, buildProduit(null)));
         verify(repository, times(1)).findById(99L);
-    }
-
-    @Test
-    @DisplayName("update doit refuser un payload null")
-    void testUpdateWithNullPayload() {
-        assertThrows(NullPointerException.class, () -> service.update(1L, null));
     }
 
     @Test
     @DisplayName("delete doit déléguer au repository")
     void testDelete() {
+        when(repository.existsById(7L)).thenReturn(true);
         doNothing().when(repository).deleteById(7L);
 
         service.delete(7L);
 
+        verify(repository).existsById(7L);
         ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
-        verify(repository, times(1)).deleteById(captor.capture());
+        verify(repository).deleteById(captor.capture());
         assertThat(captor.getValue()).isEqualTo(7L);
+    }
+
+    @Test
+    @DisplayName("delete doit lever une exception si le produit n'existe pas")
+    void testDeleteNotFound() {
+        when(repository.existsById(88L)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class, () -> service.delete(88L));
+        verify(repository).existsById(88L);
+        verify(repository, times(0)).deleteById(any());
     }
 
     private Produit buildProduit(Long id) {

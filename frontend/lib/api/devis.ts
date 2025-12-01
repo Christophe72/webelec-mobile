@@ -1,13 +1,23 @@
 import { api } from "./base";
 import { DevisDTO, DevisCreateDTO, DevisUpdateDTO } from "@/types";
 
-export function getDevis(): Promise<DevisDTO[]> {
+export function getDevis(filters?: {
+  societeId?: number | string;
+  clientId?: number | string;
+}): Promise<DevisDTO[]> {
+  if (filters?.societeId && filters?.clientId) {
+    return api(`/devis/societe/${filters.societeId}/client/${filters.clientId}`);
+  }
+  if (filters?.societeId) return api(`/devis/societe/${filters.societeId}`);
+  if (filters?.clientId) return api(`/devis/client/${filters.clientId}`);
   return api("/devis");
 }
 
-export function getUnDevis(id: string): Promise<DevisDTO> {
+export function getDevisById(id: number | string): Promise<DevisDTO> {
   return api(`/devis/${id}`);
 }
+
+export const getUnDevis = getDevisById;
 
 export function createDevis(data: DevisCreateDTO): Promise<DevisDTO> {
   return api("/devis", {
@@ -16,9 +26,13 @@ export function createDevis(data: DevisCreateDTO): Promise<DevisDTO> {
   });
 }
 
-export function updateDevis(id: string, data: DevisUpdateDTO): Promise<DevisDTO> {
+export function updateDevis(id: number | string, data: DevisUpdateDTO): Promise<DevisDTO> {
   return api(`/devis/${id}`, {
-    method: "PATCH",
+    method: "PUT",
     body: JSON.stringify(data)
   });
+}
+
+export function deleteDevis(id: number | string): Promise<void> {
+  return api(`/devis/${id}`, { method: "DELETE" });
 }

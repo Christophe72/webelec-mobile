@@ -1,5 +1,6 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Produit;
 import com.webelec.backend.repository.ProduitRepository;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class ProduitService {
     public Produit update(Long id, Produit produit) {
         Objects.requireNonNull(produit, "Produit invalide");
         Produit existing = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Produit non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé"));
         existing.setReference(produit.getReference());
         existing.setNom(produit.getNom());
         existing.setDescription(produit.getDescription());
@@ -47,6 +48,9 @@ public class ProduitService {
     }
 
     public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Produit non trouvé");
+        }
         repository.deleteById(id);
     }
 }
