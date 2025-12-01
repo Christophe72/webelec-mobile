@@ -7,9 +7,9 @@ type RouteParams = {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: RouteParams }
+  { params }: { params: Promise<RouteParams> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const societe = getSociete(id);
 
   if (!societe) {
@@ -22,9 +22,9 @@ export async function GET(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: RouteParams }
+  { params }: { params: Promise<RouteParams> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const deleted = deleteSociete(id);
 
   if (!deleted) {
