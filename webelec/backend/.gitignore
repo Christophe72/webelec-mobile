@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# IDE metadata
+.metadata/
+backend/.metadata/
+
 ### STS ###
 .apt_generated
 .classpath
