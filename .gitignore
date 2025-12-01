@@ -13,4 +13,5 @@ Thumbs.db
 *.old
 
 # Ignorer les fichiers de cookies et de cache
-webelec/.metadata/.plugins/org.eclipse.swt/EBWebView/Default/Network/Cookies
+webelec/.metadata/.plugins/org.eclipse.swt/EBWebView/Default/Network/Cookiespush-webelec-saas.bat
+push-webelec-saas.bat

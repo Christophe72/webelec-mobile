@@ -15,14 +15,15 @@ REM 4) Définir le message de commit
 REM    - Si tu passes un paramètre, on l'utilise comme message
 REM    - Sinon, on met un message par défaut
 if "%~1"=="" (
-    set COMMIT_MSG=MAJ automatique webelec-saas
+    set "COMMIT_MSG=MAJ_automatique_webelec-saas"
 ) else (
-    set COMMIT_MSG=%*
+    set "COMMIT_MSG=%*"
 )
 
 echo.
-echo === Commit avec le message: "%COMMIT_MSG%" ===
-git commit -m "%COMMIT_MSG%" --allow-empty-message
+echo === Commit avec le message: %COMMIT_MSG% ===
+git commit -m %COMMIT_MSG%
+
 REM 5) Pousser sur la branche main
 echo.
 echo === Push vers origin/main ===
