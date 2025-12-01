@@ -7,6 +7,7 @@
 </div>
 
 ---
+
 ## 🏗️ Architecture du projet
 
 ```mermaid
@@ -15,10 +16,11 @@ graph TD
     Utilisateur --> Frontend
     Frontend --> Backend
     Backend --> BDD[(Base de Données)]
+```
 
-- **Frontend :** Next.js (React), TypeScript
-- **Backend :** Spring Boot 3.5.8 (Java 21), API REST
-- **Base de données :** H2 intégrée (dev) ou PostgreSQL (prod)
+- **Frontend :** Next.js (React), TypeScript  
+- **Backend :** Spring Boot 3.5.8 (Java 21), API REST  
+- **Base de données :** H2 intégrée (développement) ou PostgreSQL (production)
 
 ---
 
@@ -50,7 +52,7 @@ npm run dev
 ```
 Puis ouvre http://localhost:3000 dans ton navigateur.
 
-**⚙️ Pour changer l'adresse du backend, édite la variable d'environnement `NEXT_PUBLIC_API_BASE` (voir fichier `.env`).**
+**⚙️ Pour changer l'adresse du backend, édite l’environnement `NEXT_PUBLIC_API_BASE` (voir le fichier `.env`).**
 
 ---
 
@@ -58,42 +60,42 @@ Puis ouvre http://localhost:3000 dans ton navigateur.
 
 - Mode sombre/clair à bascule
 - Gestion des sociétés : création, affichage, suppression via panneau de test intégré
-- Consommation API REST réalisée avec Spring Boot
+- Consommation de l’API REST réalisée avec Spring Boot
 - Structure prête à l'emploi pour rajouter de nouveaux modules (chantiers, utilisateurs...)
 
 ---
 
 ## 🧑‍🎓 Pour les débutants
 
-- **Installe Java 21 et Node.js 20+** (lien et vérification de version plus haut).
-- Lance d’abord le backend (API), puis le frontend (interface).
-- Si l’interface affiche « aucune société », vérifie que l’API tourne bien.
-- En cas de souci, regarde le terminal/cmd pour lire les messages d’erreur : c’est souvent parlant !
-- Pour ajouter une société de test, saisis juste un nom et valide : tu la retrouveras listée instantanément.
+- **Installe Java 21 et Node.js 20+** (liens plus haut)
+- Lance d’abord le backend (API), puis le frontend (interface)
+- Si l’interface affiche « aucune société », vérifie que l’API fonctionne bien
+- En cas de souci, lis le terminal/cmd pour voir les messages d’erreur : c’est souvent parlant !
+- Pour ajouter une société de test, saisis juste un nom et valide : elle s’affichera instantanément
 
 ---
 
 ## 🔌 Points techniques – Backend
 
 - **Spring Boot 3.5.8** (Web, Data JPA, Validation)
-- **Base H2** auto-configurée en développement (aucune installation supplémentaire).
-- Passez facilement sur PostgreSQL en production (voir `application.yml`)
+- **Base H2** auto-configurée en développement (aucune installation supplémentaire)
+- Passe facilement sur PostgreSQL en production (voir `application.yml`)
 - Structure recommandée :  
-    - `src/main/java/com/webelec/backend/BackendApplication.java` : point d'entrée de l'appli Spring
-    - `src/main/resources` : configuration & ressources
+    - `src/main/java/com/webelec/backend/BackendApplication.java` : point d'entrée Spring
+    - `src/main/resources` : configuration et ressources
 
 ---
 
 ## 📋 Exemple d’utilisation API (sociétés)
 
-| Méthode | Endpoint                    | Action                         |
-|---------|-----------------------------|-------------------------------|
-| GET     | `/api/societes`             | Lister les sociétés           |
-| POST    | `/api/societes`             | Créer une société             |
-| GET     | `/api/societes/{id}`        | Détail d'une société          |
-| DELETE  | `/api/societes/{id}`        | Supprimer une société         |
+| Méthode | Endpoint                | Action                     |
+|---------|-------------------------|----------------------------|
+| GET     | `/api/societes`         | Lister les sociétés        |
+| POST    | `/api/societes`         | Créer une société          |
+| GET     | `/api/societes/{id}`    | Détail d'une société       |
+| DELETE  | `/api/societes/{id}`    | Supprimer une société      |
 
-Exemple d’ajout depuis un terminal :
+Exemple d’ajout depuis un terminal :
 ```bash
 curl -X POST -H "Content-Type: application/json" \
   -d '{"name":"Test"}' http://localhost:8080/api/societes
@@ -103,26 +105,26 @@ curl -X POST -H "Content-Type: application/json" \
 
 ## 🔧 Astuce – Captures d'écran
 
-Ajoute des images dans le README pour illustrer l’application :  
+Ajoute des images dans le README pour illustrer l’application :  
 ```markdown
 ![Capture écran interface](./screenshot.png)
 ```
-Prends une capture (Windows : Win+Shift+S) et place-la dans le dossier du projet.
+Fais une capture (Windows : Win+Maj+S) et place-la dans le dossier du projet.
 
 ---
 
 ## 🛟 Besoin d’aide ?
 
-- Vérifie systématiquement les prérequis.
-- Copie tout message d’erreur si tu bloques, pour demander de l’aide sur GitHub ou ici.
-- Consulte les README additionnels dans les sous-dossiers si besoin de détails encore plus techniques.
+- Vérifie les prérequis.
+- Si tu bloques, copie le message d’erreur pour demander de l’aide ici ou sur GitHub.
+- Consulte les README additionnels si besoin de détails.
 
 ---
 
 ## 🤝 Contribuer
 
-Toute suggestion/correction est la bienvenue !  
-Fais une « issue » ou une « pull request » pour améliorer le projet ou sa documentation.
+Toute suggestion ou correction est la bienvenue !  
+Fais une « issue » ou une « pull request ».
 
 ---
 
