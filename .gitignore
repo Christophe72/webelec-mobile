@@ -1,0 +1,16 @@
+# Ignorer les fichiers générés par Eclipse
+webelec/.metadata/
+
+# Ignorer les fichiers système
+.DS_Store
+Thumbs.db
+
+# Ignorer les fichiers de logs
+*.log
+
+# Ignorer les fichiers de configuration locaux
+*.dat
+*.old
+
+# Ignorer les fichiers de cookies et de cache
+webelec/.metadata/.plugins/org.eclipse.swt/EBWebView/Default/Network/Cookies
