@@ -1,19 +1,17 @@
 param(
-    [string]$Message = "update"
+    [string]$Message
 )
-
-# Chemin autorisé (monorepo)
-$AllowedRepoRoot = "C:\saas\webelec-saas"
 
 # Fonction pour normaliser les chemins
 function Normalize-Path([string]$path) {
     return (Resolve-Path $path).Path.ToLower()
 }
 
-# Normaliser le repo autorisé
+# Chemin du monorepo
+$AllowedRepoRoot = "C:\saas\webelec-saas"
 $Allowed = Normalize-Path $AllowedRepoRoot
 
-# Récupérer la racine du repo courant
+# Récupérer la racine Git courante
 try {
     $RepoRoot = git rev-parse --show-toplevel 2>$null
     $RepoRoot = Normalize-Path $RepoRoot
@@ -22,27 +20,45 @@ try {
     exit 1
 }
 
-# Vérifier si on est dans le bon repo
+# Vérifier repo correct
 if ($RepoRoot -ne $Allowed) {
-    Write-Host "REFUS : Tu n'es pas dans le bon repository Git." -ForegroundColor Red
-    Write-Host "Dossier courant : $RepoRoot"
-    Write-Host "Repo autorisé :  $Allowed"
+    Write-Host "REFUS : Tu n'es pas dans le bon repository." -ForegroundColor Red
+    Write-Host "Actuel : $RepoRoot"
+    Write-Host "Autorisé : $Allowed"
     exit 1
 }
 
 # Vérifier la branche
 $Branch = git rev-parse --abbrev-ref HEAD
-
 $AllowedBranches = @("main", "dev")
 
 if ($Branch -notin $AllowedBranches -and -not ($Branch -like "feature/*")) {
-    Write-Host "REFUS : Pousser sur '$Branch' est interdit." -ForegroundColor Red
+    Write-Host "REFUS : La branche '$Branch' n'est pas autorisée." -ForegroundColor Red
     exit 1
 }
 
-# Tout OK → push
-Write-Host "OK : Pushing depuis '$RepoRoot' sur la branche '$Branch'..." -ForegroundColor Green
+# DEMANDE DU MESSAGE SI VIDE
+if (-not $Message) {
+    $Message = Read-Host "Message de commit"
+    if (-not $Message) {
+        Write-Host "Annulé : aucun message de commit fourni." -ForegroundColor Yellow
+        exit 1
+    }
+}
 
+# PROTECTION SUR MAIN
+if ($Branch -eq "main") {
+    Write-Host "ATTENTION : tu es sur la branche 'main' !" -ForegroundColor Yellow
+    $Confirm = Read-Host "Confirmer le push ? (O/N)"
+
+    if ($Confirm.ToLower() -ne "o") {
+        Write-Host "PUSH ANNULÉ." -ForegroundColor Red
+        exit 1
+    }
+}
+
+# Tout est OK → push
+Write-Host "Pushing depuis '$RepoRoot' sur '$Branch'..." -ForegroundColor Green
 git add .
 git commit -m "$Message"
 git push
