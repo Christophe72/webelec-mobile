@@ -25,5 +25,9 @@ export async function POST(req: NextRequest) {
 }
 // ajouter delete
 export async function DELETE(req: NextRequest) {
+  const url = new URL(req.url);
+  const id = url.searchParams.get("id");
+  console.log("Deleting societe with id:", id);
+  
   return new Response("Method Not Allowed", { status: 405 });
 }
