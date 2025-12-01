@@ -18,21 +18,64 @@ La configuration par défaut (`src/main/resources/application.yml`) active H2 en
 
 ## Démarrage rapide
 ```bash
-# Windows
 mvnw.cmd spring-boot:run
+```
 
-# Linux / macOS
-y ./mvnw spring-boot:run
+```bash
+./mvnw spring-boot:run
 ```
 L'application démarre sur http://localhost:8080.
 
 ## Tests
 ```bash
-# Windows
 mvnw.cmd test
+```
 
-# Linux / macOS
-y ./mvnw test
+```bash
+./mvnw test
+```
+
+## Fonctionnalités métier
+- **Sociétés** : CRUD de base via `/api/societes` (déjà existant dans le squelette initial).
+- **Chantiers** : `/api/chantiers` pour lister, créer, filtrer par société (`/societe/{id}`) et supprimer.
+- **Produits (stock)** : `/api/produits` avec filtres par société, création, mise à jour et suppression.
+- **Clients** : `/api/clients` avec les mêmes opérations (GET/POST/PUT/DELETE) et filtre `/societe/{id}`.
+
+Chaque entité est composée d'une couche **Repository** (Spring Data JPA), **Service** (logique métier/testable) et **Controller** REST. Les relations sont câblées via `@ManyToOne` vers `Societe` pour préparer les regroupements et future facturation.
+
+## Exemples de payloads
+```json
+POST /api/chantiers
+{
+  "nom": "Installation nouvelle cuisine",
+  "adresse": "Rue du Four 15, 4000 Liège",
+  "description": "Tableau secondaire + circuit prises + éclairage LED",
+  "societe": { "id": 1 }
+}
+```
+
+```json
+POST /api/produits
+{
+  "reference": "REF-001",
+  "nom": "Disjoncteur 16A",
+  "description": "Courbe C",
+  "quantiteStock": 25,
+  "prixUnitaire": 14.90,
+  "societe": { "id": 1 }
+}
+```
+
+```json
+POST /api/clients
+{
+  "nom": "Dupont",
+  "prenom": "Alice",
+  "email": "alice.dupont@example.com",
+  "telephone": "0470/11.22.33",
+  "adresse": "Rue des Artisans 12, 4000 Liège",
+  "societe": { "id": 1 }
+}
 ```
 
 ## Structure
@@ -41,6 +84,6 @@ y ./mvnw test
 - `pom.xml` : gestion des dépendances et configuration Java 21
 
 ## Prochaines étapes suggérées
-1. Ajouter vos entités JPA et DTO.
-2. Exposer des contrôleurs REST avec validation côté serveur.
-3. Configurer un profil Spring pour différencier dev/test/prod.
+- Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.
+- Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.
+- Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.
