@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend WebElec (Next.js)
 
-## Getting Started
+## Pré-requis
+- Node.js 20+
+- Backend Spring Boot en cours d’exécution sur `http://localhost:8080` (modifiable via `NEXT_PUBLIC_API_BASE`)
 
-First, run the development server:
-
+## Démarrer le front
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# ou npm run build && npm run start pour la prod
+```
+Ouvrir http://localhost:3000.
+
+## Fonctionnalités
+- Mode clair/sombre avec mémorisation locale (toggle en haut à droite).
+- Panneau de test des sociétés : listage/ajout/suppression via l’API Spring.
+
+## API consommée (backend Spring)
+- `GET /api/societes` : liste toutes les sociétés.
+- `GET /api/societes/{id}` : récupère une société (500 si absente).
+- `POST /api/societes` : crée une société (JSON `{ name, city?, description? }`).
+- `DELETE /api/societes/{id}` : supprime une société.
+
+Configurez l’URL du backend avec la variable d’environnement côté client :
+```bash
+NEXT_PUBLIC_API_BASE="http://localhost:8080"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tests manuels rapides
+- Lancer le backend Spring, puis le front (`npm run dev`).
+- Utiliser le panneau “Sociétés” sur la page d’accueil pour créer et supprimer.
+- Ou via cURL :
+  - `curl http://localhost:8080/api/societes`
+  - `curl -X POST -H "Content-Type: application/json" -d '{"name":"Test"}' http://localhost:8080/api/societes`
+  - `curl -X DELETE http://localhost:8080/api/societes/<id>`
