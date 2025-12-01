@@ -7,17 +7,14 @@
 </div>
 
 ---
-
 ## 🏗️ Architecture du projet
-
-Schéma simplifié du fonctionnement de l'application :
 
 ```mermaid
 graph TD
-    Utilisateur[Utilisateur (navigateur)] --> Front(Frontend <br> Next.js / React)
-    Front -->|Requêtes HTTP| Back(Backend <br> Spring Boot API)
-    Back -->|Requêtes SQL| BDD[(Base de Données <br> H2 ou PostgreSQL)]
-```
+    Utilisateur[Utilisateur (navigateur)]
+    Utilisateur --> Frontend
+    Frontend --> Backend
+    Backend --> BDD[(Base de Données)]
 
 - **Frontend :** Next.js (React), TypeScript
 - **Backend :** Spring Boot 3.5.8 (Java 21), API REST
