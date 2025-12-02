@@ -58,7 +58,7 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
   - `curl http://localhost:8080/api/societes`
   - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"WebElec","tva":"BE0123456789","email":"contact@webelec.be","telephone":"0470/00.00.00","adresse":"Rue des Artisans 12, Liège"}' http://localhost:8080/api/societes`
   - `curl -X DELETE http://localhost:8080/api/societes/<id>`
-- Tester les proxys front vers le backend :
-  - `curl http://localhost:3000/api/test/chantiers`
-  - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"Installation nouvelle cuisine","adresse":"Rue du Four 15, 4000 Liège","description":"Tableau secondaire + circuit prises + éclairage LED","societeId":1}' http://localhost:3000/api/test/chantiers`
-  - `curl http://localhost:3000/api/test/produits`
+- Tester directement les endpoints de base du backend (au lieu de passer par `http://localhost:3000/api`) :
+  - `curl http://localhost:8080/api/chantiers`
+  - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"Installation nouvelle cuisine","adresse":"Rue du Four 15, 4000 Liège","description":"Tableau secondaire + circuit prises + éclairage LED","societeId":1}' http://localhost:8080/api/chantiers`
+  - `curl http://localhost:8080/api/produits`

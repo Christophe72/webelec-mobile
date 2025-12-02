@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { SocieteRequest, SocieteResponse } from "@/types";
-import { createSociete, deleteSociete, getSocietes } from "@/lib/api/societe";
+import { createSociete, deleteSocieteById, getSocietes } from "@/lib/api/societe";
 
 const emptyForm: SocieteRequest = {
   nom: "",
@@ -54,7 +54,7 @@ export function SocietesPanel() {
   const onDelete = async (id: number) => {
     try {
       setError(null);
-      await deleteSociete(id);
+      await deleteSocieteById(id.toString());
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
@@ -65,7 +65,7 @@ export function SocietesPanel() {
     <section className="mx-auto mt-12 w-full max-w-3xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-widest text-[var(--muted)]">
+          <p className="text-xs uppercase tracking-widest text-(--muted)">
             API demo
           </p>
           <h2 className="text-xl font-semibold">Sociétés</h2>
@@ -139,7 +139,7 @@ export function SocietesPanel() {
         {loading ? (
           <p className="py-4 text-[var(--muted)]">Chargement…</p>
         ) : societes.length === 0 ? (
-          <p className="py-4 text-[var(--muted)]">Aucune société pour le moment.</p>
+          <p className="py-4 text-(--muted)">Aucune société pour le moment.</p>
         ) : (
           societes.map((societe, index) => {
             const id = societe.id ?? index;
@@ -149,15 +149,15 @@ export function SocietesPanel() {
                 className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
-                  <p className="font-medium text-[var(--foreground)]">
+                  <p className="font-medium text-(--foreground)">
                     {societe.nom}
                   </p>
-                  <p className="text-[var(--muted)]">
+                  <p className="text-(--muted)">
                     TVA {societe.tva} ·{" "}
                     {societe.telephone || "Téléphone indisponible"}
                   </p>
                   {(societe.email || societe.adresse) && (
-                    <p className="text-[var(--muted)]">
+                    <p className="text-(--muted)">
                       {societe.email ?? "Email non renseigné"} ·{" "}
                       {societe.adresse ?? "Adresse non renseignée"}
                     </p>

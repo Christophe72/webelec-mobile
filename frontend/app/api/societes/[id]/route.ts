@@ -19,7 +19,6 @@ export async function GET(
 
   return Response.json(societe);
 }
-
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<RouteParams> }
@@ -28,7 +27,6 @@ export async function DELETE(
   const deleted = deleteSociete(id);
 
   if (!deleted) {
-    // idem, 404 si l’ID n’existe pas
     return new Response("Societe not found", { status: 404 });
   }
 
