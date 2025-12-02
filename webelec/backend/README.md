@@ -16,6 +16,22 @@ Ce dépôt contient une API Spring Boot minimaliste (Java 21) qui sert de squele
 ## Configuration
 La configuration par défaut (`src/main/resources/application.yml`) active H2 en mémoire et met Hibernate en `ddl-auto:update`. Pour utiliser PostgreSQL, remplacez les propriétés `spring.datasource.*` par vos valeurs (URL, utilisateur, mot de passe) et désactivez H2.
 
+### Seed des sociétés personnalisable
+Le backend charge automatiquement des sociétés de test au démarrage via `DataSeeder`. Pour contrôler cette liste sans toucher au code, modifiez la section `webelec.seed.societes` dans `application.yml` :
+
+```yaml
+webelec:
+  seed:
+    societes:
+      - nom: "ElecPro"
+        tva: "FR12345678901"
+        email: "contact@elecpro.fr"
+        telephone: "01 23 45 67 89"
+        adresse: "12 rue des Ouvriers, Paris"
+```
+
+Ajoutez autant de blocs `societes` que nécessaire, chaque entrée devant contenir `nom` et `tva` (les autres champs sont optionnels). Le seed ne s’exécute que si la table est vide.
+
 ## Démarrage rapide
 ```bash
 mvnw.cmd spring-boot:run
@@ -54,7 +70,7 @@ mvnw.cmd test
   - `nom` *(string, obligatoire, ≤255)*
   - `tva` *(string, obligatoire, ≤32)*
   - `email` *(string, optionnel, format email, ≤255)*
-  - `telephone` *(string, optionnel, regex `^[0-9+().\\/\\-\\s]{6,30}$`)*
+  - `telephone` *(string, optionnel, regex `^[0-9+().\/\-\s]{6,30}$`)*
   - `adresse` *(string, optionnel, ≤512)*
 - `SocieteResponse` (payload sortant)
   - `id`, `nom`, `tva`, `email`, `telephone`, `adresse`

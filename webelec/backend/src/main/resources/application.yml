@@ -12,3 +12,21 @@ spring:
         format_sql: true
 server:
   port: 8080
+webelec:
+  seed:
+    societes:
+      - nom: "ElecPro"
+        tva: "FR12345678901"
+        email: "contact@elecpro.fr"
+        telephone: "01 23 45 67 89"
+        adresse: "12 rue des Ouvriers, Paris"
+      - nom: "VoltServices"
+        tva: "FR22345678901"
+        email: "bonjour@voltservices.fr"
+        telephone: "02 98 76 54 32"
+        adresse: "43 avenue de Lyon, Lyon"
+      - nom: "CourantPlus"
+        tva: "FR32345678901"
+        email: "support@courantplus.fr"
+        telephone: "03 66 55 44 33"
+        adresse: "5 boulevard de Provence, Marseille"
