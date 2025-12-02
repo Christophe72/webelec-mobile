@@ -51,6 +51,12 @@ mvnw.cmd test
 ./mvnw test
 ```
 
+### Tests unitaires des DTO (mapping entité <-> DTO)
+Des tests JUnit sont présents pour tous les DTO principaux (`*Response`, `*Request`).
+- Ils vérifient le mapping entité → DTO (`from(...)`) et DTO → entité (`toEntity()`), y compris les cas limites (`null`, valeurs par défaut).
+- Les tests garantissent la robustesse des getters/setters et la stabilité des conversions, même si la structure évolue.
+- Les fichiers de test sont situés dans `src/test/java/com/webelec/backend/dto/`.
+
 ## Fonctionnalités métier
 - **Sociétés** : CRUD de base via `/api/societes` (déjà existant dans le squelette initial).
 - **Chantiers** : `/api/chantiers` pour lister, créer, filtrer par société (`/societe/{id}`) et supprimer.
