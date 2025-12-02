@@ -203,28 +203,30 @@ POST /api/factures
   "societe": { "id": 1 },
   "client": { "id": 5 },
   "lignes": [
-    { "description": "Câblage IT", "quantite": 2, "prixUnitaire": 1000, "total": 2000 }
-  ]
-}
-```
-
-## Structure
-- `src/main/java/com/webelec/backend/BackendApplication.java` : point d'entrée Spring Boot
-- `src/main/resources` : configuration (`application.yml`), gabarits et ressources statiques
 - `pom.xml` : gestion des dépendances et configuration Java 21
 
+## Prochaines étapes suggérées
+
+- ~~Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.~~ ✅
+- Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.
+
+## Frontend WebElec (Next.js)
+
+## Pré-requis
+
+- Node.js 20+
 ## Prochaines étapes suggérées
 - ~~Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.~~ ✅
 - ~~Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.~~ ✅
 - Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.
   
-  # Frontend WebElec (Next.js)
+# ou npm run build && npm run start pour la prod
 
 ## Pré-requis
 - Node.js 20+
 - Backend Spring Boot en cours d’exécution sur `http://localhost:8080` (base API par défaut `http://localhost:8080/api`, modifiable via `NEXT_PUBLIC_API_URL`)
 
-## Démarrer le front
+NEXT_PUBLIC_API_URL="http://localhost:8080/api"
 ```bash
 npm install
 npm run dev
@@ -232,16 +234,14 @@ npm run dev
 ```
 Ouvrir http://localhost:3000.
 
-Configurez l’URL du backend avec la variable d’environnement côté client :
-```bash
-NEXT_PUBLIC_API_URL="http://localhost:8080/api"
-```
+- Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
 
-## Fonctionnalités
-- Mode clair/sombre avec mémorisation locale (toggle en haut à droite).
-- Panneau de test des sociétés : listage/ajout/suppression via les DTO Spring `SocieteRequest` / `SocieteResponse`.
-- Clients API front (`lib/api`) : helpers typés pour auth, sociétés, clients, chantiers, interventions, devis, factures, catalogue (produits + produits avancés), pièces, RGIE, Peppol, notifications. Point d’entrée commun `lib/api/base.ts` (fetch JSON, headers, no-store).
-- DTO TypeScript (`types`) : toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
+## API consommée (backend Spring)
+
+Contrat principal actuellement branché dans le front : **Sociétés**.
+
+DTOs exposés côté backend :
+- `SocieteResponse` (sortie) : `id`, `nom`, `tva`, `email?`, `telephone?- DTO TypeScript (`types`) : toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
 - Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
 
 ## API consommée (backend Spring)
@@ -269,10 +269,8 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
     "tva: La TVA est obligatoire"
   ]
 }
-```
-
-## Tests manuels rapides
-- Lancer le backend Spring, puis le front (`npm run dev`).
+``ackend STests manuels rapides
+- Lancer le backend Spring, puis le front (`npm run dev`). (`npm run dev`).
 - Utiliser le panneau “Sociétés” sur la page d’accueil pour créer et supprimer (les champs obligatoires sont *Nom* et *TVA*).
 - Tester directement le backend Spring via cURL :
   - `curl http://localhost:8080/api/societes`
@@ -282,3 +280,59 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
   - `curl http://localhost:3000/api/test/chantiers`
   - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"Installation nouvelle cuisine","adresse":"Rue du Four 15, 4000 Liège","description":"Tableau secondaire + circuit prises + éclairage LED","societeId":1}' http://localhost:3000/api/test/chantiers`
   - `curl http://localhost:3000/api/test/produits`
+  
+
+
+## Architecture globale
+```mermaid
+graph TD
+    style COL1 fill:#f9f,stroke:#333,stroke-width:1px
+
+    %% =====================================================
+    %%   COLONNE 1 — INTERFACE (prise / utilisateur)
+    %% =====================================================
+    subgraph COL1[Colonne 1 – Interface / Utilisateur]
+        U["👤 Utilisateurs"]
+        NX["🔌 Next.js<br/>UI + IA"]
+        U --> NX
+    end
+
+
+    %% =====================================================
+    %%   COLONNE 2 — TGBT (Disjoncteur principal / CPU)
+    %% =====================================================
+    subgraph COL2[Colonne 2 – Tableau principal (Backend)]
+        SP["⚡ Spring Boot<br/>(Disjoncteur général / CPU)"]
+        DB[":|: PostgreSQL<br/>(Barre de mesure / Bus)"]
+        NX --> SP
+        SP --> DB
+    end
+
+
+    %% =====================================================
+    %%   COLONNE 3 — AUTOMATION (Relais / Automatismes)
+    %% =====================================================
+    subgraph COL3[Colonne 3 – Automatisation / IA]
+        N8["🔁 n8n<br/>(Automate / Relais logique)"]
+        B2["📁 Backblaze B2<br/>(Stockage / Archivage)"]
+        DB --> N8
+        N8 --> B2
+        SP --> N8
+        N8 --> SP
+    end
+
+
+    %% =====================================================
+    %%   COLONNE 4 — TERRAIN (Capteurs / Actionneurs)apteur%% ===================================================== =====================================================
+    subgraph COL4[Colonne 4 – Terrain IoT]
+        MQ["📡 MQTT Broker<br/>ESP32 / Capteurs"]
+        MQ --> SP
+        MQ --> N8
+    end
+
+    %% =====================================================
+    %%   CONNEXIONS OPTIONNELLES (Bus auxiliaire)
+    %% =====================================================
+    NX -. Bus auxiliaire .-> N8
+    N8 -. Retour info .-> NX
+
