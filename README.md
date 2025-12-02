@@ -31,3 +31,254 @@ Techno utilisées :
 
     Frontend --> Backend[Backend (Spring Boot)]
     Backend --> Database[(Base de Données)]
+# Backend Spring Boot Project
+
+Ce dépôt contient une API Spring Boot minimaliste (Java 21) qui sert de squelette pour des services REST avec persistance JPA.
+
+## Pile technique
+- **Spring Boot 3.5.8** avec starters Web, Data JPA, Validation et Test
+- **Base de données**: PostgreSQL en production, H2 en mémoire pour le développement
+- **Lombok** pour réduire le code boilerplate
+- **DevTools** pour le rechargement à chaud en local
+
+## Prérequis
+- Java 21 (JDK complet)
+- Maven Wrapper inclus (`mvnw`/`mvnw.cmd`)
+- PostgreSQL optionnel si vous souhaitez persister les données hors H2
+
+## Configuration
+La configuration par défaut (`src/main/resources/application.yml`) active H2 en mémoire et met Hibernate en `ddl-auto:update`. Pour utiliser PostgreSQL, remplacez les propriétés `spring.datasource.*` par vos valeurs (URL, utilisateur, mot de passe) et désactivez H2.
+
+## Démarrage rapide
+```bash
+mvnw.cmd spring-boot:run
+```
+
+```bash
+./mvnw spring-boot:run
+```
+L'application démarre sur http://localhost:8080.
+
+## Tests
+```bash
+mvnw.cmd test
+```
+
+```bash
+./mvnw test
+```
+
+## Fonctionnalités métier
+- **Sociétés** : CRUD de base via `/api/societes` (déjà existant dans le squelette initial).
+- **Chantiers** : `/api/chantiers` pour lister, créer, filtrer par société (`/societe/{id}`) et supprimer.
+- **Produits (stock)** : `/api/produits` avec filtres par société, création, mise à jour et suppression.
+- **Clients** : `/api/clients` avec les mêmes opérations (GET/POST/PUT/DELETE) et filtre `/societe/{id}`.
+  _Toutes ces ressources utilisent désormais des DTOs validés côté backend pour garantir des contrats stables (voir dossier `dto/`)._
+- **Interventions** : `/api/interventions` + filtres `/societe/{id}` et `/chantier/{id}` avec PUT/DELETE.
+- **Produits avancés** : `/api/produits-avances` pour gérer le catalogue enrichi (prix achat/vente, fournisseur).
+- **Devis** : `/api/devis` avec filtres `/societe/{id}`/`/client/{id}`, gestion des lignes (`DevisLigne`).
+- **Factures** : `/api/factures` similaires aux devis mais avec échéance/statut d'encaissement.
+
+👉 Spec OpenAPI (Next.js friendly) : `src/main/resources/api-spec.yaml`
+
+### Contrat API Société (`/api/societes`)
+**DTOs exposés**
+- `SocieteRequest` (payload entrant)
+  - `nom` *(string, obligatoire, ≤255)*
+  - `tva` *(string, obligatoire, ≤32)*
+  - `email` *(string, optionnel, format email, ≤255)*
+  - `telephone` *(string, optionnel, regex `^[0-9+().\\/\\-\\s]{6,30}$`)*
+  - `adresse` *(string, optionnel, ≤512)*
+- `SocieteResponse` (payload sortant)
+  - `id`, `nom`, `tva`, `email`, `telephone`, `adresse`
+
+**Endpoints**
+1. `GET /api/societes` → `200 OK` avec `List<SocieteResponse>`
+2. `GET /api/societes/{id}` → `200 OK` avec un `SocieteResponse` ou `404` si introuvable
+3. `POST /api/societes`
+   ```json
+   {
+     "nom": "WebElec",
+     "tva": "BE0123456789",
+     "email": "contact@webelec.be",
+     "telephone": "0470/00.00.00",
+     "adresse": "Rue des Artisans 12, Liège"
+   }
+   ```
+   Réponse `200 OK` (pour l’instant) contenant le `SocieteResponse`
+4. `DELETE /api/societes/{id}` → `204 No Content` si la suppression réussit, `404 Not Found` si l'identifiant n'existe pas
+
+**Format d’erreur global** (`ApiError`)
+```json
+{
+  "timestamp": "2025-12-01T22:15:37.123Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Requête invalide",
+  "details": [
+    "nom: Le nom de la société est obligatoire",
+    "tva: La TVA est obligatoire"
+  ]
+}
+```
+- `400 Bad Request` : violations Bean Validation (liste dans `details`)
+- `404 Not Found` : identifiant inexistant (`message` contient la raison via `ResourceNotFoundException`)
+- `500 Internal Server Error` : erreur inattendue côté serveur
+
+## Exemples de payloads
+```json
+POST /api/chantiers
+{
+  "nom": "Installation nouvelle cuisine",
+  "adresse": "Rue du Four 15, 4000 Liège",
+  "description": "Tableau secondaire + circuit prises + éclairage LED",
+  "societeId": 1
+}
+```
+
+```json
+POST /api/produits
+{
+  "reference": "REF-001",
+  "nom": "Disjoncteur 16A",
+  "description": "Courbe C",
+  "quantiteStock": 25,
+  "prixUnitaire": 14.90,
+  "societeId": 1
+}
+```
+
+```json
+POST /api/clients
+{
+  "nom": "Dupont",
+  "prenom": "Alice",
+  "email": "alice.dupont@example.com",
+  "telephone": "0470/11.22.33",
+  "adresse": "Rue des Artisans 12, 4000 Liège",
+  "societeId": 1
+}
+```
+
+```json
+POST /api/interventions
+{
+  "titre": "Dépannage tableau",
+  "description": "Remplacement disjoncteur",
+  "dateIntervention": "2025-01-15",
+  "societe": { "id": 1 },
+  "chantier": { "id": 3 },
+  "client": { "id": 5 }
+}
+```
+
+```json
+POST /api/devis
+{
+  "numero": "DEV-2025-001",
+  "dateEmission": "2025-01-02",
+  "dateExpiration": "2025-01-31",
+  "montantHT": 1200.00,
+  "montantTVA": 252.00,
+  "montantTTC": 1452.00,
+  "statut": "DRAFT",
+  "societe": { "id": 1 },
+  "client": { "id": 5 },
+  "lignes": [
+    { "description": "Tableau électrique", "quantite": 1, "prixUnitaire": 900, "total": 900 }
+  ]
+}
+```
+
+```json
+POST /api/factures
+{
+  "numero": "FAC-2025-015",
+  "dateEmission": "2025-02-10",
+  "dateEcheance": "2025-03-10",
+  "montantHT": 2000.00,
+  "montantTVA": 420.00,
+  "montantTTC": 2420.00,
+  "statut": "SENT",
+  "societe": { "id": 1 },
+  "client": { "id": 5 },
+  "lignes": [
+    { "description": "Câblage IT", "quantite": 2, "prixUnitaire": 1000, "total": 2000 }
+  ]
+}
+```
+
+## Structure
+- `src/main/java/com/webelec/backend/BackendApplication.java` : point d'entrée Spring Boot
+- `src/main/resources` : configuration (`application.yml`), gabarits et ressources statiques
+- `pom.xml` : gestion des dépendances et configuration Java 21
+
+## Prochaines étapes suggérées
+- ~~Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.~~ ✅
+- ~~Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.~~ ✅
+- Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.
+  
+  # Frontend WebElec (Next.js)
+
+## Pré-requis
+- Node.js 20+
+- Backend Spring Boot en cours d’exécution sur `http://localhost:8080` (base API par défaut `http://localhost:8080/api`, modifiable via `NEXT_PUBLIC_API_URL`)
+
+## Démarrer le front
+```bash
+npm install
+npm run dev
+# ou npm run build && npm run start pour la prod
+```
+Ouvrir http://localhost:3000.
+
+Configurez l’URL du backend avec la variable d’environnement côté client :
+```bash
+NEXT_PUBLIC_API_URL="http://localhost:8080/api"
+```
+
+## Fonctionnalités
+- Mode clair/sombre avec mémorisation locale (toggle en haut à droite).
+- Panneau de test des sociétés : listage/ajout/suppression via les DTO Spring `SocieteRequest` / `SocieteResponse`.
+- Clients API front (`lib/api`) : helpers typés pour auth, sociétés, clients, chantiers, interventions, devis, factures, catalogue (produits + produits avancés), pièces, RGIE, Peppol, notifications. Point d’entrée commun `lib/api/base.ts` (fetch JSON, headers, no-store).
+- DTO TypeScript (`types`) : toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
+- Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
+
+## API consommée (backend Spring)
+Contrat principal actuellement branché dans le front : **Sociétés**.
+
+DTOs exposés côté backend :
+- `SocieteRequest` (entrée) : `nom` (string, obligatoire, ≤255), `tva` (string, obligatoire, ≤32), `email?` (email, ≤255), `telephone?` (regex `^[0-9+().\\/\\-\\s]{6,30}$`), `adresse?` (≤512).
+- `SocieteResponse` (sortie) : `id`, `nom`, `tva`, `email?`, `telephone?`, `adresse?`.
+
+Endpoints consommés par le front :
+- `GET /api/societes` → `SocieteResponse[]` (liste toutes les sociétés).
+- `GET /api/societes/{id}` → `SocieteResponse` ou 404 si introuvable.
+- `POST /api/societes` → crée une société (JSON `SocieteRequest`).
+- `DELETE /api/societes/{id}` → 204 No Content si suppression OK, 404 sinon.
+
+Format d’erreur global (simplifié, renvoyé par Spring) :
+```json
+{
+  "timestamp": "2025-12-01T22:15:37.123Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Requête invalide",
+  "details": [
+    "nom: Le nom de la société est obligatoire",
+    "tva: La TVA est obligatoire"
+  ]
+}
+```
+
+## Tests manuels rapides
+- Lancer le backend Spring, puis le front (`npm run dev`).
+- Utiliser le panneau “Sociétés” sur la page d’accueil pour créer et supprimer (les champs obligatoires sont *Nom* et *TVA*).
+- Tester directement le backend Spring via cURL :
+  - `curl http://localhost:8080/api/societes`
+  - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"WebElec","tva":"BE0123456789","email":"contact@webelec.be","telephone":"0470/00.00.00","adresse":"Rue des Artisans 12, Liège"}' http://localhost:8080/api/societes`
+  - `curl -X DELETE http://localhost:8080/api/societes/<id>`
+- Tester les proxys front vers le backend :
+  - `curl http://localhost:3000/api/test/chantiers`
+  - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"Installation nouvelle cuisine","adresse":"Rue du Four 15, 4000 Liège","description":"Tableau secondaire + circuit prises + éclairage LED","societeId":1}' http://localhost:3000/api/test/chantiers`
+  - `curl http://localhost:3000/api/test/produits`
