@@ -203,48 +203,48 @@ POST /api/factures
   "societe": { "id": 1 },
   "client": { "id": 5 },
   "lignes": [
+    { "description": "Installation électrique complète", "quantite": 1, "prixUnitaire": 2000, "total": 2000 }
+  ]
+}
+```
+
 - `pom.xml` : gestion des dépendances et configuration Java 21
+
 
 ## Prochaines étapes suggérées
 
 - ~~Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.~~ ✅
+- ~~Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.~~ ✅
 - Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.
 
 ## Frontend WebElec (Next.js)
 
-## Pré-requis
+### Pré-requis
 
 - Node.js 20+
-## Prochaines étapes suggérées
-- ~~Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.~~ ✅
-- ~~Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.~~ ✅
-- Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.
-  
-# ou npm run build && npm run start pour la prod
+- Backend Spring Boot en cours d'exécution sur `http://localhost:8080` (base API par défaut `http://localhost:8080/api`, modifiable via `NEXT_PUBLIC_API_URL`)
 
-## Pré-requis
-- Node.js 20+
-- Backend Spring Boot en cours d’exécution sur `http://localhost:8080` (base API par défaut `http://localhost:8080/api`, modifiable via `NEXT_PUBLIC_API_URL`)
+### Démarrage
 
-NEXT_PUBLIC_API_URL="http://localhost:8080/api"
 ```bash
+NEXT_PUBLIC_API_URL="http://localhost:8080/api"
 npm install
 npm run dev
 # ou npm run build && npm run start pour la prod
 ```
+
 Ouvrir http://localhost:3000.
 
-- Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
+### DTO TypeScript
 
-## API consommée (backend Spring)
+Toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
 
-Contrat principal actuellement branché dans le front : **Sociétés**.
+### Endpoints de test/proxy
 
-DTOs exposés côté backend :
-- `SocieteResponse` (sortie) : `id`, `nom`, `tva`, `email?`, `telephone?- DTO TypeScript (`types`) : toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
-- Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
+- `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
 
-## API consommée (backend Spring)
+### API consommée (backend Spring)
+
 Contrat principal actuellement branché dans le front : **Sociétés**.
 
 DTOs exposés côté backend :
@@ -257,7 +257,7 @@ Endpoints consommés par le front :
 - `POST /api/societes` → crée une société (JSON `SocieteRequest`).
 - `DELETE /api/societes/{id}` → 204 No Content si suppression OK, 404 sinon.
 
-Format d’erreur global (simplifié, renvoyé par Spring) :
+Format d'erreur global (simplifié, renvoyé par Spring) :
 ```json
 {
   "timestamp": "2025-12-01T22:15:37.123Z",
@@ -269,9 +269,12 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
     "tva: La TVA est obligatoire"
   ]
 }
-``ackend STests manuels rapides
-- Lancer le backend Spring, puis le front (`npm run dev`). (`npm run dev`).
-- Utiliser le panneau “Sociétés” sur la page d’accueil pour créer et supprimer (les champs obligatoires sont *Nom* et *TVA*).
+```
+
+## Tests manuels rapides
+
+- Lancer le backend Spring, puis le front (`npm run dev`).
+- Utiliser le panneau "Sociétés" sur la page d'accueil pour créer et supprimer (les champs obligatoires sont *Nom* et *TVA*).
 - Tester directement le backend Spring via cURL :
   - `curl http://localhost:8080/api/societes`
   - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"WebElec","tva":"BE0123456789","email":"contact@webelec.be","telephone":"0470/00.00.00","adresse":"Rue des Artisans 12, Liège"}' http://localhost:8080/api/societes`
@@ -280,8 +283,6 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
   - `curl http://localhost:3000/api/test/chantiers`
   - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"Installation nouvelle cuisine","adresse":"Rue du Four 15, 4000 Liège","description":"Tableau secondaire + circuit prises + éclairage LED","societeId":1}' http://localhost:3000/api/test/chantiers`
   - `curl http://localhost:3000/api/test/produits`
-  
-
 
 ## Architecture globale
 ```mermaid
@@ -323,7 +324,8 @@ graph TD
 
 
     %% =====================================================
-    %%   COLONNE 4 — TERRAIN (Capteurs / Actionneurs)apteur%% ===================================================== =====================================================
+    %%   COLONNE 4 — TERRAIN (Capteurs / Actionneurs)
+    %% =====================================================
     subgraph COL4[Colonne 4 – Terrain IoT]
         MQ["📡 MQTT Broker<br/>ESP32 / Capteurs"]
         MQ --> SP
@@ -335,4 +337,4 @@ graph TD
     %% =====================================================
     NX -. Bus auxiliaire .-> N8
     N8 -. Retour info .-> NX
-
+```
