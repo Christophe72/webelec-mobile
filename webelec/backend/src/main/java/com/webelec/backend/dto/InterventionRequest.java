@@ -4,6 +4,7 @@ import com.webelec.backend.model.Chantier;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.model.Intervention;
 import com.webelec.backend.model.Societe;
+import com.webelec.backend.model.Utilisateur;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -30,6 +31,9 @@ public class InterventionRequest {
 
     @NotNull(message = "Le client est obligatoire")
     private Long clientId;
+
+    @NotNull(message = "L'utilisateur est obligatoire")
+    private Long utilisateurId;
 
     public String getTitre() {
         return titre;
@@ -79,6 +83,14 @@ public class InterventionRequest {
         this.clientId = clientId;
     }
 
+    public Long getUtilisateurId() {
+        return utilisateurId;
+    }
+
+    public void setUtilisateurId(Long utilisateurId) {
+        this.utilisateurId = utilisateurId;
+    }
+
     public Intervention toEntity() {
         Societe societe = new Societe();
         societe.setId(societeId);
@@ -89,6 +101,9 @@ public class InterventionRequest {
         Client client = new Client();
         client.setId(clientId);
 
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setId(utilisateurId);
+
         return Intervention.builder()
                 .titre(this.titre)
                 .description(this.description)
@@ -96,6 +111,7 @@ public class InterventionRequest {
                 .societe(societe)
                 .chantier(chantier)
                 .client(client)
+                .utilisateur(utilisateur)
                 .build();
     }
 }

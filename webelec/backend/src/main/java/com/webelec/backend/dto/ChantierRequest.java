@@ -1,6 +1,7 @@
 package com.webelec.backend.dto;
 
 import com.webelec.backend.model.Chantier;
+import com.webelec.backend.model.Client;
 import com.webelec.backend.model.Societe;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,9 @@ public class ChantierRequest {
 
     @NotNull(message = "La société est obligatoire")
     private Long societeId;
+
+    @NotNull(message = "Le client est obligatoire")
+    private Long clientId;
 
     public String getNom() {
         return nom;
@@ -53,15 +57,27 @@ public class ChantierRequest {
         this.societeId = societeId;
     }
 
+    public Long getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
+    }
+
     public Chantier toEntity() {
         Societe societe = new Societe();
         societe.setId(societeId);
+
+        Client client = new Client();
+        client.setId(clientId);
 
         return Chantier.builder()
                 .nom(this.nom)
                 .adresse(this.adresse)
                 .description(this.description)
                 .societe(societe)
+                .client(client)
                 .build();
     }
 }

@@ -13,6 +13,7 @@ class ProduitResponseTest {
     void from_maps_entity_to_response() {
         Societe societe = new Societe();
         societe.setId(7L);
+        societe.setNom("WebElec");
         Produit produit = new Produit();
         produit.setId(2L);
         produit.setReference("REF-1");
@@ -28,13 +29,15 @@ class ProduitResponseTest {
         assertEquals("DescX", dto.getDescription());
         assertEquals(10, dto.getQuantiteStock());
         assertEquals(new BigDecimal("99.99"), dto.getPrixUnitaire());
-        assertEquals(7L, dto.getSocieteId());
+        assertNotNull(dto.getSociete());
+        assertEquals(7L, dto.getSociete().getId());
+        assertEquals("WebElec", dto.getSociete().getNom());
     }
     @Test
     void from_handles_null_societe() {
         Produit produit = new Produit();
         produit.setId(3L);
         ProduitResponse dto = ProduitResponse.from(produit);
-        assertNull(dto.getSocieteId());
+        assertNull(dto.getSociete());
     }
 }

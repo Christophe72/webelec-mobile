@@ -59,6 +59,7 @@ Des tests JUnit sont présents pour tous les DTO principaux (`*Response`, `*Requ
 
 ## Fonctionnalités métier
 - **Sociétés** : CRUD de base via `/api/societes` (déjà existant dans le squelette initial).
+- **Utilisateurs** : CRUD complet via `/api/utilisateurs` (nouveau module). Permet de gérer les utilisateurs rattachés à une société : création, modification, suppression, récupération par société ou par identifiant.
 - **Chantiers** : `/api/chantiers` pour lister, créer, filtrer par société (`/societe/{id}`) et supprimer.
 - **Produits (stock)** : `/api/produits` avec filtres par société, création, mise à jour et suppression.
 - **Clients** : `/api/clients` avec les mêmes opérations (GET/POST/PUT/DELETE) et filtre `/societe/{id}`.
@@ -113,6 +114,39 @@ Des tests JUnit sont présents pour tous les DTO principaux (`*Response`, `*Requ
 - `400 Bad Request` : violations Bean Validation (liste dans `details`)
 - `404 Not Found` : identifiant inexistant (`message` contient la raison via `ResourceNotFoundException`)
 - `500 Internal Server Error` : erreur inattendue côté serveur
+
+### Contrat API Utilisateur (`/api/utilisateurs`)
+**DTOs exposés**
+- `UtilisateurRequest` (payload entrant)
+  - `nom` *(string, obligatoire, ≤255)*
+  - `prenom` *(string, obligatoire, ≤255)*
+  - `email` *(string, optionnel, format email, ≤255)*
+  - `motDePasse` *(string, obligatoire, 6-255)*
+  - `role` *(string, obligatoire, ≤100)*
+  - `societeId` *(long, obligatoire)*
+- `UtilisateurResponse` (payload sortant)
+  - `id`, `nom`, `prenom`, `email`, `role`, `societe` (résumé)
+
+**Endpoints**
+1. `GET /api/utilisateurs` → `200 OK` avec `List<UtilisateurResponse>`
+2. `GET /api/utilisateurs/{id}` → `200 OK` avec un `UtilisateurResponse` ou `404` si introuvable
+3. `GET /api/utilisateurs/societe/{societeId}` → `200 OK` avec la liste des utilisateurs d’une société
+4. `POST /api/utilisateurs`
+   ```json
+   {
+     "nom": "Martin",
+     "prenom": "Paul",
+     "email": "paul.martin@example.com",
+     "motDePasse": "secret123",
+     "role": "ADMIN",
+     "societeId": 1
+   }
+   ```
+   Réponse `200 OK` contenant le `UtilisateurResponse`
+5. `PUT /api/utilisateurs/{id}` → met à jour l’utilisateur
+6. `DELETE /api/utilisateurs/{id}` → `204 No Content` si la suppression réussit, `404 Not Found` si l'identifiant n'existe pas
+
+**Format d’erreur global** (`ApiError`) : identique aux autres ressources (voir plus haut)
 
 ## Exemples de payloads
 ```json
@@ -194,6 +228,18 @@ POST /api/factures
   "lignes": [
     { "description": "Câblage IT", "quantite": 2, "prixUnitaire": 1000, "total": 2000 }
   ]
+}
+```
+
+```json
+POST /api/utilisateurs
+{
+  "nom": "Martin",
+  "prenom": "Paul",
+  "email": "paul.martin@example.com",
+  "motDePasse": "secret123",
+  "role": "ADMIN",
+  "societeId": 1
 }
 ```
 
