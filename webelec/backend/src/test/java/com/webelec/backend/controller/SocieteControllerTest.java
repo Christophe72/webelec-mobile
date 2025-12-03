@@ -1,0 +1,66 @@
+package com.webelec.backend.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.webelec.backend.dto.SocieteRequest;
+import com.webelec.backend.model.Societe;
+import com.webelec.backend.service.SocieteService;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(SocieteController.class)
+class SocieteControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockBean
+    private SocieteService service;
+
+    @Test
+    void createSociete_success() throws Exception {
+        SocieteRequest req = new SocieteRequest();
+        req.setNom("WebElec");
+        req.setTva("BE123456789");
+        req.setEmail("contact@webelec.com");
+        Societe societe = Societe.builder().id(1L).nom("WebElec").tva("BE123456789").email("contact@webelec.com").build();
+        Mockito.when(service.create(any(Societe.class))).thenReturn(societe);
+        mockMvc.perform(post("/api/societes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nom").value("WebElec"));
+    }
+
+    @Test
+    void createSociete_invalidJson_returns400() throws Exception {
+        String invalidJson = "{\"nom\":\"\",\"tva\":\"\",\"email\":\"not-an-email\"}";
+        mockMvc.perform(post("/api/societes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createSociete_conflict_returns409() throws Exception {
+        SocieteRequest req = new SocieteRequest();
+        req.setNom("WebElec");
+        req.setTva("BE123456789");
+        req.setEmail("contact@webelec.com");
+        Mockito.when(service.create(any(Societe.class))).thenThrow(new IllegalStateException("Email déjà utilisé"));
+        mockMvc.perform(post("/api/societes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isConflict())
+                .andExpect(content().string("Email déjà utilisé"));
+    }
+}

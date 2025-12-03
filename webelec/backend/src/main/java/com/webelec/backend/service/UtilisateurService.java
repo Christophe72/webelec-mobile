@@ -30,6 +30,9 @@ public class UtilisateurService {
     }
 
     public Utilisateur create(Utilisateur utilisateur) {
+        if (repository.findByEmail(utilisateur.getEmail()) != null) {
+            throw new IllegalStateException("Email déjà utilisé");
+        }
         return repository.save(utilisateur);
     }
 

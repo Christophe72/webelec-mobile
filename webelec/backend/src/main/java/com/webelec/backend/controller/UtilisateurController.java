@@ -49,9 +49,13 @@ public class UtilisateurController {
     }
 
     @PostMapping
-    public UtilisateurResponse create(@Valid @RequestBody UtilisateurRequest request) {
-        var created = service.create(request.toEntity());
-        return UtilisateurResponse.from(created);
+    public ResponseEntity<?> create(@Valid @RequestBody UtilisateurRequest request) {
+        try {
+            var created = service.create(request.toEntity());
+            return ResponseEntity.ok(UtilisateurResponse.from(created));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

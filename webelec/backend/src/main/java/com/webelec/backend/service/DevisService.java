@@ -34,6 +34,9 @@ public class DevisService {
     }
 
     public Devis create(Devis devis) {
+        if (repository.findByNumero(devis.getNumero()) != null) {
+            throw new IllegalStateException("Numéro de devis déjà utilisé");
+        }
         return repository.save(devis);
     }
 

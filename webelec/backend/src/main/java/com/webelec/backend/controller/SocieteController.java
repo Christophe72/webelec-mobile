@@ -37,9 +37,13 @@ public class SocieteController {
     }
 
     @PostMapping
-    public ResponseEntity<SocieteResponse> create(@Valid @RequestBody SocieteRequest request) {
-        var created = service.create(request.toEntity());
-        return ResponseEntity.ok(SocieteResponse.from(created));
+    public ResponseEntity<?> create(@Valid @RequestBody SocieteRequest request) {
+        try {
+            var created = service.create(request.toEntity());
+            return ResponseEntity.ok(SocieteResponse.from(created));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")

@@ -47,9 +47,13 @@ public class ClientController {
     }
 
     @PostMapping
-    public ClientResponse create(@Valid @RequestBody ClientRequest request) {
-        var created = service.create(request.toEntity());
-        return ClientResponse.from(created);
+    public ResponseEntity<?> create(@Valid @RequestBody ClientRequest request) {
+        try {
+            var created = service.create(request.toEntity());
+            return ResponseEntity.ok(ClientResponse.from(created));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

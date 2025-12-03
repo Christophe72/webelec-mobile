@@ -26,6 +26,9 @@ public class SocieteService {
     }
 
     public Societe create(Societe societe) {
+        if (repository.findByEmail(societe.getEmail()) != null) {
+            throw new IllegalStateException("Email déjà utilisé");
+        }
         return repository.save(societe);
     }
 

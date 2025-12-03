@@ -639,7 +639,7 @@ components:
               format: int64
     ChantierRequest:
       type: object
-      required: [nom, societeId]
+      required: [nom, societeId, clientId]
       properties:
         nom:
           type: string
@@ -649,6 +649,9 @@ components:
         description:
           type: string
         societeId:
+          type: integer
+          format: int64
+        clientId:
           type: integer
           format: int64
     ChantierResponse:

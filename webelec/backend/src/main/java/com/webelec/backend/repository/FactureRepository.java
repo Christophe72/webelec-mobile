@@ -8,4 +8,5 @@ import java.util.List;
 public interface FactureRepository extends JpaRepository<Facture, Long> {
     List<Facture> findBySocieteId(Long societeId);
     List<Facture> findByClientId(Long clientId);
+    Facture findByNumero(String numero);
 }

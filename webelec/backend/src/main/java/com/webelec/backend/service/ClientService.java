@@ -30,6 +30,9 @@ public class ClientService {
     }
 
     public Client create(Client client) {
+        if (repository.findByEmail(client.getEmail()) != null) {
+            throw new IllegalStateException("Email déjà utilisé");
+        }
         return repository.save(client);
     }
 

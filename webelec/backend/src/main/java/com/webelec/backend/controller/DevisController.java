@@ -45,9 +45,13 @@ public class DevisController {
     }
 
     @PostMapping
-    public DevisResponse create(@Valid @RequestBody DevisRequest request) {
-        var created = service.create(request.toEntity());
-        return DevisResponse.from(created);
+    public ResponseEntity<?> create(@Valid @RequestBody DevisRequest request) {
+        try {
+            var created = service.create(request.toEntity());
+            return ResponseEntity.ok(DevisResponse.from(created));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

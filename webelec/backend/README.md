@@ -243,6 +243,82 @@ POST /api/utilisateurs
 }
 ```
 
+## Exemples de requêtes REST (curl)
+
+### Chantier
+
+**GET (liste)**
+```cmd
+curl.exe -X GET http://localhost:8080/api/chantiers
+```
+
+**GET (détail)**
+```cmd
+curl.exe -X GET http://localhost:8080/api/chantiers/1
+```
+
+**POST (création)**
+```cmd
+curl.exe -X POST http://localhost:8080/api/chantiers ^
+  -H "Content-Type: application/json" ^
+  -d "{\"nom\":\"Chantier A\",\"adresse\":\"Rue des Lilas 10\",\"description\":\"Installation électrique\",\"societeId\":1,\"clientId\":2}"
+```
+
+**PUT (édition)**
+```cmd
+curl.exe -X PUT http://localhost:8080/api/chantiers/1 ^
+  -H "Content-Type: application/json" ^
+  -d "{\"nom\":\"Chantier A modifié\",\"adresse\":\"Rue des Lilas 10\",\"description\":\"Mise à jour\",\"societeId\":1,\"clientId\":2}"
+```
+
+**DELETE (suppression)**
+```cmd
+curl.exe -X DELETE http://localhost:8080/api/chantiers/1
+```
+
+### Client
+
+**GET (liste)**
+```cmd
+curl.exe -X GET http://localhost:8080/api/clients
+```
+
+**POST (création)**
+```cmd
+curl.exe -X POST http://localhost:8080/api/clients ^
+  -H "Content-Type: application/json" ^
+  -d "{\"nom\":\"Dupont\",\"prenom\":\"Marc\",\"email\":\"marc@exemple.com\",\"societeId\":1}"
+```
+
+### Devis
+
+**POST (création)**
+```cmd
+curl.exe -X POST http://localhost:8080/api/devis ^
+  -H "Content-Type: application/json" ^
+  -d "{\"numero\":\"DV-2025-001\",\"dateEmission\":\"2025-12-02\",\"dateExpiration\":\"2025-12-31\",\"montantHT\":1000.00,\"montantTVA\":210.00,\"montantTTC\":1210.00,\"statut\":\"EN_ATTENTE\",\"societeId\":1,\"clientId\":2,\"lignes\":[{\"description\":\"Prestation\",\"quantite\":1,\"prixUnitaire\":1000.00,\"total\":1000.00}]}"
+```
+
+### Facture
+
+**POST (création)**
+```cmd
+curl.exe -X POST http://localhost:8080/api/factures ^
+  -H "Content-Type: application/json" ^
+  -d "{\"numero\":\"FA-2025-001\",\"dateEmission\":\"2025-12-02\",\"dateEcheance\":\"2025-12-31\",\"montantHT\":1000.00,\"montantTVA\":210.00,\"montantTTC\":1210.00,\"statut\":\"EN_ATTENTE\",\"societeId\":1,\"clientId\":2,\"lignes\":[{\"description\":\"Pose câblage\",\"quantite\":2,\"prixUnitaire\":500.00,\"total\":1000.00}]}"
+```
+
+---
+
+## Automatisation de la vérification (MockMvc)
+
+Des tests MockMvc sont présents pour chaque ressource (voir `src/test/java/com/webelec/backend/controller/`).
+- Ils vérifient les statuts (200, 400, 404, 409, 204) et la validité du JSON pour chaque route REST.
+- Les cas d’erreur (payload manquant, doublon, ressource absente) sont couverts.
+- Pour ajouter un test, inspirez-vous des méthodes existantes dans les fichiers `*ControllerTest.java`.
+
+---
+
 ## Structure
 - `src/main/java/com/webelec/backend/BackendApplication.java` : point d'entrée Spring Boot
 - `src/main/resources` : configuration (`application.yml`), gabarits et ressources statiques
