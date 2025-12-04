@@ -319,6 +319,120 @@ Des tests MockMvc sont présents pour chaque ressource (voir `src/test/java/com/
 
 ---
 
+## Tests d'intégration avec Testcontainers (PostgreSQL)
+
+Le projet inclut des tests d'intégration qui valident la communication réelle entre Spring Boot et PostgreSQL grâce à [Testcontainers](https://www.testcontainers.org/). Ces tests démarrent un conteneur Docker PostgreSQL 16 à la volée, injectent dynamiquement la configuration JDBC, et vérifient la validité de la connexion et des opérations JPA.
+
+### Dépendances Maven nécessaires
+
+Ajoutez dans la section `<dependencies>` de votre `pom.xml` :
+
+```xml
+<!-- Tests Spring -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
+<!-- Testcontainers Postgres -->
+<dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+
+Et dans `<build>` (pour JUnit 5 + Testcontainers) :
+
+```xml
+<plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+    </plugin>
+</plugins>
+```
+
+### Exemple de test minimal de connexion
+
+```java
+@Testcontainers
+@SpringBootTest
+class DatabaseConnectionTest {
+    @Container
+    static PostgreSQLContainer<?> postgres =
+        new PostgreSQLContainer<>("postgres:16")
+            .withDatabaseName("webelec")
+            .withUsername("postgres")
+            .withPassword("postgres");
+
+    @DynamicPropertySource
+    static void registerProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Test
+    void connection_test(@Autowired DataSource ds) throws Exception {
+        try (Connection cn = ds.getConnection()) {
+            assertTrue(cn.isValid(2));
+        }
+    }
+}
+```
+
+- **Aucun `application-test.yml` n'est requis** : Testcontainers injecte tout automatiquement.
+- **Lancement** :
+
+```bash
+mvnw.cmd test
+```
+
+- **Ce que valide ce test** :
+    - Le conteneur PostgreSQL démarre
+    - Spring Boot s'y connecte réellement
+    - Le DataSource répond et la connexion est valide
+
+### Exemple de test Repository
+
+```java
+@Testcontainers
+@SpringBootTest
+class ClientRepositoryTest {
+    @Container
+    static PostgreSQLContainer<?> postgres = ... // identique à ci-dessus
+    @DynamicPropertySource
+    static void registerProps(DynamicPropertyRegistry registry) { ... }
+    @Autowired
+    ClientRepository clientRepo;
+    @Test
+    void save_and_find() {
+        Client c = new Client();
+        c.setNom("Test");
+        c.setPrenom("JUnit");
+        Client saved = clientRepo.save(c);
+        assertNotNull(saved.getId());
+        Client found = clientRepo.findById(saved.getId()).orElse(null);
+        assertNotNull(found);
+        assertEquals("Test", found.getNom());
+    }
+}
+```
+
+### Avantages
+- **Reproductible** : chaque test démarre une base PostgreSQL isolée
+- **Fiable** : pas de dépendance à une base locale ou CI
+- **Nettoyage automatique** : le conteneur est détruit après les tests
+- **Compatible CI/CD**
+
+---
 ## Structure
 - `src/main/java/com/webelec/backend/BackendApplication.java` : point d'entrée Spring Boot
 - `src/main/resources` : configuration (`application.yml`), gabarits et ressources statiques

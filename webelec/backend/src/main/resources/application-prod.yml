@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://<IP_VPS>:5432/webelec
+    username: <TON_USER>
+    password: <TON_PASSWORD>
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # en prod on ne touche jamais le schéma

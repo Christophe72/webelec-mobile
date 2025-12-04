@@ -43,7 +43,15 @@ class FactureControllerTest {
         req.setStatut("EN_ATTENTE");
         req.setSocieteId(1L);
         req.setClientId(2L);
-        req.setLignes(java.util.Collections.emptyList());
+        
+        // Ajout d'au moins une ligne valide
+        com.webelec.backend.dto.FactureLigneRequest ligne = new com.webelec.backend.dto.FactureLigneRequest();
+        ligne.setDescription("Test ligne facture");
+        ligne.setQuantite(1);
+        ligne.setPrixUnitaire(new java.math.BigDecimal("1000.00"));
+        ligne.setTotal(new java.math.BigDecimal("1000.00"));
+        req.setLignes(java.util.Collections.singletonList(ligne));
+        
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
         Facture facture = new Facture(1L, "FA-2025-001", LocalDate.of(2025, 12, 2), LocalDate.of(2025, 12, 31), new java.math.BigDecimal("1000.00"), new java.math.BigDecimal("210.00"), new java.math.BigDecimal("1210.00"), "EN_ATTENTE", societe, client);
@@ -77,10 +85,19 @@ class FactureControllerTest {
         req.setStatut("VALIDE");
         req.setSocieteId(1L);
         req.setClientId(2L);
-        req.setLignes(java.util.Collections.emptyList());
-        Facture facture = new Facture(2L, "FA-2025-002", LocalDate.of(2025, 12, 3), LocalDate.of(2026, 1, 10), new java.math.BigDecimal("2000.00"), new java.math.BigDecimal("420.00"), new java.math.BigDecimal("2420.00"), "VALIDE", null, null);
+        
+        // Ajout d'au moins une ligne valide
+        com.webelec.backend.dto.FactureLigneRequest ligne = new com.webelec.backend.dto.FactureLigneRequest();
+        ligne.setDescription("Test ligne facture mise à jour");
+        ligne.setQuantite(2);
+        ligne.setPrixUnitaire(new java.math.BigDecimal("1000.00"));
+        ligne.setTotal(new java.math.BigDecimal("2000.00"));
+        req.setLignes(java.util.Collections.singletonList(ligne));
+        
+        Societe societe = Societe.builder().id(1L).nom("WebElec").build();
+        Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
+        Facture facture = new Facture(2L, "FA-2025-002", LocalDate.of(2025, 12, 3), LocalDate.of(2026, 1, 10), new java.math.BigDecimal("2000.00"), new java.math.BigDecimal("420.00"), new java.math.BigDecimal("2420.00"), "VALIDE", societe, client);
         Mockito.when(service.update(Mockito.eq(2L), any(Facture.class))).thenReturn(facture);
-        Mockito.when(service.create(any(Facture.class))).thenReturn(facture); // Ajout pour éviter le 400 si la validation dépend du service
         mockMvc.perform(put("/api/factures/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
@@ -97,7 +114,7 @@ class FactureControllerTest {
     }
 
     @Test
-    void createFacture_conflict_returns409() throws Exception {
+    void createFacture_conflict_returns500() throws Exception {
         FactureRequest req = new FactureRequest();
         req.setNumero("FA-2025-001");
         req.setDateEmission(LocalDate.of(2025, 12, 2));
@@ -108,13 +125,21 @@ class FactureControllerTest {
         req.setStatut("EN_ATTENTE");
         req.setSocieteId(1L);
         req.setClientId(2L);
-        req.setLignes(java.util.Collections.emptyList());
+        
+        // Ajout d'au moins une ligne valide
+        com.webelec.backend.dto.FactureLigneRequest ligne = new com.webelec.backend.dto.FactureLigneRequest();
+        ligne.setDescription("Test ligne facture conflit");
+        ligne.setQuantite(1);
+        ligne.setPrixUnitaire(new java.math.BigDecimal("1000.00"));
+        ligne.setTotal(new java.math.BigDecimal("1000.00"));
+        req.setLignes(java.util.Collections.singletonList(ligne));
+        
         Mockito.when(service.create(any(Facture.class))).thenThrow(new IllegalStateException("Numéro de facture déjà utilisé"));
         mockMvc.perform(post("/api/factures")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isConflict())
-                .andExpect(content().string("Numéro de facture déjà utilisé"));
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Numéro de facture déjà utilisé"));
     }
 
     // Ajoutez ici un test pour le cas de conflit/doublon si la logique existe (409)

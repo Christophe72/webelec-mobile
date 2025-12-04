@@ -67,8 +67,10 @@ class ChantierControllerTest {
         req.setAdresse("Adresse B");
         req.setDescription("Desc2");
         req.setSocieteId(1L);
+        req.setClientId(2L);
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
-        Chantier chantier = new Chantier(2L, "Chantier B", "Adresse B", "Desc2", societe, null);
+        Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
+        Chantier chantier = new Chantier(2L, "Chantier B", "Adresse B", "Desc2", societe, client);
         Mockito.when(service.update(Mockito.eq(2L), any(Chantier.class))).thenReturn(chantier);
         mockMvc.perform(put("/api/chantiers/2")
                 .contentType(MediaType.APPLICATION_JSON)
