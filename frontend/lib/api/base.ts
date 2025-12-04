@@ -1,4 +1,10 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+const API_URL = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080/api";
+
+interface ApiError extends Error {
+  status?: number;
+  body?: unknown;
+  details?: unknown;
+}
 
 export async function api<T = unknown>(
   endpoint: string,
@@ -32,17 +38,12 @@ export async function api<T = unknown>(
         ? (errorBody as { message?: string; details?: unknown })
         : null;
 
-    const baseMessage = `API error ${res.status}${res.statusText ? `: ${res.statusText}` : ""}`;
-    const message =
-      apiError?.message ||
-      (typeof errorBody === "string" && errorBody.trim()) ||
-      baseMessage;
-
-    const error = new Error(message);
-    (error as any).status = res.status;
-    (error as any).body = errorBody;
+    const message = apiError?.message || `API Error: ${res.status} ${res.statusText}`;
+    const error = new Error(message) as ApiError;
+    error.status = res.status;
+    error.body = errorBody;
     if (apiError?.details) {
-      (error as any).details = apiError.details;
+      error.details = apiError.details;
     }
 
     throw error;
