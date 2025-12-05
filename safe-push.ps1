@@ -57,8 +57,13 @@ if ($Branch -eq "main") {
     }
 }
 
-# Tout est OK → push
+# Tout est OK → commit & push
 Write-Host "Pushing depuis '$RepoRoot' sur '$Branch'..." -ForegroundColor Green
 git add .
 git commit -m "$Message"
+
+# Synchronisation avec le dépôt distant avant push
+git pull --rebase
+
 git push
+# ...existing code...
