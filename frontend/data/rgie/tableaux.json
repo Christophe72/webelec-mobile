@@ -1,0 +1,2172 @@
+[
+  {
+    "id": "tableaux_opkv21ir",
+    "symptomes": [
+      "Sympt\u00f4me 1 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 0"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.3.4",
+      "nature": "obligation",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 1"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 0 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_dsw012si",
+    "symptomes": [
+      "Sympt\u00f4me 2 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 1"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.4.24",
+      "nature": "condition",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 2"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 1 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_eyp1wyue",
+    "symptomes": [
+      "Sympt\u00f4me 3 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 2"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "6.5.8",
+      "nature": "condition",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 3"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 2 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_8jaknqlm",
+    "symptomes": [
+      "Sympt\u00f4me 4 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 3"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.5.12",
+      "nature": "obligation",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 4"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 3 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_9v5w4ti3",
+    "symptomes": [
+      "Sympt\u00f4me 5 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 4"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.5.18",
+      "nature": "interdiction",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 5"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 4 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_8gvftrm6",
+    "symptomes": [
+      "Sympt\u00f4me 6 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 5"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "8.1.18",
+      "nature": "valeur_min",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 6"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 5 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_6o8a6kig",
+    "symptomes": [
+      "Sympt\u00f4me 7 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 6"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.1.22",
+      "nature": "obligation",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 7"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 6 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_gutpg2f5",
+    "symptomes": [
+      "Sympt\u00f4me 8 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 7"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "7.4.7",
+      "nature": "obligation",
+      "seuil": "IPx4",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 8"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 7 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_o6f628ti",
+    "symptomes": [
+      "Sympt\u00f4me 9 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 8"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "8.3.17",
+      "nature": "valeur_min",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 9"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 8 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_hpwbnbx8",
+    "symptomes": [
+      "Sympt\u00f4me 10 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 9"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.3.15",
+      "nature": "valeur_min",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 10"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 9 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_jqlka699",
+    "symptomes": [
+      "Sympt\u00f4me 11 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 10"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.1.1",
+      "nature": "valeur_min",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 11"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 10 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_jcc8n607",
+    "symptomes": [
+      "Sympt\u00f4me 12 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 11"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "4.5.15",
+      "nature": "valeur_max",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 12"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 11 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_9d5au8cz",
+    "symptomes": [
+      "Sympt\u00f4me 13 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 12"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.2.24",
+      "nature": "interdiction",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 13"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 12 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_bjwtz61g",
+    "symptomes": [
+      "Sympt\u00f4me 14 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 13"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.4.15",
+      "nature": "interdiction",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 14"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 13 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_13u4r5be",
+    "symptomes": [
+      "Sympt\u00f4me 15 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 14"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.5.21",
+      "nature": "condition",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 15"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 14 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_4dpay3zv",
+    "symptomes": [
+      "Sympt\u00f4me 16 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 15"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.3.17",
+      "nature": "valeur_min",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 16"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 15 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_bsol5np1",
+    "symptomes": [
+      "Sympt\u00f4me 17 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 16"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.3.11",
+      "nature": "obligation",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 17"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 16 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_s7w5jp5p",
+    "symptomes": [
+      "Sympt\u00f4me 18 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 17"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "1.2.7",
+      "nature": "valeur_min",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 18"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 17 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_dqh3pkbh",
+    "symptomes": [
+      "Sympt\u00f4me 19 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 18"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.3.8",
+      "nature": "valeur_max",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 19"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 18 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_vfy18ww7",
+    "symptomes": [
+      "Sympt\u00f4me 20 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 19"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.3.20",
+      "nature": "valeur_max",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 20"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 19 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_7p9moy1d",
+    "symptomes": [
+      "Sympt\u00f4me 21 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 20"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.5.4",
+      "nature": "valeur_min",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 21"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 20 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_yq7l1eth",
+    "symptomes": [
+      "Sympt\u00f4me 22 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 21"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.3.3",
+      "nature": "valeur_min",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 22"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 21 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_d4j9w67t",
+    "symptomes": [
+      "Sympt\u00f4me 23 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 22"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.3.7",
+      "nature": "obligation",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 23"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 22 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_b4omu7vj",
+    "symptomes": [
+      "Sympt\u00f4me 24 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 23"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.2.9",
+      "nature": "interdiction",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 24"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 23 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_yv2tqneo",
+    "symptomes": [
+      "Sympt\u00f4me 25 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 24"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "2.3.11",
+      "nature": "valeur_min",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 25"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 24 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_21fi9ow8",
+    "symptomes": [
+      "Sympt\u00f4me 26 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 25"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "2.2.14",
+      "nature": "obligation",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 26"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 25 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_dysi0rjg",
+    "symptomes": [
+      "Sympt\u00f4me 27 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 26"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.3.15",
+      "nature": "valeur_min",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 27"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 26 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_bbah1m9p",
+    "symptomes": [
+      "Sympt\u00f4me 28 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 27"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "4.1.8",
+      "nature": "valeur_min",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 28"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 27 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_kei25i04",
+    "symptomes": [
+      "Sympt\u00f4me 29 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 28"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "8.5.25",
+      "nature": "valeur_min",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 29"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 28 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_vvagdefu",
+    "symptomes": [
+      "Sympt\u00f4me 30 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 29"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "2.4.18",
+      "nature": "valeur_max",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 30"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 29 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_o4pb1stg",
+    "symptomes": [
+      "Sympt\u00f4me 31 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 30"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "6.5.22",
+      "nature": "obligation",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 31"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 30 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_asg47mfu",
+    "symptomes": [
+      "Sympt\u00f4me 32 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 31"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "7.4.7",
+      "nature": "obligation",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 32"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 31 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_ml3zonko",
+    "symptomes": [
+      "Sympt\u00f4me 33 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 32"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.4.7",
+      "nature": "obligation",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 33"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 32 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_5f7gzra8",
+    "symptomes": [
+      "Sympt\u00f4me 34 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 33"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "7.4.21",
+      "nature": "condition",
+      "seuil": "IPx4",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 34"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 33 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "tableaux_8fnjnltb",
+    "symptomes": [
+      "Sympt\u00f4me 35 li\u00e9 \u00e0 tableaux",
+      "Sympt\u00f4me additionnel 34"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.3.10",
+      "nature": "condition",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour tableaux r\u00e8gle 35"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "tableaux",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "tableaux 34 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  }
+]

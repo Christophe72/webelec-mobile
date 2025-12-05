@@ -1,0 +1,52 @@
+[
+  {
+    "file": "ddr.json",
+    "status": "OK",
+    "items": 35
+  },
+  {
+    "file": "influences_externes.json",
+    "status": "OK",
+    "items": 35
+  },
+  {
+    "file": "installations_existantes.json",
+    "status": "OK",
+    "items": 35
+  },
+  {
+    "file": "pv.json",
+    "status": "OK",
+    "items": 35
+  },
+  {
+    "file": "sdb_2025.json",
+    "status": "OK",
+    "items": 35
+  },
+  {
+    "file": "sections.json",
+    "status": "OK",
+    "items": 35
+  },
+  {
+    "file": "surintensites.json",
+    "status": "OK",
+    "items": 35
+  },
+  {
+    "file": "tableaux.json",
+    "status": "OK",
+    "items": 35
+  },
+  {
+    "file": "terre.json",
+    "status": "OK",
+    "items": 35
+  },
+  {
+    "file": "ve.json",
+    "status": "OK",
+    "items": 35
+  }
+]

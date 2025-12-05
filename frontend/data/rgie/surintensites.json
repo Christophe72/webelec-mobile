@@ -1,0 +1,2172 @@
+[
+  {
+    "id": "surintensites_90lmr11f",
+    "symptomes": [
+      "Sympt\u00f4me 1 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 0"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "4.3.16",
+      "nature": "valeur_min",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 1"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 0 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_6vu8khf1",
+    "symptomes": [
+      "Sympt\u00f4me 2 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 1"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.3.12",
+      "nature": "obligation",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 2"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 1 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_ppa4c34k",
+    "symptomes": [
+      "Sympt\u00f4me 3 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 2"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "6.1.9",
+      "nature": "valeur_min",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 3"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 2 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_ubr3jj6l",
+    "symptomes": [
+      "Sympt\u00f4me 4 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 3"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.4.16",
+      "nature": "obligation",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 4"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 3 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_fnfot8ja",
+    "symptomes": [
+      "Sympt\u00f4me 5 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 4"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "4.4.4",
+      "nature": "valeur_min",
+      "seuil": "IPx4",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 5"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 4 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_dagcdaet",
+    "symptomes": [
+      "Sympt\u00f4me 6 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 5"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "4.4.20",
+      "nature": "valeur_max",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 6"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 5 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_lijxb7cq",
+    "symptomes": [
+      "Sympt\u00f4me 7 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 6"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "4.5.1",
+      "nature": "valeur_max",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 7"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 6 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_p7utnjuw",
+    "symptomes": [
+      "Sympt\u00f4me 8 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 7"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.5.25",
+      "nature": "valeur_min",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 8"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 7 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_bz1s5uvh",
+    "symptomes": [
+      "Sympt\u00f4me 9 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 8"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "2.3.1",
+      "nature": "interdiction",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 9"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 8 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_baecl8x5",
+    "symptomes": [
+      "Sympt\u00f4me 10 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 9"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.3.14",
+      "nature": "interdiction",
+      "seuil": "IPx4",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 10"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 9 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_i7mw12do",
+    "symptomes": [
+      "Sympt\u00f4me 11 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 10"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "6.5.25",
+      "nature": "valeur_min",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 11"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 10 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_o74md8lu",
+    "symptomes": [
+      "Sympt\u00f4me 12 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 11"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "4.1.13",
+      "nature": "obligation",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 12"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 11 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_2ku0q21v",
+    "symptomes": [
+      "Sympt\u00f4me 13 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 12"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "8.4.11",
+      "nature": "obligation",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 13"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 12 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_3vdfv66k",
+    "symptomes": [
+      "Sympt\u00f4me 14 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 13"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "8.4.16",
+      "nature": "valeur_max",
+      "seuil": "IPx4",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 14"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 13 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_zslinzui",
+    "symptomes": [
+      "Sympt\u00f4me 15 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 14"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "4.2.11",
+      "nature": "obligation",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 15"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 14 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_adqz2tle",
+    "symptomes": [
+      "Sympt\u00f4me 16 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 15"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "2.1.20",
+      "nature": "valeur_max",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 16"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 15 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_ndcl0p22",
+    "symptomes": [
+      "Sympt\u00f4me 17 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 16"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "6.4.19",
+      "nature": "obligation",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 17"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 16 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_68qsrps5",
+    "symptomes": [
+      "Sympt\u00f4me 18 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 17"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "1.1.11",
+      "nature": "interdiction",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 18"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 17 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_al10frje",
+    "symptomes": [
+      "Sympt\u00f4me 19 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 18"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "important",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.5.7",
+      "nature": "condition",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 19"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 18 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_zmlhoo9j",
+    "symptomes": [
+      "Sympt\u00f4me 20 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 19"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.2.19",
+      "nature": "condition",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 20"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 19 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_6n6fktph",
+    "symptomes": [
+      "Sympt\u00f4me 21 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 20"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "8.4.6",
+      "nature": "valeur_min",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 21"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 20 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_6ewe56ro",
+    "symptomes": [
+      "Sympt\u00f4me 22 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 21"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.1.3",
+      "nature": "valeur_max",
+      "seuil": "IPx4",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 22"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 21 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_m8jeenxf",
+    "symptomes": [
+      "Sympt\u00f4me 23 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 22"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "2.4.10",
+      "nature": "valeur_max",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 23"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 22 symptome risque rgie norme",
+    "incertitude": "\u00e9lev\u00e9e",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_snvhx1sg",
+    "symptomes": [
+      "Sympt\u00f4me 24 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 23"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "3.2.25",
+      "nature": "valeur_max",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 24"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 23 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_yyw43yxi",
+    "symptomes": [
+      "Sympt\u00f4me 25 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 24"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.2.13",
+      "nature": "interdiction",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 25"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 24 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_y77sm8aa",
+    "symptomes": [
+      "Sympt\u00f4me 26 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 25"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "8.4.22",
+      "nature": "valeur_max",
+      "seuil": "\u2264 12 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 26"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 25 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_m95vi8p2",
+    "symptomes": [
+      "Sympt\u00f4me 27 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 26"
+    ],
+    "gravite": {
+      "niveau": 1,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "8.1.10",
+      "nature": "obligation",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 27"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 26 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_uhtyoaxd",
+    "symptomes": [
+      "Sympt\u00f4me 28 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 27"
+    ],
+    "gravite": {
+      "niveau": 3,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "7.5.12",
+      "nature": "obligation",
+      "seuil": "30 mA",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 28"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 27 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_1jt9l50y",
+    "symptomes": [
+      "Sympt\u00f4me 29 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 28"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 4,
+      "sur_5": "possible",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.4.17",
+      "nature": "valeur_max",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 29"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 28 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_9ky4d4gh",
+    "symptomes": [
+      "Sympt\u00f4me 30 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 29"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 1,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.3.17",
+      "nature": "condition",
+      "seuil": "IPx4",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 30"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 29 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_e6a3mq69",
+    "symptomes": [
+      "Sympt\u00f4me 31 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 30"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "dangereux",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 5,
+      "sur_5": "rare",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "7.3.20",
+      "nature": "interdiction",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 31"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 30 symptome risque rgie norme",
+    "incertitude": "faible",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_sqr8lfvj",
+    "symptomes": [
+      "Sympt\u00f4me 32 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 31"
+    ],
+    "gravite": {
+      "niveau": 5,
+      "sur_5": "faible",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 2,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "9.3.13",
+      "nature": "interdiction",
+      "seuil": "2,5 mm\u00b2",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 32"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 31 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_ecvl8xxd",
+    "symptomes": [
+      "Sympt\u00f4me 33 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 32"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "8.5.22",
+      "nature": "obligation",
+      "seuil": "30 \u03a9",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 33"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 32 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_47j50q6r",
+    "symptomes": [
+      "Sympt\u00f4me 34 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 33"
+    ],
+    "gravite": {
+      "niveau": 2,
+      "sur_5": "critique",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "peu probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "2.2.15",
+      "nature": "valeur_min",
+      "seuil": "IPx4",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 34"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 33 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  },
+  {
+    "id": "surintensites_p7fbk4ur",
+    "symptomes": [
+      "Sympt\u00f4me 35 li\u00e9 \u00e0 surintensites",
+      "Sympt\u00f4me additionnel 34"
+    ],
+    "gravite": {
+      "niveau": 4,
+      "sur_5": "mod\u00e9r\u00e9",
+      "impact": [
+        "s\u00e9curit\u00e9 personnes",
+        "incendie",
+        "contact indirect",
+        "surtension"
+      ]
+    },
+    "probabilite": {
+      "niveau": 3,
+      "sur_5": "tr\u00e8s probable",
+      "causes_possibles": [
+        "d\u00e9faut mat\u00e9riel",
+        "mauvaise installation",
+        "usure",
+        "corrosion"
+      ]
+    },
+    "rgie": {
+      "livre": 1,
+      "article": "5.4.15",
+      "nature": "condition",
+      "seuil": "\u2264 25 V",
+      "verbatim": "Extrait RGIE synth\u00e9tique pour surintensites r\u00e8gle 35"
+    },
+    "actions": {
+      "urgentes": [
+        "Couper alimentation",
+        "S\u00e9curiser zone"
+      ],
+      "correctives": [
+        "R\u00e9parer composant",
+        "Remplacer mat\u00e9riel",
+        "Revoir c\u00e2blage"
+      ],
+      "prevention": [
+        "Contr\u00f4le annuel",
+        "V\u00e9rification r\u00e9guli\u00e8re"
+      ]
+    },
+    "contextes": [
+      "domestique",
+      "non_domestique"
+    ],
+    "tags": [
+      "surintensites",
+      "rgie",
+      "securite",
+      "diagnostic"
+    ],
+    "embedding_ready": "surintensites 34 symptome risque rgie norme",
+    "incertitude": "moyenne",
+    "maj": "2025-03-01"
+  }
+]
