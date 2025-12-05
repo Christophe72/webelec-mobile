@@ -73,3 +73,13 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
   - `curl "http://localhost:3000/api/test/rgie"`
   - `curl "http://localhost:3000/api/test/rgie?theme=ddr"`
   - `curl "http://localhost:3000/api/test/rgie?meta=true"`
+
+## Schéma d’architecture MCP RGIE (simplifié)
+
+- `data/rgie/*.json`  
+  ↓ (import TypeScript, typé via `RgieRegle`)  
+- `lib/rgie-local.ts` : agrégation + helpers (`getAllRgieRegles`, `getRgieDataset`, `searchRgieByTag`, `searchRgieByArticle`)  
+  ↓  
+- `app/api/test/rgie/route.ts` : endpoint Next API (`/api/test/rgie`) qui expose les règles, le rapport de validation et le schéma  
+  ↓  
+- `components/rgie-panel.tsx` : composant client `RgiePanel` affiché sur la page d’accueil (`app/page.tsx`), qui interroge `/api/test/rgie` et visualise le pack MCP RGIE.
