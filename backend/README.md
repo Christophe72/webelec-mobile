@@ -442,3 +442,320 @@ class ClientRepositoryTest {
 - ~~Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.~~ ✅
 - ~~Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.~~ ✅
 - Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.
+
+
+## Variables d'environnement pour PostgreSQL et vps
+	-	export DB_HOST=127.0.0.1
+	-	export DB_PORT=5432
+	-	export DB_NAME=webelec_db
+	-	export DB_USER=webelec
+	-	export DB_PASSWORD=webelec_pwd
+	
+	
+# WebElec – Backend
+
+Backend du SaaS WebElec, en Java 21 / Spring Boot 3.5, avec PostgreSQL et tests d’intégration via Testcontainers.
+
+Il gère (ou préparera) :
+- Sociétés, clients, chantiers
+- Produits, devis, factures, interventions
+- Authentification / rôles (à venir)
+- Intégrations IA / RGIE / PDF / IoT (à venir)
+
+---
+
+## 1. Stack technique
+
+- Java 21  
+- Spring Boot 3.5.x  
+- PostgreSQL 16 (Docker)  
+- Spring Data JPA / Hibernate  
+- HikariCP  
+- Testcontainers (PostgreSQL)  
+- Maven 3.9+  
+
+---
+
+## 2. Lancer l’environnement
+
+### 2.1 Démarrer PostgreSQL (Docker)
+
+Depuis le dossier contenant `docker-compose.yml` :
+
+    docker compose up -d
+
+Paramètres typiques du conteneur :
+- Base : webelec_db  
+- Utilisateur : webelec  
+- Mot de passe : webelec_pwd  
+- Port : 5432  
+
+Test de connexion :
+
+    psql -h localhost -U webelec -d webelec_db
+
+---
+
+## 3. Profils Spring
+
+Le backend utilise trois profils cibles : `dev`, `test`, `prod`.
+
+### 3.1 Profil `dev` – application-dev.yml
+
+Utilisé pour le développement local, connecté au PostgreSQL Docker.
+
+    spring:
+      datasource:
+        url: jdbc:postgresql://localhost:5432/webelec_db
+        username: webelec
+        password: webelec_pwd
+        driver-class-name: org.postgresql.Driver
+
+      jpa:
+        hibernate:
+          ddl-auto: update
+        properties:
+          hibernate:
+            format_sql: true
+        show-sql: true
+
+    server:
+      port: 8080
+
+Lancement en dev :
+
+    mvn spring-boot:run -Dspring.profiles.active=dev
+
+---
+
+### 3.2 Profil `test` – Testcontainers
+
+Utilisé pour les tests d’intégration. Testcontainers démarre un PostgreSQL éphémère.
+
+Exécution des tests avec profil `test` :
+
+    mvn clean test "-Dspring.profiles.active=test"
+
+Résultat actuel attendu :
+- 69 tests exécutés  
+- 0 échec  
+- 0 erreur  
+- BUILD SUCCESS  
+
+---
+
+### 3.3 Profil `prod` – application-prod.yml
+
+Utilisé pour la production (VPS / serveur externe).  
+Les credentials viennent des variables d’environnement.
+
+    spring:
+      datasource:
+        url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:webelec_db}
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+
+      jpa:
+        hibernate:
+          ddl-auto: validate
+        properties:
+          hibernate:
+            format_sql: false
+        show-sql: false
+
+      datasource.hikari:
+        maximum-pool-size: 10
+        minimum-idle: 2
+        idle-timeout: 30000
+        connection-timeout: 30000
+        max-lifetime: 1800000
+
+    server:
+      port: 8080
+
+    logging:
+      level:
+        root: INFO
+        org.springframework.web: INFO
+        org.hibernate.SQL: OFF
+        org.hibernate.type: OFF
+
+Variables d’environnement à définir en prod :
+- DB_HOST  
+- DB_PORT  
+- DB_NAME  
+- DB_USER  
+- DB_PASSWORD  
+
+---
+
+## 4. Structure actuelle du backend
+
+    backend/
+     ├─ src/main/java/com/webelec/backend/
+     │   ├─ controller/          # API REST (Sociétés, Clients, etc.)
+     │   ├─ service/             # Logique métier
+     │   ├─ repository/          # Spring Data JPA
+     │   ├─ model/               # Entités JPA
+     │   ├─ dto/                 # Objets de transfert
+     │   └─ BackendApplication.java
+     ├─ src/main/resources/
+     │   ├─ application-dev.yml
+     │   ├─ application-prod.yml
+     │   └─ application.yml      # config commune éventuelle
+     ├─ src/test/java/com/webelec/backend/
+     │   ├─ controller/          # Tests des contrôleurs
+     │   ├─ dto/                 # Tests des DTO
+     │   ├─ service/             # Tests des services
+     │   └─ DatabaseConnectionTest.java   # Testcontainers / PostgreSQL
+     └─ pom.xml
+
+---
+
+## 5. Tests et qualité
+
+### 5.1 Lancer tous les tests
+
+    mvn clean test "-Dspring.profiles.active=test"
+
+Testcontainers :
+- démarre un conteneur PostgreSQL
+- applique le schéma
+- exécute les tests d’intégration
+
+État actuel :
+- Tests contrôleurs : OK  
+- Tests services : OK  
+- Tests DTO : OK  
+- Test DatabaseConnection (Testcontainers) : OK  
+- Résultat global : BUILD SUCCESS  
+
+---
+
+## 6. Ce qui est déjà en place
+
+- PostgreSQL via Docker fonctionnel  
+- Profils Spring `dev` et `prod` configurés  
+- Profil `test` actif via la ligne Maven  
+- Tests d’intégration avec Testcontainers  
+- WSL2 + Docker Desktop configurés correctement  
+- Connexions JDBC stables (HikariCP)  
+- Code organisé par couches (controller / service / repository / model / dto)  
+
+Le backend est prêt à :
+- être branché en CI/CD (GitHub Actions)  
+- servir d’API au frontend Next.js WebElec  
+- accueillir les modules IA / RGIE / IoT / PDF  
+
+---
+
+## 7. Roadmap backend – À faire
+
+### 7.1 Créer `application-test.yml`
+
+But : clarifier la configuration du profil `test` (même si Testcontainers gère l’URL DB).
+
+Exemple minimal :
+
+    spring:
+      jpa:
+        hibernate:
+          ddl-auto: update
+        properties:
+          hibernate:
+            format_sql: false
+        show-sql: false
+
+    logging:
+      level:
+        root: WARN
+
+---
+
+### 7.2 Configurer Maven Surefire pour le profil `test`
+
+Dans `pom.xml`, ajouter (section build/plugins) :
+
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <version>3.2.5</version>
+      <configuration>
+        <systemPropertyVariables>
+          <spring.profiles.active>test</spring.profiles.active>
+        </systemPropertyVariables>
+      </configuration>
+    </plugin>
+
+Ensuite, un simple :
+
+    mvn test
+
+suffira (plus besoin de `-Dspring.profiles.active=test`).
+
+---
+
+### 7.3 Créer un pipeline GitHub Actions (CI)
+
+Objectif :
+- lancer les tests à chaque push
+- préparer l’artefact jar pour déploiement
+
+Étapes typiques :
+1. Checkout du repo  
+2. Installation JDK 21  
+3. Cache Maven  
+4. `mvn test`  
+5. `mvn package`  
+
+---
+
+### 7.4 Ajouter la sécurité (Spring Security)
+
+À implémenter :
+- Authentification (JWT ou autre)
+- Rôles (ADMIN, USER, TECH, etc.)
+- Protection des endpoints sensibles
+- Intégration avec le frontend Next.js
+
+---
+
+### 7.5 Préparer les endpoints pour modules IA / RGIE / PDF / IoT
+
+- Endpoints pour interrogation IA (symptômes, diagnostics, RGIE)  
+- Endpoints pour extraction PDF (certificats, rapports)  
+- Endpoints pour données terrain (IoT, ESP32, MQTT, mesures électriques)  
+
+---
+
+### 7.6 Ajouter Flyway ou Liquibase (optionnel mais conseillé)
+
+Pour versionner le schéma PostgreSQL :
+
+- scripts de création tables  
+- scripts d’évolution (alter table, index, etc.)
+- utilisation en dev / test / prod
+
+---
+
+## 8. Rappel des commandes utiles
+
+### Lancer le backend en dev
+
+    mvn spring-boot:run -Dspring.profiles.active=dev
+
+### Lancer tous les tests
+
+    mvn clean test "-Dspring.profiles.active=test"
+
+(plus tard, après config Surefire) :
+
+    mvn clean test
+
+### Vérifier Docker / Postgres
+
+    docker ps
+    docker logs webelec-postgres -f
+
+---
