@@ -311,3 +311,309 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
   - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"Installation nouvelle cuisine","adresse":"Rue du Four 15, 4000 Liège","description":"Tableau secondaire + circuit prises + éclairage LED","societeId":1}' http://localhost:3000/api/test/chantiers`
   - `curl http://localhost:3000/api/test/produits`
   - `curl -X POST -H "Content-Type: application/json" -d '{"reference":"REF-001","nom":"Disjoncteur 16A","description":"Courbe C","quantiteStock":25,"prixUnitaire":14.90,"societeId":1}' http://localhost:3000/api/test/produits`
+  
+  
+  
+  
+  🌩️ WebElec – Plateforme SaaS pour Électriciens Belges (RGIE 2025, IoT, ERP)
+
+WebElec est une plateforme SaaS conçue pour les artisans électriciens, PME techniques et bureaux d’étude.
+Elle centralise la gestion des clients, chantiers, interventions, documents, conformité RGIE, et intègre un module IoT (ESP32 + MQTT) pour remonter les mesures en temps réel.
+
+Une seule application, pensée pour le terrain, compatible smartphone, et conforme aux bonnes pratiques du métier.
+
+⚡ Objectifs du projet
+
+Offrir à l’électricien un outil simple, fiable et rapide
+
+Standardiser la conformité RGIE Livre 1 (2025) sans interprétations hasardeuses
+
+Numériser les chantiers (photos, documents, schémas, mesures)
+
+Connecter les installations au cloud via ESP32 / MQTT
+
+Fournir un ERP technique complet, mais accessible
+
+🧱 Architecture générale
+
+Le projet WebElec est composé de quatre modules principaux :
+
+/frontend       → Application Next.js (App Router, TypeScript, Tailwind, shadcn/ui)
+/backend        → API Spring Boot 3.5 (Java 21, PostgreSQL, JPA)
+/database       → Scripts SQL, seeds, migrations, configuration Postgres
+/iot            → Code ESP32, MQTT topics, flux Node-RED, formats JSON
+
+
+Un projet modulaire, clair, extensible.
+
+🎨 Frontend – Next.js 15 (App Router)
+
+Le frontend constitue l’interface utilisateur moderne, responsive, et optimisée pour une utilisation sur chantier.
+
+Technologies :
+
+Next.js 15+ (App Router, Server Components)
+
+TypeScript strict
+
+Tailwind CSS
+
+shadcn/ui
+
+Charts/IoT clients (MQTT/WebSockets)
+
+Actions serveur pour le métier électrique
+
+Principales fonctionnalités :
+
+Gestion des sociétés, clients, chantiers, interventions
+
+Upload de photos, documents, schémas
+
+Dashboard RGIE (circuits, protections, articles associés)
+
+Affichage en temps réel des mesures IoT
+
+Support mobile complet
+
+🔧 Backend – Spring Boot 3.5 (Java 21)
+
+Le backend fournit l’intelligence métier, la sécurité, la gestion des données et la conformité.
+
+Technologies :
+
+Spring Boot 3.5
+
+Spring Web
+
+Spring Validation
+
+JPA / Hibernate
+
+PostgreSQL
+
+Swagger / OpenAPI
+
+Modules fournis :
+
+API REST sécurisée
+
+Gestion chantiers / clients / interventions
+
+Stockage des documents (selon implémentation)
+
+Vérifications RGIE (via règles ou articles chargés)
+
+Synchronisation IoT
+
+🗄️ Base de données – PostgreSQL
+
+Le dossier database/ contient :
+
+Scripts SQL de création
+
+Seeds métiers (fournisseurs, produits, index RGIE, clients de test)
+
+Migrations Flyway / Liquibase
+
+Configuration dockerisée : Postgres + PGAdmin
+
+L’objectif : une base propre, structurée, avec données minimales pour tests et démos.
+
+📡 IoT – ESP32, MQTT, Node-RED
+
+Le dossier iot/ centralise tout le module connecté :
+
+Firmware ESP32 pour capteurs et mesures
+
+Topics MQTT officiels WebElec
+
+Flux Node-RED (ETL léger, automatisations)
+
+Schémas JSON des données mesurées
+
+Exemple de dashboard temps réel
+
+L’IoT n’est plus une usine à gaz : simple, stable, prévisible.
+
+📚 Documentation et RGIE
+
+Le dossier docs/ contient :
+
+Articles RGIE (fournis par l’utilisateur, aucun inventé)
+
+Documentation API (OpenAPI)
+
+Schémas UML / PlantUML / Mermaid
+
+Guides techniques pour installation du SaaS
+
+Architecture du projet
+
+Ton dossier rgie/ contient les données officielles, sans extrapolation.
+C’est ton "référentiel métier".
+
+🧪 Qualité, CI/CD, Sécurité
+
+Le dossier .github/ inclut :
+
+Workflows GitHub Actions (tests, build, déploiement)
+
+Instructions IA anti-hallucinations
+
+Templates d’issues et PR
+
+Ton SaaS s’inscrit dans une approche sérieuse : cohérence, traçabilité, zéro surprise.
+
+🐋 Déploiement
+
+Plusieurs options :
+
+1. Docker Compose (recommandé)
+
+Un fichier deployments/docker-compose.yml orchestre :
+
+frontend (Next.js)
+
+backend (Spring Boot)
+
+database (Postgres)
+
+pgadmin
+
+mqtt (Eclipse Mosquitto)
+
+2. VPS (Hostinger, OVH, Hetzner)
+
+Reverse proxy avec Nginx + certificats Let’s Encrypt.
+
+3. Kubernetes (optionnel)
+
+Des manifestes sont fournis dans deployments/k8s/.
+
+🛠️ Scripts utiles
+
+Dans scripts/ :
+
+safe-push.ps1 : push Git sécurisé
+
+deploy-vps.sh : déploiement automatisé
+
+backup-db.sh : sauvegarde Postgres
+
+init-dev.ps1 : préparation machine dev
+
+🚀 Roadmap (2025)
+
+ Module devis + factures (Peppol EN16931)
+
+ Intégration AI (diagnostic + automatisation)
+
+ Gestion du stock et catalogue matériel
+
+ Générateur de schémas unifilaires
+
+ Application mobile (React Native ?)
+
+ Monitoring IoT avancé
+
+🏗️ Objectif final
+
+Faire de WebElec l’outil de référence pour l’électricien belge :
+
+Simple
+
+Conforme
+
+Mobile
+
+Connecté
+
+Sans surprises
+
+Un SaaS fait par un électricien, pour des électriciens.
+
+📞 Contact (exemple)
+
+Christophe Seyler
+Développeur & Électricien (Belgique)
+GSM : 0497 50 65 36
+Email : christophe.seyler@webelec.be
+
+Souhaites-tu maintenant :
+
+La version courte du README (30 lignes) ?
+
+La version orientée investisseurs / professionnels ?
+
+La version "marketing site Web" ?
+
+Un README séparé Front / Back / IoT / Database ?
+
+Je peux également générer le fichier docker-compose complet si tu veux passer en mode déploiement.
+
+Vous avez dit :
+comment je fais un redame de ça, copie colle ?
+ChatGPT a dit :
+
+Oui, exactement : tu crées un fichier README.md → tu colles le contenu → et c’est fini.
+GitHub se charge de l’afficher automatiquement.
+
+Voici comment faire proprement, étape par étape :
+
+1) À la racine de ton projet
+
+Dans ton dossier :
+
+webelec-saas/
+
+
+tu crées un fichier :
+
+README.md
+
+
+(avec un éditeur comme VS Code, un clic droit → New File → README.md)
+
+2) Tu ouvres ce fichier
+
+Puis tu colles entièrement le texte du README que je t’ai préparé.
+
+Exemple dans VS Code :
+
+Ouvrir VS Code
+
+Cliquer sur README.md
+
+Coller le texte
+
+Sauvegarder (Ctrl + S)
+
+3) GitHub le détecte automatiquement
+
+Une fois que tu pushes ton projet :
+
+git add README.md
+git commit -m "Ajout du README WebElec"
+git push
+
+
+→ GitHub affichera ton README en page d’accueil du repo, sans configuration supplémentaire.
+
+4) Tu veux le voir en aperçu local ?
+
+Dans VS Code, clique en haut à droite :
+“Open Preview” (icône de loupe).
+Tu verras le rendu final comme sur GitHub.
+
+5) Résumé
+
+Oui, tu copies-colles.
+
+Tu mets ça dans un fichier README.md.
+
+Tu le commits.
+
+GitHub l'affiche automatiquement.
+
+Rien de plus à faire.

@@ -83,3 +83,13 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
 - `app/api/test/rgie/route.ts` : endpoint Next API (`/api/test/rgie`) qui expose les règles, le rapport de validation et le schéma  
   ↓  
 - `components/rgie-panel.tsx` : composant client `RgiePanel` affiché sur la page d’accueil (`app/page.tsx`), qui interroge `/api/test/rgie` et visualise le pack MCP RGIE.
+
+## Réutiliser les données RGIE (autre composant / agent IA)
+
+- Dans un autre composant React (server ou utilitaire Node) : importer directement les helpers locaux :
+  - `import { getAllRgieRegles, searchRgieByTag } from "@/lib/rgie-local";`
+  - Exemple : `const reglesTerre = searchRgieByTag("terre");`
+- Depuis un agent IA ou un service externe : consommer l’API HTTP exposée par le front :
+  - `GET http://localhost:3000/api/test/rgie` → toutes les règles (format JSON).
+  - `GET http://localhost:3000/api/test/rgie?theme=ddr` → filtrage par thème.
+  - `GET http://localhost:3000/api/test/rgie?meta=true` → inclut `validation_report` et `webelec_schema` pour inspection ou validation.
