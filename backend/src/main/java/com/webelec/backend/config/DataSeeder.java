@@ -13,6 +13,7 @@ import com.webelec.backend.repository.ProduitRepository;
 import com.webelec.backend.repository.SocieteRepository;
 import com.webelec.backend.repository.UtilisateurRepository;
 import jakarta.annotation.PostConstruct;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Component
+@Profile("!test")
 public class DataSeeder {
 
     private final SocieteRepository societeRepository;

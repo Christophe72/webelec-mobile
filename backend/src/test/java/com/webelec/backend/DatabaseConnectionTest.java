@@ -14,7 +14,7 @@ import java.sql.Connection;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
-@SpringBootTest
+@SpringBootTest(properties = "spring.profiles.active=test")
 class DatabaseConnectionTest {
 
     @Container

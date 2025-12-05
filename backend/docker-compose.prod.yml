@@ -1,0 +1,70 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: webelec-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: webelec
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # optionnel : utile si tu veux accéder hors docker
+    networks:
+      - webelec-net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: webelec-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@webelec.be
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80" # http://ip-vps:5050
+    depends_on:
+      - postgres
+    networks:
+      - webelec-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: webelec-backend
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/webelec
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - webelec-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: webelec-frontend
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: "https://ton-domaine-ou-ip:8080"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - webelec-net
+
+networks:
+  webelec-net:
+
+volumes:
+  postgres_data:
