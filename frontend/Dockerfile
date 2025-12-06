@@ -1,7 +1,7 @@
 # ============================
 #       BUILD
 # ============================
-FROM node:22 AS build
+FROM node:24.1.0 AS build
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ RUN npm run build
 # ============================
 #       RUNTIME
 # ============================
-FROM node:22-slim AS runtime
+FROM node:24.1.0-slim AS runtime
 
 WORKDIR /app
 
