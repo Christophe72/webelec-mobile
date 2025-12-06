@@ -219,52 +219,38 @@ POST /api/factures
   "societe": { "id": 1 },
   "client": { "id": 5 },
   "lignes": [
-    { "description": "Câblage IT", "quantite": 2, "prixUnitaire": 1000, "total": 2000 }
-  ]
-}
-```
-
-## Structure
-
-- `src/main/java/com/webelec/backend/BackendApplication.java` : point d'entrée Spring Boot
-- `src/main/resources` : configuration (`application.yml`), gabarits et ressources statiques
 - `pom.xml` : gestion des dépendances et configuration Java 21
+
 
 ## Prochaines étapes suggérées
 
 - ~~Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.~~ ✅
-- ~~Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.~~ ✅
 - Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.
-  
-## 🎨 Frontend WebElec (Next.js)
+
+## Frontend WebElec (Next.js)
 
 ## Pré-requis
 
 - Node.js 20+
+## Prochaines étapes suggérées
+- ~~Ajouter les entités restantes (Intervention, Produit avancé, Devis, Facture) en suivant le même pattern Repository/Service/Controller.~~ ✅
+- ~~Introduire des DTO + validation Bean Validation pour exposer des contrats stables au front.~~ ✅
+- Séparer les profils Spring (dev/test/prod) et intégrer PostgreSQL dans vos pipelines CI/CD.
+  
+# ou npm run build && npm run start pour la prod
+
+## Pré-requis
+- Node.js 20+
 - Backend Spring Boot en cours d’exécution sur `http://localhost:8080` (base API par défaut `http://localhost:8080/api`, modifiable via `NEXT_PUBLIC_API_URL`)
 
-## Démarrer le front
-
+NEXT_PUBLIC_API_URL="http://localhost:8080/api"
 ```bash
 npm install
 npm run dev
 # ou npm run build && npm run start pour la prod
 ```
+Ouvrir http://localhost:3000.
 
-Ouvrir <http://localhost:3000>.
-
-Configurez l’URL du backend avec la variable d’environnement côté client :
-
-```bash
-NEXT_PUBLIC_API_URL="http://localhost:8080/api"
-```
-
-## Fonctionnalités
-
-- Mode clair/sombre avec mémorisation locale (toggle en haut à droite).
-- Panneau de test des sociétés : listage/ajout/suppression via les DTO Spring `SocieteRequest` / `SocieteResponse`.
-- Clients API front (`lib/api`) : helpers typés pour auth, sociétés, clients, chantiers, interventions, devis, factures, catalogue (produits + produits avancés), pièces, RGIE, Peppol, notifications. Point d’entrée commun `lib/api/base.ts` (fetch JSON, headers, no-store).
-- DTO TypeScript (`types`) : toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
 - Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
 
 ## API consommée (backend Spring)
@@ -272,6 +258,11 @@ NEXT_PUBLIC_API_URL="http://localhost:8080/api"
 Contrat principal actuellement branché dans le front : **Sociétés**.
 
 DTOs exposés côté backend :
+- `SocieteResponse` (sortie) : `id`, `nom`, `tva`, `email?`, `telephone?- DTO TypeScript (`types`) : toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
+- Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
+
+## API consommée (backend Spring)
+Contrat principal actuellement branché dans le front : **Sociétés**.
 
 - `SocieteRequest` (entrée) : `nom` (string, obligatoire, ≤255), `tva` (string, obligatoire, ≤32), `email?` (email, ≤255), `telephone?` (regex `^[0-9+().\\/\\-\\s]{6,30}$`), `adresse?` (≤512).
 - `SocieteResponse` (sortie) : `id`, `nom`, `tva`, `email?`, `telephone?`, `adresse?`.
@@ -284,7 +275,6 @@ Endpoints consommés par le front :
 - `DELETE /api/societes/{id}` → 204 No Content si suppression OK, 404 sinon.
 
 Format d’erreur global (simplifié, renvoyé par Spring) :
-
 ```json
 {
   "timestamp": "2025-12-01T22:15:37.123Z",
@@ -296,12 +286,9 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
     "tva: La TVA est obligatoire"
   ]
 }
-```
-
-## Tests manuels rapides
-
-- Lancer le backend Spring, puis le front (`npm run dev`).
-- Utiliser le panneau “Sociétés” sur la page d’accueil pour créer et supprimer (les champs obligatoires sont _Nom_ et _TVA_).
+``ackend STests manuels rapides
+- Lancer le backend Spring, puis le front (`npm run dev`). (`npm run dev`).
+- Utiliser le panneau “Sociétés” sur la page d’accueil pour créer et supprimer (les champs obligatoires sont *Nom* et *TVA*).
 - Tester directement le backend Spring via cURL :
   - `curl http://localhost:8080/api/societes`
   - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"WebElec","tva":"BE0123456789","email":"contact@webelec.be","telephone":"0470/00.00.00","adresse":"Rue des Artisans 12, Liège"}' http://localhost:8080/api/societes`
@@ -310,129 +297,59 @@ Format d’erreur global (simplifié, renvoyé par Spring) :
   - `curl http://localhost:3000/api/test/chantiers`
   - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"Installation nouvelle cuisine","adresse":"Rue du Four 15, 4000 Liège","description":"Tableau secondaire + circuit prises + éclairage LED","societeId":1}' http://localhost:3000/api/test/chantiers`
   - `curl http://localhost:3000/api/test/produits`
-  - `curl -X POST -H "Content-Type: application/json" -d '{"reference":"REF-001","nom":"Disjoncteur 16A","description":"Courbe C","quantiteStock":25,"prixUnitaire":14.90,"societeId":1}' http://localhost:3000/api/test/produits`
   
-  # WebElec SaaS
 
-WebElec est une application destinée aux électriciens et petites PME techniques. Elle centralise la gestion des sociétés, clients, chantiers, interventions, devis, factures, documents et conformité RGIE.
 
-## Fonctionnalités
+## Architecture globale
+```mermaid
+graph TD
+    style COL1 fill:#f9f,stroke:#333,stroke-width:1px
 
-- Gestion des sociétés
-- Clients et chantiers
-- Interventions
-- Devis et factures
-- Produits et stock
-- RGIE 2025 (dataset utilisateur)
-- Module IoT (ESP32, MQTT, Node-RED)
-- Préparation pour Peppol (facturation électronique)
+    %% =====================================================
+    %%   COLONNE 1 — INTERFACE (prise / utilisateur)
+    %% =====================================================
+    subgraph COL1[Colonne 1 – Interface / Utilisateur]
+        U["👤 Utilisateurs"]
+        NX["🔌 Next.js<br/>UI + IA"]
+        U --> NX
+    end
 
-## Architecture
 
-- frontend : Next.js
-- backend : Spring Boot (Java 21)
-- database : PostgreSQL
-- iot : ESP32, MQTT, Node-RED
+    %% =====================================================
+    %%   COLONNE 2 — TGBT (Disjoncteur principal / CPU)
+    %% =====================================================
+    subgraph COL2[Colonne 2 – Tableau principal (Backend)]
+        SP["⚡ Spring Boot<br/>(Disjoncteur général / CPU)"]
+        DB[":|: PostgreSQL<br/>(Barre de mesure / Bus)"]
+        NX --> SP
+        SP --> DB
+    end
 
-Flux général :
-Frontend → Backend Spring → PostgreSQL
-ESP32 → MQTT → Node-RED → WebElec
 
-## Installation
+    %% =====================================================
+    %%   COLONNE 3 — AUTOMATION (Relais / Automatismes)
+    %% =====================================================
+    subgraph COL3[Colonne 3 – Automatisation / IA]
+        N8["🔁 n8n<br/>(Automate / Relais logique)"]
+        B2["📁 Backblaze B2<br/>(Stockage / Archivage)"]
+        DB --> N8
+        N8 --> B2
+        SP --> N8
+        N8 --> SP
+    end
 
-### Backend
 
-Dans le dossier backend :
+    %% =====================================================
+    %%   COLONNE 4 — TERRAIN (Capteurs / Actionneurs)apteur%% ===================================================== =====================================================
+    subgraph COL4[Colonne 4 – Terrain IoT]
+        MQ["📡 MQTT Broker<br/>ESP32 / Capteurs"]
+        MQ --> SP
+        MQ --> N8
+    end
 
-mvnw spring-boot:run
+    %% =====================================================
+    %%   CONNEXIONS OPTIONNELLES (Bus auxiliaire)
+    %% =====================================================
+    NX -. Bus auxiliaire .-> N8
+    N8 -. Retour info .-> NX
 
-API disponible sur :
-http://localhost:8080/api
-
-### Frontend
-
-Dans le dossier frontend :
-
-npm install
-npm run dev
-
-Interface disponible sur :
-http://localhost:3000
-
-Variable d’environnement :
-
-NEXT_PUBLIC_API_URL=http://localhost:8080/api
-
-## Base de données
-
-Le dossier database contient :
-
-- Scripts SQL
-- Seeds
-- Migrations
-- Configuration docker pour Postgres + PGAdmin
-
-H2 est utilisé en développement, PostgreSQL en production.
-
-## IoT
-
-Le dossier iot contient :
-
-- Code ESP32
-- Topics MQTT
-- Flows Node-RED
-- Formats JSON
-- Exemple de dashboard temps réel
-
-## API et métier
-
-Le backend expose des endpoints CRUD pour :
-
-- Sociétés
-- Clients
-- Chantiers
-- Interventions
-- Produits
-- Devis + lignes
-- Factures + lignes
-
-Les DTO backend et frontend sont alignés pour garantir un contrat stable.
-
-## Tests
-
-Backend :
-mvnw test
-
-Frontend :
-npm run lint
-npm run build
-
-## Déploiement
-
-- Docker Compose (frontend + backend + postgres + pgadmin + mqtt)
-- VPS (nginx + certbot)
-- Kubernetes (optionnel)
-
-## Dataset RGIE
-
-Les données RGIE sont chargées uniquement depuis :
-
-data/rgie/*.json
-
-Aucune extrapolation n'est autorisée.
-
-## Roadmap simplifiée
-
-- Intégration Peppol
-- IA métier (diagnostic, suggestions)
-- Générateur de schémas unifilaires
-- Application mobile
-- Dashboard IoT avancé
-- Gestion avancée du stock
-
-## Contact
-
-Christophe Seyler  
-Développeur et Électricien (Belgique)  
-Email : christophe.seyler@webelec.be  
-GSM : 0497 50 65 36
