@@ -32,9 +32,9 @@ jobs:
 
       - name: Show Java version
         run: java -version
-
-      - name: Run tests (profile test)
-        run: mvn -B clean test "-Dspring.profiles.active=test"
+        
+      - name: Run tests
+        run: mvn -B clean test
 
       - name: Build backend jar
         run: mvn -B package -DskipTests

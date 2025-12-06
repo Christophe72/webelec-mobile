@@ -7,7 +7,6 @@ $ErrorActionPreference = "Stop"
 function Normalize-Path([string]$path) {
     return (Resolve-Path $path).Path.ToLower()
 }
-
 # Chemin du monorepo
 $AllowedRepoRoot = "C:\saas\webelec-saas"
 $Allowed = Normalize-Path $AllowedRepoRoot
@@ -82,7 +81,7 @@ try {
     Write-Host "=== Lancement des tests Maven backend (profil test) ===" -ForegroundColor Cyan
     Push-Location $BackendPath
 
-    mvn clean test "-Dspring.profiles.active=test"
+	mvn clean test
     $TestExitCode = $LASTEXITCODE
 
     Pop-Location
