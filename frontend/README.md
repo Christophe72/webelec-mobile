@@ -148,3 +148,52 @@ En local, tu peux reproduire :
 - Ajouter un README global pour documenter la navigation (pages, routes, modules WebElec).
 
 ---
+--- a/frontend/README.md
++++ b/frontend/README.md
+@@
+-## 3. Configuration de l’API backend
+-
+-Le frontend appelle le backend via une variable d’environnement :
+-
+-- `NEXT_PUBLIC_API_URL`
++## 3. Configuration de l’API backend
++
++Le frontend appelle le backend via :
++
++- `NEXT_PUBLIC_API_BASE` (ex: `http://localhost:8080/api`)
++
++Et, pour les embeddings (route `/api/embedding`) :
++
++- `OPENAI_API_KEY` (obligatoire)
++- `OPENAI_BASE_URL` (optionnel, par défaut api.openai.com)
++- `OPENAI_MODEL` (optionnel, par défaut `text-embedding-3-large`)
+@@
+-    NEXT_PUBLIC_API_URL=http://localhost:8080
++    NEXT_PUBLIC_API_BASE=http://localhost:8080/api
++    OPENAI_API_KEY=sk-xxxx
+@@
+-        NEXT_PUBLIC_API_URL: "http://localhost:8080"
++        NEXT_PUBLIC_API_BASE: "http://localhost:8080/api"
+@@
+-- `NEXT_PUBLIC_API_URL` est lu par le navigateur, pas par le conteneur.  
+-- Utiliser `http://localhost:8080` est donc correct : c’est l’hôte vu par le navigateur.
++- `NEXT_PUBLIC_API_BASE` est lu par le navigateur, pas par le conteneur.  
++- Utiliser `http://localhost:8080/api` est donc correct : c’est l’hôte vu par le navigateur.
++
++---
++
++## 4. Fonctionnalités IA (Chat RGIE & Auditeur Pro)
++
++- Route embeddings : `/api/embedding` (utilise `OPENAI_API_KEY`).
++- SDK IA : `lib/sdk/webelec-ai.ts` (ask/explain/diagnostic guidé, steps, self-check).
++- Chat RGIE : `app/rgie/chat/page.tsx` (questions, citations, steps).
++- Auditeur Pro : `app/rgie/auditeur-pro/page.tsx` (embedding + audit symbolique + citations + steps).
++
++Lancer en dev (front) :
++
++```bash
++cd frontend
++npm install
++npm run dev
++# Vérifie que le backend répond sur NEXT_PUBLIC_API_BASE et que OPENAI_API_KEY est défini
++```
