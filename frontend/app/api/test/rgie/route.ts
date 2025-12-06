@@ -1,10 +1,11 @@
+// frontend/app/api/test/rgie/route.ts
 import { NextRequest } from "next/server";
 import {
   getAllRgieRegles,
   getRgieDataset,
   getRgieSchema,
   getRgieValidationReport,
-  type RgieTheme
+  type RgieTheme,
 } from "@/lib/rgie-local";
 
 export async function GET(req: NextRequest) {
@@ -24,13 +25,12 @@ export async function GET(req: NextRequest) {
       count: all.length,
       items: all,
       validation: getRgieValidationReport(),
-      schema: getRgieSchema()
+      schema: getRgieSchema(),
     });
   }
 
   return Response.json({
     count: all.length,
-    items: all
+    items: all,
   });
 }
-

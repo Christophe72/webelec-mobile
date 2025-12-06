@@ -65,7 +65,7 @@ export function SocietesPanel() {
     <section className="mx-auto mt-12 w-full max-w-3xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-widest text-(--muted)">
+          <p className="text-xs uppercase tracking-widest text-muted">
             API demo
           </p>
           <h2 className="text-xl font-semibold">Sociétés</h2>
@@ -73,7 +73,7 @@ export function SocietesPanel() {
         <button
           type="button"
           onClick={load}
-          className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium text-(--foreground) shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
+          className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
         >
           Rafraîchir
         </button>
@@ -85,21 +85,21 @@ export function SocietesPanel() {
           value={form.nom}
           onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
           placeholder="Nom*"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-(--foreground) shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
           type="text"
           value={form.tva}
           onChange={(e) => setForm((f) => ({ ...f, tva: e.target.value }))}
           placeholder="TVA*"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-(--foreground) shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
           type="email"
           value={form.email || ""}
           onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
           placeholder="Email"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-(--foreground) shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
           type="text"
@@ -108,7 +108,7 @@ export function SocietesPanel() {
             setForm((f) => ({ ...f, telephone: e.target.value }))
           }
           placeholder="Téléphone"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-(--foreground) shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
           type="text"
@@ -117,7 +117,7 @@ export function SocietesPanel() {
             setForm((f) => ({ ...f, adresse: e.target.value }))
           }
           placeholder="Adresse"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-(--foreground) shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60 sm:col-span-3"
+          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60 sm:col-span-3"
         />
         <div className="sm:col-span-3 flex justify-end">
           <button
@@ -137,9 +137,9 @@ export function SocietesPanel() {
 
       <div className="mt-6 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
         {loading ? (
-          <p className="py-4 text-(--muted)">Chargement…</p>
+          <p className="py-4 text-muted">Chargement…</p>
         ) : societes.length === 0 ? (
-          <p className="py-4 text-(--muted)">Aucune société pour le moment.</p>
+          <p className="py-4 text-muted">Aucune société pour le moment.</p>
         ) : (
           societes.map((societe, index) => {
             const id = societe.id ?? index;
@@ -149,15 +149,15 @@ export function SocietesPanel() {
                 className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
-                  <p className="font-medium text-(--foreground)">
+                  <p className="font-medium text-foreground">
                     {societe.nom}
                   </p>
-                  <p className="text-(--muted)">
+                  <p className="text-muted">
                     TVA {societe.tva} ·{" "}
                     {societe.telephone || "Téléphone indisponible"}
                   </p>
                   {(societe.email || societe.adresse) && (
-                    <p className="text-(--muted)">
+                    <p className="text-muted">
                       {societe.email ?? "Email non renseigné"} ·{" "}
                       {societe.adresse ?? "Adresse non renseignée"}
                     </p>

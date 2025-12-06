@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import { WebElecAI } from "../../../lib/sdk/webelec-ai";
+import { analyseEffet } from "@/lib/rgie/chat/page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -20,12 +21,12 @@ async function getEmbedding(text: string): Promise<number[]> {
   });
   return await res.json();
 }
-
 type ChatMessage = {
   role: "user" | "ai";
   text: string;
   rules?: RgieRule[];
   selfCheck?: boolean;
+  steps?: string[];
 };
 
 export default function ChatRgiePage() {
@@ -36,7 +37,7 @@ export default function ChatRgiePage() {
   const ai = new WebElecAI();
 
   // ------------------------------------------------------------
-  // Envoi du message utilisateur
+  // Envoi du message utilisateur (mode Q/R articles)
   // ------------------------------------------------------------
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -58,6 +59,7 @@ export default function ChatRgiePage() {
         text: ans.answer,
         rules: ans.usedRules,
         selfCheck: ans.selfCheckPassed,
+        steps: ans.steps,
       };
 
       setMessages((prev) => [...prev, aiMsg]);
@@ -77,13 +79,41 @@ export default function ChatRgiePage() {
   };
 
   // ------------------------------------------------------------
+  // Envoi du message en mode "Analyse d'effet → causes"
+  // ------------------------------------------------------------
+const sendEffectAnalysis = async () => {
+  if (!input.trim()) return;
+
+  const userMsg: ChatMessage = { role: "user", text: input };
+  setMessages((prev) => [...prev, userMsg]);
+
+  setLoading(true);
+
+  try {
+    await analyseEffet(input, setMessages);
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "ai",
+        text: `Erreur: ${errorMessage}`,
+      },
+    ]);
+  }
+
+  setLoading(false);
+  setInput("");
+};
+
+  // ------------------------------------------------------------
   // Rendu des messages
   // ------------------------------------------------------------
   const renderMessage = (msg: ChatMessage, index: number) => {
     const isAI = msg.role === "ai";
 
     return (
-      <div key={index} className={`mb-6`}>
+      <div key={index} className="mb-6">
         <Card className={isAI ? "border-blue-300" : "border-gray-300"}>
           <CardHeader>
             <CardTitle className="text-lg">
@@ -110,6 +140,17 @@ export default function ChatRgiePage() {
                       Gravité : {r.gravite.niveau} – Probabilité :{" "}
                       {r.probabilite.niveau}
                     </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {msg.steps && msg.steps.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-bold mb-2 text-sm">Étapes d’analyse :</h4>
+                <ul className="text-xs space-y-1">
+                  {msg.steps.map((s, i) => (
+                    <li key={i}>{s}</li>
                   ))}
                 </ul>
               </div>
@@ -143,18 +184,30 @@ export default function ChatRgiePage() {
         {messages.map((msg, i) => renderMessage(msg, i))}
       </div>
 
-    <div className="flex gap-4">
-      <Input
-        placeholder="Pose une question RGIE…"
-        className="flex-1"
-        value={input}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === "Enter" && sendMessage()}
-      />
-      <Button disabled={loading} onClick={sendMessage}>
-        {loading ? "…" : "Envoyer"}
-      </Button>
-    </div>
+      <div className="flex gap-4">
+        <Input
+          placeholder="Pose une question RGIE…"
+          className="flex-1"
+          value={input}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setInput(e.target.value)
+          }
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
+            e.key === "Enter" && sendMessage()
+          }
+        />
+        <Button disabled={loading} onClick={sendMessage}>
+          {loading ? "…" : "Envoyer"}
+        </Button>
+        <Button
+          variant="outline"
+          disabled={loading}
+          onClick={sendEffectAnalysis}
+        >
+          {loading ? "…" : "Analyse effet"}
+        </Button>
+      </div>
     </div>
   );
 }
+

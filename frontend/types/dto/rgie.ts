@@ -50,6 +50,7 @@ export interface RgieActions {
 }
 
 export interface RgieRegle {
+  causes: never[];
   id: string;
   symptomes: string[];
   gravite: RgieGravite;

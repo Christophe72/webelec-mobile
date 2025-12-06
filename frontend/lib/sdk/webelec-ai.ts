@@ -33,6 +33,7 @@ export type GuidedDiagnosisResult = {
 //  PROMPTS INTERNES (toujours contrôlés par le SDK)
 // ----------------------------------------------------------------------
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SYSTEM_RISK_PROMPT = `
 Tu es l’Agent RGIE WebElec AI.
 Tu ne peux utiliser QUE les règles provenant des JSON /data/rgie/.
@@ -43,6 +44,7 @@ Ne jamais inventer un seuil, une valeur, un article.
 Mode : Double Validation interne.
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SELF_CHECK_PROMPT = `
 Vérifie que la réponse finale respecte absolument :
 1. Aucune règle inventée.

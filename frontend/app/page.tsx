@@ -4,7 +4,7 @@ import RgiePanel from "../components/rgie-panel";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col bg-(--background) font-sans text-(--foreground) transition-colors duration-200">
+    <main className="flex min-h-screen flex-col bg-background font-sans text-foreground transition-colors duration-200">
       <header className="w-full">
         <div className="mx-auto flex max-w-5xl items-center justify-end px-4 py-4">
           <ThemeToggle />
@@ -12,7 +12,7 @@ export default function Home() {
       </header>
 
       <div className="flex flex-1 items-center justify-center">
-        <div className="text-center space-y-4 px-4 text-(--foreground)">
+        <div className="text-center space-y-4 px-4 text-foreground">
           <div className="inline-flex items-center gap-2 rounded-full bg-(--badge-bg) px-3 py-1 text-xs font-medium text-(--badge-text) shadow-sm">
             <span className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
             <span>Site en construction</span>
@@ -22,7 +22,7 @@ export default function Home() {
             WebElec – saas en construction
           </h1>
 
-          <p className="text-sm sm:text-base max-w-md mx-auto text-(--muted)">
+          <p className="text-sm sm:text-base max-w-md mx-auto text-muted">
             Saas professionnel pour électricien en cours de réalisation.
             Revenez bientôt pour découvrir nos services et réalisations.
           </p>
