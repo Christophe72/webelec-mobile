@@ -167,6 +167,15 @@ Adaptez ces commandes à vos besoins (PUT/DELETE) ou utilisez un client comme In
 5. **Endpoints avancés** : IA, RGIE, PDF, IoT (après formalisation des règles métier)
 6. **Observabilité** : activer metrics/health actuateurs et logs structurés
 
+| Issue GitHub | Objectif | Priorité | Labels suggérés |
+| --- | --- | --- | --- |
+| `#01` – CI Pipeline | Créer un workflow GitHub Actions (build, tests, packaging) déclenché sur `main` et PR. | Haute | `ci`, `automation` |
+| `#02` – Spring Security | Ajouter un module JWT avec rôles ADMIN/TECH/USER et guards sur les endpoints sensibles. | Haute | `security`, `enhancement` |
+| `#03` – Flyway Migration | Introduire Flyway, versionner le schéma actuel et documenter la procédure de migration. | Haute | `database`, `migration` |
+| `#04` – Test Profile Auto | Configurer Surefire/Failsafe pour injecter `spring.profiles.active=test` par défaut. | Moyenne | `testing`, `build` |
+| `#05` – Observabilité | Activer Actuator (health, metrics), préparer un dashboard Grafana/Prometheus. | Moyenne | `observability`, `feature` |
+| `#06` – Endpoints avancés | Définir l’étendue (IA, RGIE, PDF, IoT) puis créer des sous-issues spécifiques. | Basse | `product`, `needs-spec` |
+
 ---
 
 ## 12. Commandes récapitulatives
