@@ -1,95 +1,150 @@
-# Frontend WebElec (Next.js)
+# WebElec – Frontend
 
-## Pré-requis
-- Node.js 20+
-- Backend Spring Boot en cours d’exécution sur `http://localhost:8080` (base API par défaut `http://localhost:8080/api`, modifiable via `NEXT_PUBLIC_API_URL`)
+Frontend du SaaS WebElec (Next.js).  
+Il consomme l’API du backend Spring Boot et s’exécute soit :
 
-## Démarrer le front
-```bash
-npm install
-npm run dev
-# ou npm run build && npm run start pour la prod
-```
-Ouvrir http://localhost:3000.
+- en mode développement (`npm run dev`)
+- en mode Docker via `docker compose`
+- en build CI GitHub (workflow `Frontend CI`)
 
-Configurez l’URL du backend avec la variable d’environnement côté client :
-```bash
-NEXT_PUBLIC_API_URL="http://localhost:8080/api"
-```
+---
 
-## Fonctionnalités
-- Mode clair/sombre avec mémorisation locale (toggle en haut à droite).
-- Panneau de test des sociétés : listage/ajout/suppression via les DTO Spring `SocieteRequest` / `SocieteResponse`.
-- Clients API front (`lib/api`) : helpers typés pour auth, sociétés, clients, chantiers, interventions, devis, factures, catalogue (produits + produits avancés), pièces, RGIE, Peppol, notifications. Point d’entrée commun `lib/api/base.ts` (fetch JSON, headers, no-store).
-- DTO TypeScript (`types`) : toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
-- Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
-- Pack MCP RGIE local : jeux de données RGIE synthétiques en JSON dans `data/rgie`, helpers de lecture/agrégation dans `lib/rgie-local.ts` et endpoint de test `GET /api/test/rgie` (consommé par le composant `RgiePanel` sur la page d’accueil).
+## 1. Stack technique
 
-## API consommée (backend Spring)
-Contrat principal actuellement branché dans le front : **Sociétés**.
+- Next.js (App Router)
+- React
+- TypeScript (si activé)
+- Tailwind CSS (si activé)
+- npm (ou pnpm / yarn selon ton setup)
 
-DTOs exposés côté backend :
-- `SocieteRequest` (entrée) : `nom` (string, obligatoire, ≤255), `tva` (string, obligatoire, ≤32), `email?` (email, ≤255), `telephone?` (regex `^[0-9+().\\/\\-\\s]{6,30}$`), `adresse?` (≤512).
-- `SocieteResponse` (sortie) : `id`, `nom`, `tva`, `email?`, `telephone?`, `adresse?`.
+---
 
-Endpoints consommés par le front :
-- `GET /api/societes` → `SocieteResponse[]` (liste toutes les sociétés).
-- `GET /api/societes/{id}` → `SocieteResponse` ou 404 si introuvable.
-- `POST /api/societes` → crée une société (JSON `SocieteRequest`).
-- `DELETE /api/societes/{id}` → 204 No Content si suppression OK, 404 sinon.
+## 2. Scripts npm
 
-Endpoint de test pour le pack MCP RGIE (données locales) :
-- `GET /api/test/rgie` → retourne toutes les règles RGIE agrégées.
-  - Query optionnelle `?theme=ddr|terre|ve|…` pour filtrer par thème.
-  - Query optionnelle `?meta=true` pour inclure le rapport de validation et le schéma.
+Dans `frontend/package.json`, tu dois retrouver au minimum :
 
-Format d’erreur global (simplifié, renvoyé par Spring) :
-```json
-{
-  "timestamp": "2025-12-01T22:15:37.123Z",
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Requête invalide",
-  "details": [
-    "nom: Le nom de la société est obligatoire",
-    "tva: La TVA est obligatoire"
-  ]
-}
-```
+- `npm run dev`   → mode développement
+- `npm run build` → build de production
+- `npm run start` → démarrage sur build compilé
+- `npm run lint`  → lint du code (utilisé par la CI)
 
-## Tests manuels rapides
-- Lancer le backend Spring, puis le front (`npm run dev`).
-- Utiliser le panneau “Sociétés” sur la page d’accueil pour créer et supprimer (les champs obligatoires sont *Nom* et *TVA*).
-- Utiliser le panneau “MCP RGIE” (`RgiePanel`) sur la page d’accueil pour explorer les règles RGIE chargées depuis `data/rgie` via `/api/test/rgie`.
-- Tester directement le backend Spring via cURL :
-  - `curl http://localhost:8080/api/societes`
-  - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"WebElec","tva":"BE0123456789","email":"contact@webelec.be","telephone":"0470/00.00.00","adresse":"Rue des Artisans 12, Liège"}' http://localhost:8080/api/societes`
-  - `curl -X DELETE http://localhost:8080/api/societes/<id>`
-- Tester directement les endpoints de base du backend (au lieu de passer par `http://localhost:3000/api`) :
-  - `curl http://localhost:8080/api/chantiers`
-  - `curl -X POST -H "Content-Type: application/json" -d '{"nom":"Installation nouvelle cuisine","adresse":"Rue du Four 15, 4000 Liège","description":"Tableau secondaire + circuit prises + éclairage LED","societeId":1}' http://localhost:8080/api/chantiers`
-  - `curl http://localhost:8080/api/produits`
-- Tester le pack MCP RGIE côté front ou via cURL :
-  - `curl "http://localhost:3000/api/test/rgie"`
-  - `curl "http://localhost:3000/api/test/rgie?theme=ddr"`
-  - `curl "http://localhost:3000/api/test/rgie?meta=true"`
+Exemple de section `scripts` (à adapter si besoin) :
 
-## Schéma d’architecture MCP RGIE (simplifié)
+    {
+      "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+      }
+    }
 
-- `data/rgie/*.json`  
-  ↓ (import TypeScript, typé via `RgieRegle`)  
-- `lib/rgie-local.ts` : agrégation + helpers (`getAllRgieRegles`, `getRgieDataset`, `searchRgieByTag`, `searchRgieByArticle`)  
-  ↓  
-- `app/api/test/rgie/route.ts` : endpoint Next API (`/api/test/rgie`) qui expose les règles, le rapport de validation et le schéma  
-  ↓  
-- `components/rgie-panel.tsx` : composant client `RgiePanel` affiché sur la page d’accueil (`app/page.tsx`), qui interroge `/api/test/rgie` et visualise le pack MCP RGIE.
+---
 
-## Réutiliser les données RGIE (autre composant / agent IA)
+## 3. Configuration de l’API backend
 
-- Dans un autre composant React (server ou utilitaire Node) : importer directement les helpers locaux :
-  - `import { getAllRgieRegles, searchRgieByTag } from "@/lib/rgie-local";`
-  - Exemple : `const reglesTerre = searchRgieByTag("terre");`
-- Depuis un agent IA ou un service externe : consommer l’API HTTP exposée par le front :
-  - `GET http://localhost:3000/api/test/rgie` → toutes les règles (format JSON).
-  - `GET http://localhost:3000/api/test/rgie?theme=ddr` → filtrage par thème.
-  - `GET http://localhost:3000/api/test/rgie?meta=true` → inclut `validation_report` et `webelec_schema` pour inspection ou validation.
+Le frontend appelle le backend via une variable d’environnement :
+
+- `NEXT_PUBLIC_API_URL`
+
+### 3.1 En développement (local, sans Docker)
+
+Créer un fichier `.env.local` dans `frontend/` :
+
+    NEXT_PUBLIC_API_URL=http://localhost:8080
+
+Lancer ensuite :
+
+    npm install
+    npm run dev
+
+Le frontend tourne alors sur :
+
+- http://localhost:3000  
+et appelle le backend sur :
+
+- http://localhost:8080
+
+---
+
+### 3.2 En mode Docker (docker-compose dev)
+
+Dans `docker-compose.yml` (dev), le service `frontend` définit :
+
+    frontend:
+      build:
+        context: ./frontend
+        dockerfile: Dockerfile
+      container_name: webelec-frontend
+      restart: always
+      environment:
+        NEXT_PUBLIC_API_URL: "http://localhost:8080"
+      ports:
+        - "3000:3000"
+      depends_on:
+        - backend
+      networks:
+        - webelec-net
+
+Remarque importante :
+
+- `NEXT_PUBLIC_API_URL` est lu par le navigateur, pas par le conteneur.  
+- Utiliser `http://localhost:8080` est donc correct : c’est l’hôte vu par le navigateur.
+
+---
+
+## 4. Démarrage en développement
+
+### 4.1 Sans Docker (mode Next.js classique)
+
+Depuis `frontend/` :
+
+    npm install
+    npm run dev
+
+Accès :
+
+- Frontend : http://localhost:3000  
+- Backend : http://localhost:8080 (doit être lancé à part)
+
+### 4.2 Avec Docker (stack complet dev)
+
+Depuis la racine du monorepo :
+
+    docker compose up -d --build
+
+Accès :
+
+- Frontend : http://localhost:3000  
+- Backend : http://localhost:8080  
+- PgAdmin  : http://localhost:5050
+
+---
+
+## 5. Intégration CI GitHub
+
+Workflow : `.github/workflows/frontend-ci.yml`
+
+Tâches :
+
+- Installation des dépendances (`npm install`)
+- `npm run lint`
+- `npm run build`
+
+En local, tu peux reproduire :
+
+    cd frontend
+    npm install
+    npm run lint
+    npm run build
+
+---
+
+## 6. Idées d’amélioration frontend
+
+- Ajouter un système de layout clair : layout de base + layout “dashboard”.
+- Centraliser les appels API dans un module (par exemple `lib/api.ts`) qui utilise `NEXT_PUBLIC_API_URL`.
+- Ajouter des tests (unitaires / e2e) et les brancher plus tard dans la CI.
+- Ajouter un README global pour documenter la navigation (pages, routes, modules WebElec).
+
+---
