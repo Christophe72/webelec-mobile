@@ -5,14 +5,14 @@ export function getArticles(): Promise<ArticleDTO[]> {
   return api("/rgie/articles");
 }
 
-export function runChecklist(data: any): Promise<ChecklistResultDTO> {
+export function runChecklist(data: Record<string, unknown>): Promise<ChecklistResultDTO> {
   return api("/rgie/checklist", {
     method: "POST",
     body: JSON.stringify(data)
   });
 }
 
-export function runDiagnostic(data: any): Promise<DiagnosticDTO> {
+export function runDiagnostic(data: Record<string, unknown>): Promise<DiagnosticDTO> {
   return api("/rgie/diagnostic", {
     method: "POST",
     body: JSON.stringify(data)
