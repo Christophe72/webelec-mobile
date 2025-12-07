@@ -34,3 +34,11 @@ export async function GET(req: NextRequest) {
     items: all,
   });
 }
+export default function ChantiersPage() {
+  return (
+    <div>
+      <h1>Chantiers API</h1>
+      {/* Ton contenu ici */}
+    </div>
+  );
+}

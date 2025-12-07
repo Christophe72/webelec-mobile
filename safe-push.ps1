@@ -3,18 +3,18 @@ param(
 )
 
 # Fonction pour normaliser les chemins
-function Normalize-Path([string]$path) {
+function Convert-ToNormalizedPath([string]$path) {
     return (Resolve-Path $path).Path.ToLower()
 }
 
 # Chemin du monorepo
 $AllowedRepoRoot = "C:\saas\webelec-saas"
-$Allowed = Normalize-Path $AllowedRepoRoot
+$Allowed = Convert-ToNormalizedPath $AllowedRepoRoot
 
 # Récupérer la racine Git courante
 try {
     $RepoRoot = git rev-parse --show-toplevel 2>$null
-    $RepoRoot = Normalize-Path $RepoRoot
+    $RepoRoot = Convert-ToNormalizedPath $RepoRoot
 } catch {
     Write-Host "ERREUR : Ce dossier n'est pas un repository Git." -ForegroundColor Red
     exit 1
