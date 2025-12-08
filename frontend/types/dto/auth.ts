@@ -1,16 +1,36 @@
 export interface LoginRequestDTO {
   email: string;
-  password: string;
+  motDePasse: string;
+}
+
+export interface RegisterRequestDTO {
+  nom: string;
+  prenom: string;
+  email: string;
+  motDePasse: string;
+  role: string;
+  societeId: number;
+}
+
+export interface RefreshRequestDTO {
+  refreshToken: string;
 }
 
 export interface UserDTO {
-  id: string;
+  id: number;
+  nom: string | null;
+  prenom: string | null;
   email: string;
-  name?: string;
-  role?: string;
+  role: string | null;
+  // On simplifie la forme de SocieteSummary pour le front
+  societe?: {
+    id: number;
+    nom: string;
+  } | null;
 }
 
-export interface LoginResponseDTO {
-  token: string;
-  user: UserDTO;
+export interface AuthResponseDTO {
+  accessToken: string;
+  refreshToken: string;
+  utilisateur: UserDTO;
 }

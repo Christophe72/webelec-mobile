@@ -1,18 +1,22 @@
 package com.webelec.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.webelec.backend.config.TestSecurityConfig;
 import com.webelec.backend.dto.ChantierRequest;
 import com.webelec.backend.model.Chantier;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.service.ChantierService;
+import com.webelec.backend.security.JwtAuthenticationFilter;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.context.annotation.Import;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -21,6 +25,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ChantierController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@Import(TestSecurityConfig.class)
 class ChantierControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -29,6 +35,8 @@ class ChantierControllerTest {
     @SuppressWarnings("removal")
 	@MockBean
     private ChantierService service;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
     void createChantier_success() throws Exception {

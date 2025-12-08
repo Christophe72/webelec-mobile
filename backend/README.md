@@ -51,6 +51,36 @@ Variables d'environnement attendues en production : `DB_HOST`, `DB_PORT`, `DB_NA
 
 ---
 
+## 4bis. Authentification et sécurité (décembre 2025)
+
+- Les endpoints d’authentification sont désormais exposés sous `/api/auth` :
+  - `POST /api/auth/login`
+  - `POST /api/auth/register`
+  - `POST /api/auth/refresh`
+  - `GET /api/auth/me`
+
+- La configuration Spring Security autorise temporairement :
+  - `/api/auth/**` (authentification front)
+  - `/api/societes/**` (pour tests front)
+  - `POST /api/utilisateurs` (création utilisateur)
+  Toutes les autres routes nécessitent un JWT valide.
+
+- Exemple de requête de login :
+  ```bash
+  curl.exe -X POST http://localhost:8080/api/auth/login ^
+    -H "Content-Type: application/json" ^
+    -d "{\"email\":\"user@example.com\",\"password\":\"monmotdepasse\"}"
+  ```
+
+- Pour tester rapidement :
+  ```bash
+  mvnw.cmd spring-boot:run -Dspring.profiles.active=dev
+  curl.exe -i http://localhost:8080/api/auth/login
+  ```
+  (Une réponse 400 est normale si le body est absent.)
+
+---
+
 ## 5. Lancer l'environnement
 ### 5.1 Base de données PostgreSQL (Docker)
 Depuis le répertoire contenant le `docker-compose.yml` (ou en utilisant une commande `docker run` équivalente) :
@@ -198,8 +228,21 @@ mvnw.cmd clean package -DskipTests
 ## 13. Références utiles
 - `src/main/resources/application-*.yml` : configuration par profil
 - `src/main/resources/api-spec.yaml` : contrat OpenAPI
-a- `src/test/java/com/webelec/backend/controller/*ControllerTest.java` : exemples MockMvc
+- `src/test/java/com/webelec/backend/controller/*ControllerTest.java` : exemples MockMvc
 - `src/test/java/com/webelec/backend/dto/*Test.java` : mapping DTO ↔ entités
 - `Dockerfile` : build containerisé pour la prod
 
 Le backend est prêt pour un branchement Next.js, l'intégration CI/CD et l'ajout de modules réglementaires RGIE lorsque les règles officielles sont disponibles dans le dépôt.
+
+---
+
+## À faire (backend, sécurité, roadmap)
+
+1. Sécuriser à nouveau `/api/societes/**` dès la fin des tests front.
+2. Documenter les payloads attendus pour chaque endpoint dans le README ou l’OpenAPI.
+3. Finaliser la configuration CI/CD (GitHub Actions, Surefire, etc.).
+4. Intégrer Flyway ou Liquibase pour le versioning de la base.
+5. Activer et documenter l’observabilité (Spring Actuator, logs structurés).
+6. Formaliser les règles métier RGIE et IoT avant d’ouvrir de nouveaux endpoints.
+7. Vérifier la gestion des rôles et des guards sur les endpoints sensibles.
+8. Compléter la documentation sur les erreurs et le format `ApiError`.

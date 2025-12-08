@@ -1,15 +1,19 @@
 package com.webelec.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.webelec.backend.config.TestSecurityConfig;
 import com.webelec.backend.dto.ClientRequest;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.model.Societe;
+import com.webelec.backend.security.JwtAuthenticationFilter;
 import com.webelec.backend.service.ClientService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,6 +24,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ClientController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@Import(TestSecurityConfig.class)
 class ClientControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -27,6 +33,8 @@ class ClientControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private ClientService service;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
     void createClient_success() throws Exception {

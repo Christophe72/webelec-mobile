@@ -1,13 +1,33 @@
 import { api } from "./base";
-import { LoginRequestDTO, LoginResponseDTO } from "@/types";
+import {
+  AuthResponseDTO,
+  LoginRequestDTO,
+  RefreshRequestDTO,
+  RegisterRequestDTO,
+  UserDTO
+} from "@/types";
 
-export function login(data: LoginRequestDTO): Promise<LoginResponseDTO> {
-  return api<LoginResponseDTO>("/auth/login", {
+export function login(data: LoginRequestDTO): Promise<AuthResponseDTO> {
+  return api<AuthResponseDTO>("/auth/login", {
     method: "POST",
     body: JSON.stringify(data)
   });
 }
 
-export function me(): Promise<LoginResponseDTO["user"]> {
-  return api("/auth/me");
+export function register(data: RegisterRequestDTO): Promise<AuthResponseDTO> {
+  return api<AuthResponseDTO>("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+}
+
+export function refresh(data: RefreshRequestDTO): Promise<AuthResponseDTO> {
+  return api<AuthResponseDTO>("/auth/refresh", {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+}
+
+export function me(): Promise<UserDTO> {
+  return api<UserDTO>("/auth/me");
 }

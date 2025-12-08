@@ -6,6 +6,7 @@ import com.webelec.backend.model.Intervention;
 import com.webelec.backend.model.Produit;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.Utilisateur;
+import com.webelec.backend.model.UtilisateurRole;
 import com.webelec.backend.repository.ChantierRepository;
 import com.webelec.backend.repository.ClientRepository;
 import com.webelec.backend.repository.InterventionRepository;
@@ -14,6 +15,7 @@ import com.webelec.backend.repository.SocieteRepository;
 import com.webelec.backend.repository.UtilisateurRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class DataSeeder {
     private final ChantierRepository chantierRepository;
     private final ProduitRepository produitRepository;
     private final InterventionRepository interventionRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public DataSeeder(SocieteRepository societeRepository,
                       SocieteSeedProperties seedProperties,
@@ -39,7 +42,8 @@ public class DataSeeder {
                       ClientRepository clientRepository,
                       ChantierRepository chantierRepository,
                       ProduitRepository produitRepository,
-                      InterventionRepository interventionRepository) {
+                      InterventionRepository interventionRepository,
+                      PasswordEncoder passwordEncoder) {
         this.societeRepository = societeRepository;
         this.seedProperties = seedProperties;
         this.utilisateurRepository = utilisateurRepository;
@@ -47,6 +51,7 @@ public class DataSeeder {
         this.chantierRepository = chantierRepository;
         this.produitRepository = produitRepository;
         this.interventionRepository = interventionRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostConstruct
@@ -88,6 +93,8 @@ public class DataSeeder {
             return;
         }
 
+        seedAdmin(societes);
+
         Societe elecPro = societes.get(0);
         Societe voltServices = societes.size() > 1 ? societes.get(1) : elecPro;
 
@@ -95,8 +102,8 @@ public class DataSeeder {
                 .nom("Lefevre")
                 .prenom("Laura")
                 .email("laura.lefevre@elecpro.fr")
-                .motDePasse("demo123!")
-                .role("GERANT")
+                .motDePasse(passwordEncoder.encode("demo123!"))
+                .role(UtilisateurRole.GERANT)
                 .societe(elecPro)
                 .build());
 
@@ -104,8 +111,8 @@ public class DataSeeder {
                 .nom("Martin")
                 .prenom("Hugo")
                 .email("hugo.martin@elecpro.fr")
-                .motDePasse("demo123!")
-                .role("TECHNICIEN")
+                .motDePasse(passwordEncoder.encode("demo123!"))
+                .role(UtilisateurRole.TECHNICIEN)
                 .societe(elecPro)
                 .build());
 
@@ -113,8 +120,8 @@ public class DataSeeder {
                 .nom("Gonzales")
                 .prenom("Clara")
                 .email("clara.gonzales@voltservices.fr")
-                .motDePasse("demo123!")
-                .role("GERANT")
+                .motDePasse(passwordEncoder.encode("demo123!"))
+                .role(UtilisateurRole.GERANT)
                 .societe(voltServices)
                 .build());
 
@@ -122,8 +129,8 @@ public class DataSeeder {
                 .nom("Benali")
                 .prenom("Nabil")
                 .email("nabil.benali@voltservices.fr")
-                .motDePasse("demo123!")
-                .role("TECHNICIEN")
+                .motDePasse(passwordEncoder.encode("demo123!"))
+                .role(UtilisateurRole.TECHNICIEN)
                 .societe(voltServices)
                 .build());
 
@@ -233,6 +240,24 @@ public class DataSeeder {
                 .client(lucasBernard)
                 .chantier(boutique)
                 .utilisateur(nabil)
+                .build());
+    }
+
+    private void seedAdmin(List<Societe> societes) {
+        if (societes.isEmpty()) {
+            return;
+        }
+        if (utilisateurRepository.existsByEmail("admin@webelec.fr")) {
+            return;
+        }
+        Societe societe = societes.get(0);
+        utilisateurRepository.save(Utilisateur.builder()
+                .nom("Admin")
+                .prenom("WebElec")
+                .email("admin@webelec.fr")
+                .motDePasse(passwordEncoder.encode("Admin@12345"))
+                .role(UtilisateurRole.ADMIN)
+                .societe(societe)
                 .build());
     }
 }

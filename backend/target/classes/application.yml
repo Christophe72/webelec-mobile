@@ -24,3 +24,9 @@ webelec:
         email: "support@courantplus.fr"
         telephone: "03 66 55 44 33"
         adresse: "5 boulevard de Provence, Marseille"
+  security:
+    jwt:
+      secret: ${WEBELEC_JWT_SECRET:dev-webelec-secret-change-me-please-0123456789}
+      issuer: webelec-backend
+      access-token-validity: PT30M
+      refresh-token-validity: P7D

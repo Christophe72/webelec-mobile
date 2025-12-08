@@ -1,3 +1,5 @@
+import { getToken } from "@/lib/api/auth-storage";
+
 const API_URL = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080/api";
 
 interface ApiError extends Error {
@@ -10,12 +12,22 @@ export async function api<T = unknown>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const baseHeaders: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+
+  // Ajout automatique du token JWT côté navigateur
+  if (typeof window !== "undefined") {
+    const token = getToken();
+    if (token && !("Authorization" in baseHeaders)) {
+      (baseHeaders as Record<string, string>).Authorization = `Bearer ${token}`;
+    }
+  }
+
   const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
+    headers: baseHeaders,
     cache: "no-store"
   });
 
@@ -54,10 +66,10 @@ export async function api<T = unknown>(
     return undefined as T;
   }
 
-  const contentLength = res.headers.get("content-length");
-  if (!contentLength || contentLength === "0") {
+  try {
+    return (await res.json()) as T;
+  } catch {
+    // Si la réponse n'est pas du JSON, on renvoie undefined.
     return undefined as T;
   }
-
-  return res.json() as Promise<T>;
 }

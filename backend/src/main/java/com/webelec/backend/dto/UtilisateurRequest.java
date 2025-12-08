@@ -2,6 +2,7 @@ package com.webelec.backend.dto;
 
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.Utilisateur;
+import com.webelec.backend.model.UtilisateurRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ public class UtilisateurRequest {
     private String prenom;
 
     @Email(message = "Email invalide")
+    @NotBlank(message = "L'email est obligatoire")
     @Size(max = 255, message = "L'email ne peut dépasser 255 caractères")
     private String email;
 
@@ -84,12 +86,19 @@ public class UtilisateurRequest {
         Societe societe = new Societe();
         societe.setId(this.societeId);
 
+        UtilisateurRole utilisateurRole;
+        try {
+            utilisateurRole = UtilisateurRole.valueOf(this.role);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Rôle utilisateur invalide : " + this.role);
+        }
+
         return Utilisateur.builder()
                 .nom(this.nom)
                 .prenom(this.prenom)
                 .email(this.email)
                 .motDePasse(this.motDePasse)
-                .role(this.role)
+                .role(utilisateurRole)
                 .societe(societe)
                 .build();
     }

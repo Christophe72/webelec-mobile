@@ -5,6 +5,7 @@ import com.webelec.backend.model.Client;
 import com.webelec.backend.model.Intervention;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.Utilisateur;
+import com.webelec.backend.model.UtilisateurRole;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -17,7 +18,7 @@ class InterventionResponseTest {
         Societe societe = new Societe(); societe.setId(1L); societe.setNom("WebElec");
         Chantier chantier = new Chantier(); chantier.setId(2L); chantier.setNom("Garage");
         Client client = new Client(); client.setId(3L); client.setNom("Dupont"); client.setPrenom("Marc");
-        Utilisateur utilisateur = new Utilisateur(); utilisateur.setId(4L); utilisateur.setNom("Tech"); utilisateur.setPrenom("Alex"); utilisateur.setRole("TECH");
+        Utilisateur utilisateur = new Utilisateur(); utilisateur.setId(4L); utilisateur.setNom("Tech"); utilisateur.setPrenom("Alex"); utilisateur.setRole(UtilisateurRole.TECHNICIEN);
         Intervention intervention = new Intervention();
         intervention.setId(5L);
         intervention.setTitre("Interv");
@@ -45,7 +46,7 @@ class InterventionResponseTest {
         assertEquals("Dupont", dto.getClient().getNom());
         assertNotNull(dto.getUtilisateur());
         assertEquals(4L, dto.getUtilisateur().getId());
-        assertEquals("TECH", dto.getUtilisateur().getRole());
+        assertEquals("TECHNICIEN", dto.getUtilisateur().getRole());
     }
 
     @Test

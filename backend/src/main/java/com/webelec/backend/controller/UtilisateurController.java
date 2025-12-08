@@ -6,6 +6,7 @@ import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.service.UtilisateurService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +50,7 @@ public class UtilisateurController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@Valid @RequestBody UtilisateurRequest request) {
         try {
             var created = service.create(request.toEntity());
@@ -59,6 +61,7 @@ public class UtilisateurController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public UtilisateurResponse update(@PathVariable Long id,
                                       @Valid @RequestBody UtilisateurRequest request) {
         var updated = service.update(id, request.toEntity());
@@ -66,6 +69,7 @@ public class UtilisateurController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

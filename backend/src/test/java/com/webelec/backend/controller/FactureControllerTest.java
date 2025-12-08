@@ -1,28 +1,35 @@
 package com.webelec.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.webelec.backend.config.TestSecurityConfig;
 import com.webelec.backend.dto.FactureRequest;
 import com.webelec.backend.model.Facture;
 import com.webelec.backend.model.Societe;
+import com.webelec.backend.security.JwtAuthenticationFilter;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.service.FactureService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FactureController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@Import(TestSecurityConfig.class)
 class FactureControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -30,6 +37,8 @@ class FactureControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private FactureService service;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
     void createFacture_success() throws Exception {

@@ -1,6 +1,10 @@
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\BackendApplication.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\config\CorsConfig.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\config\DataSeeder.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\config\JwtProperties.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\config\SecurityConfig.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\config\SocieteSeedProperties.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\controller\AuthController.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\controller\ChantierController.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\controller\ClientController.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\controller\DevisController.java
@@ -10,6 +14,10 @@ C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\controller\Produi
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\controller\ProduitController.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\controller\SocieteController.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\controller\UtilisateurController.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\dto\AuthLoginRequest.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\dto\AuthRefreshRequest.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\dto\AuthRegisterRequest.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\dto\AuthResponse.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\dto\ChantierRequest.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\dto\ChantierResponse.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\dto\ChantierSummary.java
@@ -48,6 +56,7 @@ C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\model\Produit.jav
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\model\ProduitAvance.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\model\Societe.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\model\Utilisateur.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\model\UtilisateurRole.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\repository\ChantierRepository.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\repository\ClientRepository.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\repository\DevisRepository.java
@@ -57,6 +66,11 @@ C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\repository\Produi
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\repository\ProduitRepository.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\repository\SocieteRepository.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\repository\UtilisateurRepository.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\security\AuthenticatedUtilisateur.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\security\JwtAuthenticationFilter.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\security\JwtService.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\security\UtilisateurDetailsService.java
+C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\service\AuthService.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\service\ChantierService.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\service\ClientService.java
 C:\saas\webelec-saas\backend\src\main\java\com\webelec\backend\service\DevisService.java

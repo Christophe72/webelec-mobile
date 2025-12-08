@@ -22,7 +22,8 @@ public class UtilisateurSummary {
         if (entity == null) {
             return null;
         }
-        return new UtilisateurSummary(entity.getId(), entity.getNom(), entity.getPrenom(), entity.getRole());
+        return new UtilisateurSummary(entity.getId(), entity.getNom(), entity.getPrenom(),
+                entity.getRole() != null ? entity.getRole().name() : null);
     }
 
     public Long getId() {

@@ -1,5 +1,6 @@
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\BackendApplicationTests.java
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\ClientRepositoryTest.java
+C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\config\TestSecurityConfig.java
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\controller\ChantierControllerTest.java
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\controller\ClientControllerTest.java
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\controller\DevisControllerTest.java
@@ -17,6 +18,7 @@ C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\dto\InterventionR
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\dto\ProduitAvanceResponseTest.java
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\dto\ProduitResponseTest.java
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\dto\SocieteResponseTest.java
+C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\service\AuthServiceTest.java
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\service\ClientServiceTest.java
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\service\ProduitServiceTest.java
 C:\saas\webelec-saas\backend\src\test\java\com\webelec\backend\service\SocieteServiceTest.java

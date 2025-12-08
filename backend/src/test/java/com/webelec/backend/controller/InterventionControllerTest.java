@@ -1,30 +1,37 @@
 package com.webelec.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.webelec.backend.config.TestSecurityConfig;
 import com.webelec.backend.dto.InterventionRequest;
 import com.webelec.backend.model.Intervention;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.Chantier;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.model.Utilisateur;
+import com.webelec.backend.model.UtilisateurRole;
 import com.webelec.backend.service.InterventionService;
+import com.webelec.backend.security.JwtAuthenticationFilter;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(InterventionController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@Import(TestSecurityConfig.class)
 class InterventionControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -32,6 +39,8 @@ class InterventionControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private InterventionService service;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
     void createIntervention_success() throws Exception {
@@ -46,7 +55,7 @@ class InterventionControllerTest {
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Chantier chantier = new Chantier(); chantier.setId(2L); chantier.setNom("Garage");
         Client client = Client.builder().id(3L).nom("Dupont").prenom("Marc").build();
-        Utilisateur utilisateur = new Utilisateur(); utilisateur.setId(4L); utilisateur.setNom("Tech"); utilisateur.setPrenom("Alex"); utilisateur.setRole("TECH");
+        Utilisateur utilisateur = new Utilisateur(); utilisateur.setId(4L); utilisateur.setNom("Tech"); utilisateur.setPrenom("Alex"); utilisateur.setRole(UtilisateurRole.TECHNICIEN);
         Intervention intervention = new Intervention();
         intervention.setId(5L);
         intervention.setTitre("Interv");

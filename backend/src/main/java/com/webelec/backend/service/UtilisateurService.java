@@ -3,6 +3,7 @@ package com.webelec.backend.service;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Utilisateur;
 import com.webelec.backend.repository.UtilisateurRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +13,11 @@ import java.util.Optional;
 public class UtilisateurService {
 
     private final UtilisateurRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UtilisateurService(UtilisateurRepository repository) {
+    public UtilisateurService(UtilisateurRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<Utilisateur> findAll() {
@@ -30,9 +33,10 @@ public class UtilisateurService {
     }
 
     public Utilisateur create(Utilisateur utilisateur) {
-        if (repository.findByEmail(utilisateur.getEmail()) != null) {
+        if (repository.existsByEmail(utilisateur.getEmail())) {
             throw new IllegalStateException("Email déjà utilisé");
         }
+        utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
         return repository.save(utilisateur);
     }
 
@@ -42,7 +46,9 @@ public class UtilisateurService {
         existing.setNom(utilisateur.getNom());
         existing.setPrenom(utilisateur.getPrenom());
         existing.setEmail(utilisateur.getEmail());
-        existing.setMotDePasse(utilisateur.getMotDePasse());
+        if (utilisateur.getMotDePasse() != null) {
+            existing.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
+        }
         existing.setRole(utilisateur.getRole());
         existing.setSociete(utilisateur.getSociete());
         return repository.save(existing);

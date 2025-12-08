@@ -29,8 +29,8 @@ public class UtilisateurResponse {
                 entity.getNom(),
                 entity.getPrenom(),
                 entity.getEmail(),
-                entity.getRole(),
-                SocieteSummary.from(entity.getSociete())
+                entity.getRole() != null ? entity.getRole().name() : null,
+                entity.getSociete() != null ? SocieteSummary.from(entity.getSociete()) : null
         );
     }
 
