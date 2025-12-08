@@ -68,7 +68,7 @@ export function RgiePanel() {
           ? ""
           : `?${new URLSearchParams({ theme }).toString()}`;
 
-      const res = await fetch(`/api/test/rgie${params}`);
+      const res = await fetch(`/api/rgie${params}`);
       if (!res.ok) {
         throw new Error(`Erreur HTTP ${res.status}`);
       }
@@ -98,7 +98,7 @@ export function RgiePanel() {
             Pack RGIE synthétique (démo)
           </h2>
           <p className="mt-1 text-xs text-muted">
-            Données locales MCP servies via <code>/api/test/rgie</code>.
+            Données locales MCP servies via <code>/api/rgie</code>.
           </p>
         </div>
         <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">

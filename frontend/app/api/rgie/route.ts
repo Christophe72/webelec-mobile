@@ -1,4 +1,4 @@
-// frontend/app/api/test/rgie/route.ts
+// frontend/app/api/rgie/route.ts
 import { NextRequest } from "next/server";
 import {
   getAllRgieRegles,
