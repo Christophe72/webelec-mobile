@@ -59,7 +59,8 @@ Rappel : ces variables sont lues par le navigateur, pas par le conteneur. L’UR
 
 ## Points fonctionnels utiles
 
-- `app/login-test/page.tsx` : formulaire de test login JWT (stockage token + bouton déconnexion, champs avec `autoComplete`).
+- Auth : page de login sur `/login` (`app/login/page.tsx`) avec stockage token + bouton déconnexion.
+- Middleware JWT (`middleware.ts`) : protège `/api/*`, vérifie le cookie `token` et bloque `/api/admin` si rôle ≠ `admin`. Secret lu via `WEBELEC_JWT_SECRET`.
 - `lib/api/base.ts` : client fetch avec ajout automatique du token côté navigateur.
 - `lib/api/piece.ts` : upload / récupération de pièces (nécessite `NEXT_PUBLIC_API_URL`).
 - IA : `app/rgie/chat/page.tsx` (chat RGIE), `app/rgie/auditeur-pro/page.tsx` (audit symbolique), SDK `lib/sdk/webelec-ai.ts`.
@@ -72,3 +73,16 @@ Rappel : ces variables sont lues par le navigateur, pas par le conteneur. L’UR
 npm run lint
 npm run build
 ```
+
+## Workflow Git (exemple)
+
+```bash
+# Depuis la racine frontend
+npm install            # installe notamment jose et zod
+git add .
+git commit -m "chore: enforce jwt middleware and document auth"
+git push origin <branche>
+```
+# pasword et email admin pour test local
+  •  Email : admin@webelec.fr
+	•  Mot de passe : Admin@12345
