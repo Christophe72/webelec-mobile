@@ -46,6 +46,18 @@ public class SocieteController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody SocieteRequest request) {
+        try {
+            var updated = service.update(id, request.toEntity());
+            return ResponseEntity.ok(SocieteResponse.from(updated));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);

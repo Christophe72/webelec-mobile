@@ -32,6 +32,25 @@ public class SocieteService {
         return repository.save(societe);
     }
 
+    public Societe update(Long id, Societe societe) {
+        Societe existing = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Societe non trouvée"));
+
+        // Vérifie l'unicité de l'email (hors société courante)
+        Societe byEmail = repository.findByEmail(societe.getEmail());
+        if (byEmail != null && !byEmail.getId().equals(id)) {
+            throw new IllegalStateException("Email déjà utilisé");
+        }
+
+        existing.setNom(societe.getNom());
+        existing.setTva(societe.getTva());
+        existing.setEmail(societe.getEmail());
+        existing.setTelephone(societe.getTelephone());
+        existing.setAdresse(societe.getAdresse());
+
+        return repository.save(existing);
+    }
+
     public void delete(Long id) {
         if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("Societe non trouvée");
