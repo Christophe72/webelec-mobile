@@ -33,13 +33,13 @@ public class Devis {
     @Column(nullable = false)
     private LocalDate dateExpiration;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(name = "montant_ht", nullable = false, precision = 12, scale = 2)
     private BigDecimal montantHT;
 
-    @Column(precision = 12, scale = 2)
+    @Column(name = "montant_tva", precision = 12, scale = 2)
     private BigDecimal montantTVA;
 
-    @Column(precision = 12, scale = 2)
+    @Column(name = "montant_ttc", precision = 12, scale = 2)
     private BigDecimal montantTTC;
 
     @Column(length = 20)

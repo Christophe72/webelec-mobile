@@ -33,13 +33,13 @@ public class Facture {
     @Column(nullable = false)
     private LocalDate dateEcheance;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(name = "montant_ht", nullable = false, precision = 12, scale = 2)
     private BigDecimal montantHT;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(name = "montant_tva", nullable = false, precision = 12, scale = 2)
     private BigDecimal montantTVA;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(name = "montant_ttc", nullable = false, precision = 12, scale = 2)
     private BigDecimal montantTTC;
 
     @Column(length = 20)
