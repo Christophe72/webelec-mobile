@@ -26,7 +26,7 @@ webelec:
         adresse: "5 boulevard de Provence, Marseille"
   security:
     jwt:
-      secret: ${WEBELEC_JWT_SECRET:dev-webelec-secret-change-me-please-0123456789}
+      secret: ${WEBELEC_JWT_SECRET:dev-f5e447b965abff7ed55be72b26a0bc68e26efd05ba43937db5c243dd65a3e4bb300c1ed326f4ee90a3d76c8829252fec2e9bc1805aab0aca1850c9952e655f47}
       issuer: webelec-backend
       access-token-validity: PT30M
       refresh-token-validity: P7D
