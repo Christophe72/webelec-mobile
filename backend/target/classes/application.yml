@@ -30,3 +30,22 @@ webelec:
       issuer: webelec-backend
       access-token-validity: PT30M
       refresh-token-validity: P7D
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+# Pour des logs JSON, utiliser un appender dédié (voir doc Spring Boot Logging)
+# Exemple avancé (non activé par défaut) : https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.logging.json

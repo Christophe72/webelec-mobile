@@ -1,0 +1,76 @@
+name: RFC – Endpoint RGIE/IoT
+description: Décrire et valider une nouvelle fonctionnalité RGIE ou IoT avant développement backend.
+title: "[RFC-RGIE] Sujet"
+labels:
+  - needs-spec
+  - rgielogic
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 1. Contexte fonctionnel
+        Décrire brièvement le besoin, l’utilisateur cible, les bénéfices attendus.
+  - type: textarea
+    attributes:
+      label: Spécifications RGIE officielles
+      description: Références exactes (article, paragraphe, version 2025, seuils, cas limites).
+      placeholder: |
+        Article 7.4.3 — Version RGIE 2025
+        - Seuil : ...
+        - Condition d’application : ...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Modélisation métier
+      description: Entités impactées (circuits, protections, capteurs, etc.), relations, règles de calcul.
+      placeholder: |
+        Entités : Circuit, Protection, Mesure
+        Relations : Circuit 1-n Protection, ...
+        Règle : ...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Flux IoT
+      description: Topic MQTT, payload JSON, unités, fréquence, sécurité.
+      placeholder: |
+        Topic : webelec/societe/{id}/device/{id}
+        Payload : {...}
+        Unités : V, A, °C
+        Authentification : JWT device token
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Plan de tests & scénarios
+      description: Cas nominal, limites, erreurs attendues, métriques de validation.
+      placeholder: |
+        - Cas nominal : ...
+        - Cas limite : ...
+        - Monitoring : ...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Impacts backend & endpoints visés
+      description: Nouveaux endpoints ou modifications, DTO concernés, sécurité, migration DB éventuelle.
+      placeholder: |
+        - Endpoint : POST /api/rgie/... (nouveau)
+        - DTO : ...
+        - Migration DB : V2__...
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Validation préalable
+      options:
+        - label: Référent RGIE / IoT a validé ces données
+          required: true
+        - label: Les données sensibles sont conformes RGPD et sécurisées
+          required: true
+  - type: textarea
+    attributes:
+      label: Annexes / documents
+      description: Liens vers PDF RGIE, schémas, captures, cahier des charges.

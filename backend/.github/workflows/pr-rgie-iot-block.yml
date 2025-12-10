@@ -1,0 +1,26 @@
+name: Block PR RGIE/IoT sans ticket associé
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, develop]
+jobs:
+  check-rgie-iot-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vérifier la présence de l'étiquette needs-spec
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const rgieIotLabels = ['needs-spec', 'rgielogic', 'iot'];
+            const prLabels = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number
+            });
+            const hasRgieIotLabel = prLabels.data.some(label => rgieIotLabels.includes(label.name));
+            if (!hasRgieIotLabel) {
+              core.setFailed('Cette PR RGIE/IoT doit être associée à un ticket avec l’étiquette needs-spec ou rgielogic/iot.');
+            }
+      - name: Bloquer la PR si besoin
+        if: failure()
+        run: exit 1

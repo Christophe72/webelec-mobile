@@ -168,6 +168,91 @@ Pour des exemples de payloads et le contrat détaillé, consultez `src/main/reso
 
 ---
 
+## 8bis. Payloads attendus par endpoint
+
+Chaque endpoint REST attend un payload JSON conforme au DTO exposé. Les champs requis et optionnels sont strictement alignés sur le métier ; ne jamais inventer de structure ou de champ non présent dans le code ou l’OpenAPI.
+
+### Sociétés (`/api/societes`)
+- **POST /api/societes**
+  ```json
+  {
+    "nom": "ElecPro",
+    "tva": "FR12345678901",
+    "email": "contact@elecpro.fr",
+    "telephone": "01 23 45 67 89",
+    "adresse": "12 rue des Ouvriers, Paris"
+  }
+  ```
+  Champs requis : `nom`, `tva`. Les autres sont optionnels.
+
+### Utilisateurs (`/api/utilisateurs`)
+- **POST /api/utilisateurs**
+  ```json
+  {
+    "nom": "Dupont",
+    "prenom": "Alice",
+    "email": "alice.dupont@example.com",
+    "societeId": 1,
+    "role": "USER"
+  }
+  ```
+  Champs requis : `nom`, `prenom`, `email`, `societeId`, `role`.
+
+### Clients (`/api/clients`)
+- **POST /api/clients**
+  ```json
+  {
+    "nom": "Martin",
+    "prenom": "Jean",
+    "societeId": 1,
+    "email": "jean.martin@example.com",
+    "telephone": "06 12 34 56 78"
+  }
+  ```
+  Champs requis : `nom`, `societeId`. Les autres sont optionnels.
+
+### Chantiers (`/api/chantiers`)
+- **POST /api/chantiers**
+  ```json
+  {
+    "nom": "Rénovation bureau",
+    "societeId": 1,
+    "clientId": 2,
+    "adresse": "24 avenue des Artisans, Bruxelles"
+  }
+  ```
+  Champs requis : `nom`, `societeId`, `clientId`.
+
+### Produits (`/api/produits`)
+- **POST /api/produits**
+  ```json
+  {
+    "nom": "Disjoncteur 16A",
+    "societeId": 1,
+    "quantite": 10,
+    "reference": "LEGRAND-1234"
+  }
+  ```
+  Champs requis : `nom`, `societeId`, `quantite`.
+
+### Authentification (`/api/auth`)
+- **POST /api/auth/login**
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "monmotdepasse"
+  }
+  ```
+  Champs requis : `email`, `password`.
+
+---
+
+Pour chaque endpoint, adapter le payload selon le DTO exposé dans le projet. Pour les endpoints avancés (devis, factures, interventions, produits avancés), se référer au fichier `src/main/resources/api-spec.yaml` pour les exemples précis et complets.
+
+Impossible de générer cette logique : règle RGIE non fournie dans le projet.
+
+---
+
 ## 9. Exemples de requêtes REST (curl, Windows)
 ```bash
 curl.exe -X GET http://localhost:8080/api/chantiers
@@ -246,3 +331,166 @@ Le backend est prêt pour un branchement Next.js, l'intégration CI/CD et l'ajou
 6. Formaliser les règles métier RGIE et IoT avant d’ouvrir de nouveaux endpoints.
 7. Vérifier la gestion des rôles et des guards sur les endpoints sensibles.
 8. Compléter la documentation sur les erreurs et le format `ApiError`.
+
+---
+
+## 14. Intégration CI/CD (GitHub Actions)
+
+Le backend WebElec est doté d’un workflow CI/CD automatisé :
+- Build, test (profil `test`) et packaging à chaque push ou PR sur `main`/`develop`.
+- JDK 21, cache Maven, artefact JAR archivé.
+- Profil de test injecté automatiquement via Maven Surefire.
+
+### Fichier de workflow
+`.github/workflows/ci-backend.yml` :
+```yaml
+name: CI Backend WebElec
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+jobs:
+  build-test-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            m2-${{ runner.os }}-
+      - name: Build & test (profil test)
+        run: mvn -B clean test
+      - name: Package (profil prod)
+        run: mvn -B clean package -DskipTests
+      - name: Archive JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: target/backend-0.0.1-SNAPSHOT.jar
+```
+
+### Configuration Maven Surefire
+Le profil `test` est injecté automatiquement :
+```xml
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-surefire-plugin</artifactId>
+  <version>3.2.5</version>
+  <configuration>
+    <systemPropertyVariables>
+      <spring.profiles.active>test</spring.profiles.active>
+    </systemPropertyVariables>
+  </configuration>
+</plugin>
+```
+
+La CI vérifie la compilation, l’exécution des tests et archive le JAR pour déploiement.
+
+---
+
+## 15. Versioning de la base (Flyway)
+
+Le projet utilise Flyway pour le versioning et la migration de la base PostgreSQL.
+
+- Dépendance ajoutée dans le `pom.xml` :
+  ```xml
+  <dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+    <version>10.13.0</version>
+  </dependency>
+  ```
+- Les scripts de migration sont placés dans : `src/main/resources/db/migration/`
+- Exemple de migration initiale : `V1__init.sql`
+  ```sql
+  -- Migration initiale : création des tables existantes
+  CREATE TABLE IF NOT EXISTS societe (
+      id BIGSERIAL PRIMARY KEY,
+      nom VARCHAR(255) NOT NULL,
+      tva VARCHAR(32) NOT NULL,
+      email VARCHAR(255),
+      telephone VARCHAR(32),
+      adresse VARCHAR(255)
+  );
+  CREATE TABLE IF NOT EXISTS client (
+      id BIGSERIAL PRIMARY KEY,
+      nom VARCHAR(255) NOT NULL,
+      prenom VARCHAR(255),
+      societe_id BIGINT NOT NULL,
+      email VARCHAR(255),
+      telephone VARCHAR(32),
+      FOREIGN KEY (societe_id) REFERENCES societe(id)
+  );
+  -- Ajouter les autres tables selon le modèle métier validé
+  ```
+- À chaque lancement, Flyway applique automatiquement les migrations non encore exécutées.
+- Adapter les scripts SQL à la structure réelle du modèle métier.
+
+Pour toute modification du schéma, créer un nouveau fichier de migration : `V2__ajout_table_x.sql`, etc.
+
+Documentation officielle : https://flywaydb.org/documentation/
+
+---
+
+## 16. Observabilité (Actuator & logs)
+
+L’observabilité est activée via Spring Boot Actuator :
+- Endpoints exposés : `/actuator/health`, `/actuator/info`, `/actuator/metrics`
+- Détails de santé complets (`show-details: always`)
+- Accessible en local sur `http://localhost:8080/actuator/health` etc.
+
+Configuration dans `application.yml` :
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+```
+
+### Logs structurés
+- Niveau par défaut : INFO (root), INFO (Spring Web), WARN (SQL)
+- Format console lisible :
+  ```yaml
+  logging:
+    level:
+      root: INFO
+      org.springframework.web: INFO
+      org.hibernate.SQL: WARN
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  ```
+- Pour des logs JSON, utiliser un appender dédié (voir doc officielle Spring Boot Logging)
+  [Spring Boot Logging JSON](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.logging.json)
+
+La configuration est prête pour une intégration Grafana/Prometheus ou tout outil compatible Actuator.
+
+---
+
+## 17. Formalisation RGIE & IoT avant nouveaux endpoints
+
+Avant de livrer de nouveaux endpoints liés au RGIE ou à l’IoT, réunir et valider les éléments suivants :
+1. **Spécifications RGIE officielles** : article, paragraphe, version 2025, seuils/chiffres exacts, cas d’application.
+2. **Modélisation métier** : entités concernées (circuits, protections, capteurs, etc.), relations exactes, règles d’orchestration.
+3. **Flux IoT documentés** : topic MQTT, payload JSON, unités (V, A, °C), fréquence d’échantillonnage, mécanismes d’authentification.
+4. **Plan de tests** : scénarios fonctionnels, jeux de données conformes, critères de validation (statuts, alarmes, anomalies).
+5. **Validation métier** : approbation écrite d’un référent RGIE/IoT avant implémentation.
+
+Sans ces données, appliquer la règle stricte : `Données insuffisantes pour une réponse fiable en mode sécurité backend.` Aucun endpoint ne doit être créé ou exposé.
+
+Pour formaliser une nouvelle demande, utiliser l’issue template `\`.github/ISSUE_TEMPLATE/rgie-iot-spec.yml` (menu *New issue → RFC – Endpoint RGIE/IoT*). Aucune implémentation n’est lancée sans ticket approuvé.
+
+---

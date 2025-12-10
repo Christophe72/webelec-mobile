@@ -2,6 +2,10 @@ package com.webelec.backend.config;
 
 import com.webelec.backend.model.Chantier;
 import com.webelec.backend.model.Client;
+import com.webelec.backend.model.Devis;
+import com.webelec.backend.model.DevisLigne;
+import com.webelec.backend.model.Facture;
+import com.webelec.backend.model.FactureLigne;
 import com.webelec.backend.model.Intervention;
 import com.webelec.backend.model.Produit;
 import com.webelec.backend.model.Societe;
@@ -9,6 +13,8 @@ import com.webelec.backend.model.Utilisateur;
 import com.webelec.backend.model.UtilisateurRole;
 import com.webelec.backend.repository.ChantierRepository;
 import com.webelec.backend.repository.ClientRepository;
+import com.webelec.backend.repository.DevisRepository;
+import com.webelec.backend.repository.FactureRepository;
 import com.webelec.backend.repository.InterventionRepository;
 import com.webelec.backend.repository.ProduitRepository;
 import com.webelec.backend.repository.SocieteRepository;
@@ -34,6 +40,8 @@ public class DataSeeder {
     private final ChantierRepository chantierRepository;
     private final ProduitRepository produitRepository;
     private final InterventionRepository interventionRepository;
+    private final DevisRepository devisRepository;
+    private final FactureRepository factureRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataSeeder(SocieteRepository societeRepository,
@@ -43,6 +51,8 @@ public class DataSeeder {
                       ChantierRepository chantierRepository,
                       ProduitRepository produitRepository,
                       InterventionRepository interventionRepository,
+                      DevisRepository devisRepository,
+                      FactureRepository factureRepository,
                       PasswordEncoder passwordEncoder) {
         this.societeRepository = societeRepository;
         this.seedProperties = seedProperties;
@@ -51,6 +61,8 @@ public class DataSeeder {
         this.chantierRepository = chantierRepository;
         this.produitRepository = produitRepository;
         this.interventionRepository = interventionRepository;
+        this.devisRepository = devisRepository;
+        this.factureRepository = factureRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -84,6 +96,8 @@ public class DataSeeder {
                 || chantierRepository.count() > 0
                 || produitRepository.count() > 0
                 || interventionRepository.count() > 0
+                || devisRepository.count() > 0
+                || factureRepository.count() > 0
                 || utilisateurRepository.count() > 0) {
             return;
         }
@@ -241,6 +255,66 @@ public class DataSeeder {
                 .chantier(boutique)
                 .utilisateur(nabil)
                 .build());
+
+        Facture factureGarage = factureRepository.save(Facture.builder()
+                .numero("FAC-2025-001")
+                .dateEmission(LocalDate.now())
+                .dateEcheance(LocalDate.now().plusDays(30))
+                .montantHT(new BigDecimal("1588.00"))
+                .montantTVA(new BigDecimal("333.48"))
+                .montantTTC(new BigDecimal("1921.48"))
+                .statut("EN_ATTENTE")
+                .societe(elecPro)
+                .client(marcDupont)
+                .build());
+
+        FactureLigne borneLigne = new FactureLigne(
+                null,
+                "Borne murale 11kW",
+                1,
+                new BigDecimal("1199.00"),
+                new BigDecimal("1199.00"),
+                factureGarage);
+        FactureLigne tableauLigne = new FactureLigne(
+                null,
+                "Tableau secondaire 63A",
+                1,
+                new BigDecimal("389.00"),
+                new BigDecimal("389.00"),
+                factureGarage);
+        factureGarage.getLignes().add(borneLigne);
+        factureGarage.getLignes().add(tableauLigne);
+        factureRepository.save(factureGarage);
+
+        Devis devisBoutique = devisRepository.save(Devis.builder()
+                .numero("DEV-2025-045")
+                .dateEmission(LocalDate.now().minusDays(10))
+                .dateExpiration(LocalDate.now().plusDays(20))
+                .montantHT(new BigDecimal("2397.00"))
+                .montantTVA(new BigDecimal("503.37"))
+                .montantTTC(new BigDecimal("2900.37"))
+                .statut("ACCEPTE")
+                .societe(voltServices)
+                .client(lucasBernard)
+                .build());
+
+        DevisLigne ledLigne = new DevisLigne(
+                null,
+                "Projecteur LED PRO 40W",
+                18,
+                new BigDecimal("79.90"),
+                new BigDecimal("1438.20"),
+                devisBoutique);
+        DevisLigne mainOeuvreLigne = new DevisLigne(
+                null,
+                "Main d'oeuvre relamping (heure)",
+                12,
+                new BigDecimal("80.00"),
+                new BigDecimal("960.00"),
+                devisBoutique);
+        devisBoutique.getLignes().add(ledLigne);
+        devisBoutique.getLignes().add(mainOeuvreLigne);
+        devisRepository.save(devisBoutique);
     }
 
     private void seedAdmin(List<Societe> societes) {

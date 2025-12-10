@@ -1,0 +1,40 @@
+name: CI Backend WebElec
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-test-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            m2-${{ runner.os }}-
+
+      - name: Build & test (profil test)
+        run: mvn -B clean test
+
+      - name: Package (profil prod)
+        run: mvn -B clean package -DskipTests
+
+      - name: Archive JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: target/backend-0.0.1-SNAPSHOT.jar
