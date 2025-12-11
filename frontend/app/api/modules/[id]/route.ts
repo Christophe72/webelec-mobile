@@ -10,11 +10,14 @@ export async function GET(
 ) {
   const { id } = await getParams(context);
   const numericId = Number(id);
-  const module = mockDb.modules.find((m) => m.id === numericId);
-  if (!module) {
-    return NextResponse.json({ message: "Module introuvable" }, { status: 404 });
+  const item = mockDb.modules.find((m) => m.id === numericId);
+  if (!item) {
+    return NextResponse.json(
+      { message: "Module introuvable" },
+      { status: 404 }
+    );
   }
-  return NextResponse.json(module);
+  return NextResponse.json(item);
 }
 
 export async function PUT(
@@ -23,13 +26,16 @@ export async function PUT(
 ) {
   const { id } = await getParams(context);
   const numericId = Number(id);
-  const module = mockDb.modules.find((m) => m.id === numericId);
-  if (!module) {
-    return NextResponse.json({ message: "Module introuvable" }, { status: 404 });
+  const item = mockDb.modules.find((m) => m.id === numericId);
+  if (!item) {
+    return NextResponse.json(
+      { message: "Module introuvable" },
+      { status: 404 }
+    );
   }
   const payload = await req.json();
-  Object.assign(module, payload, { id: module.id });
-  return NextResponse.json(module);
+  Object.assign(item, payload, { id: item.id });
+  return NextResponse.json(item);
 }
 
 export async function DELETE(
@@ -40,7 +46,10 @@ export async function DELETE(
   const numericId = Number(id);
   const index = mockDb.modules.findIndex((m) => m.id === numericId);
   if (index === -1) {
-    return NextResponse.json({ message: "Module introuvable" }, { status: 404 });
+    return NextResponse.json(
+      { message: "Module introuvable" },
+      { status: 404 }
+    );
   }
   mockDb.modules.splice(index, 1);
   return NextResponse.json({ success: true });
