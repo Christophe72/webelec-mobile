@@ -2,7 +2,93 @@
 // Page : Chat RGIE WebElec AI
 // UI complète, citations d'articles, mode expert vectoriel
 // ======================================================================
+/**
+ * Composant de page de chat pour l'assistant IA RGIE WebElec.
+ *
+ * @remarks
+ * Ce composant fournit une interface utilisateur complète pour interagir avec l'assistant IA RGIE (Règlement Général sur les Installations Électriques).
+ * Il prend en charge deux modes d'interaction :
+ * 1. Mode Q/R standard avec citations d'articles
+ * 2. Mode d'analyse d'effets pour le raisonnement causal
+ *
+ * Fonctionnalités :
+ * - Recherche sémantique vectorielle utilisant les embeddings
+ * - Réponses IA sans hallucination basées sur les articles RGIE
+ * - Vérifications d'auto-validation pour la précision des réponses
+ * - Affichage des règles RGIE citées avec niveaux de gravité et de probabilité
+ * - Décomposition étape par étape de l'analyse
+ *
+ * @example
+ * ```tsx
+ * // Ceci est un composant de page Next.js
+ * // Accessible via la route /rgie/chat
+ * ```
+ *
+ * @returns Un composant d'interface de chat avec historique des messages et contrôles de saisie
+ */
 
+/**
+ * Représente un seul message dans la conversation de chat.
+ *
+ * @interface ChatMessage
+ * @property {("user" | "ai")} role - L'émetteur du message
+ * @property {string} text - Le contenu du message
+ * @property {RgieRule[]} [rules] - Tableau optionnel des règles RGIE citées dans la réponse
+ * @property {boolean} [selfCheck] - Indicateur optionnel si la réponse a passé la validation interne
+ * @property {string[]} [steps] - Tableau optionnel des étapes d'analyse effectuées par l'IA
+ */
+
+/**
+ * Récupère le vecteur d'embedding pour un texte donné via l'API.
+ *
+ * @param {string} text - Le texte pour lequel générer un embedding
+ * @returns {Promise<number[]>} Une promesse qui résout en un tableau de nombres représentant le vecteur d'embedding
+ * @throws {Error} Lorsque la requête API échoue
+ *
+ * @example
+ * ```tsx
+ * const embedding = await getEmbedding("Quelle est la norme pour les prises?");
+ * ```
+ */
+
+/**
+ * Envoie un message utilisateur et récupère une réponse IA en mode Q/R standard.
+ *
+ * @remarks
+ * Cette fonction :
+ * 1. Ajoute le message utilisateur à l'historique du chat
+ * 2. Génère un embedding pour la recherche sémantique
+ * 3. Appelle le SDK WebElec AI pour une réponse
+ * 4. Affiche les articles RGIE cités et le statut de validation
+ *
+ * @returns {Promise<void>}
+ * @throws {Error} Lorsque la génération d'embedding ou la requête IA échoue
+ */
+
+/**
+ * Envoie un message utilisateur pour une analyse effet-vers-cause.
+ *
+ * @remarks
+ * Ce mode analyse les effets électriques et identifie les causes racines potentielles
+ * en utilisant la base de connaissances RGIE et le raisonnement causal.
+ *
+ * @returns {Promise<void>}
+ * @throws {Error} Lorsque le processus d'analyse échoue
+ */
+
+/**
+ * Affiche un seul message de chat avec toutes les métadonnées associées.
+ *
+ * @param {ChatMessage} msg - Le message à afficher
+ * @param {number} index - L'index du message dans l'historique du chat
+ * @returns {JSX.Element} Un composant card contenant le message formaté
+ *
+ * @remarks
+ * Les messages IA incluent :
+ * - Citations d'articles RGIE avec niveaux de gravité et de probabilité
+ * - Décomposition des étapes d'analyse
+ * - Indicateur de statut d'auto-validation
+ */
 "use client";
 
 import { useState } from "react";
@@ -81,30 +167,30 @@ export default function ChatRgiePage() {
   // ------------------------------------------------------------
   // Envoi du message en mode "Analyse d'effet → causes"
   // ------------------------------------------------------------
-const sendEffectAnalysis = async () => {
-  if (!input.trim()) return;
+  const sendEffectAnalysis = async () => {
+    if (!input.trim()) return;
 
-  const userMsg: ChatMessage = { role: "user", text: input };
-  setMessages((prev) => [...prev, userMsg]);
+    const userMsg: ChatMessage = { role: "user", text: input };
+    setMessages((prev) => [...prev, userMsg]);
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    await analyseEffet(input, setMessages);
-  } catch (e: unknown) {
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "ai",
-        text: `Erreur: ${errorMessage}`,
-      },
-    ]);
-  }
+    try {
+      await analyseEffet(input, setMessages);
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "ai",
+          text: `Erreur: ${errorMessage}`,
+        },
+      ]);
+    }
 
-  setLoading(false);
-  setInput("");
-};
+    setLoading(false);
+    setInput("");
+  };
 
   // ------------------------------------------------------------
   // Rendu des messages
@@ -210,4 +296,3 @@ const sendEffectAnalysis = async () => {
     </div>
   );
 }
-

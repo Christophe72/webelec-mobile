@@ -1,7 +1,41 @@
 // ======================================================================
 // Page : Auditeur Pro – RGIE WebElec
 // ======================================================================
-
+/**
+ * Composant de Page Auditeur Pro
+ *
+ * Un composant de page Next.js qui fournit une interface d'audit professionnelle RGIE (Règlement Général
+ * sur les Installations Électriques) pour les installations électriques. Ce composant permet aux utilisateurs
+ * de décrire des problèmes ou configurations d'installations électriques et de recevoir une analyse de
+ * conformité automatisée.
+ *
+ * @component
+ *
+ * @remarks
+ * Il s'agit d'un composant côté client qui utilise le SDK WebElecAuditorPro pour analyser les installations
+ * électriques selon les normes RGIE. Il génère des embeddings à partir des descriptions utilisateur et fournit
+ * des résultats d'audit détaillés incluant les risques, les non-conformités, les articles RGIE pertinents
+ * et des explications étape par étape.
+ *
+ * @example
+ * ```tsx
+ * // Ce composant est typiquement utilisé comme page Next.js
+ * // Accessible via la route : /rgie/auditeur-pro
+ * ```
+ *
+ * @returns Un composant React qui affiche :
+ * - Une zone de texte pour décrire l'installation électrique ou le problème
+ * - Un bouton de déclenchement d'audit
+ * - Des résultats d'audit détaillés incluant :
+ *   - Résumé des constats
+ *   - Risques détectés
+ *   - Non-conformités RGIE
+ *   - Articles RGIE cités
+ *   - Explication de l'analyse étape par étape
+ *
+ * @throws {Error} Lorsque l'appel API d'embedding échoue
+ * @throws {Error} Lorsque l'analyse de l'auditeur rencontre une erreur
+ */
 "use client";
 
 import { useMemo, useState } from "react";
@@ -33,9 +67,9 @@ export default function AuditeurProPage() {
     // TODO: remplis avec la structure attendue par InstallationInput (tableau, sdb, ve, etc.)
     installation: {} as InstallationInput,
   });
-  const [result, setResult] = useState<
-    Awaited<ReturnType<WebElecAuditorPro["run"]>> | null
-  >(null);
+  const [result, setResult] = useState<Awaited<
+    ReturnType<WebElecAuditorPro["run"]>
+  > | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
