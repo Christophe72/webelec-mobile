@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mockDb } from "@/lib/mock-db";
 
-type Context = { params: { id: string } };
+type Context = { params: Promise<{ id: string }> };
 
 const findIndex = (id: number) =>
   mockDb.produits.findIndex((produit) => produit.id === id);
 
 export async function GET(_: NextRequest, { params }: Context) {
-  const id = Number(params.id);
+  const { id: idParam } = await params;
+  const id = Number(idParam);
   const produit = mockDb.produits.find((item) => item.id === id);
   if (!produit) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -16,7 +17,8 @@ export async function GET(_: NextRequest, { params }: Context) {
 }
 
 export async function PUT(req: NextRequest, { params }: Context) {
-  const id = Number(params.id);
+  const { id: idParam } = await params;
+  const id = Number(idParam);
   const index = findIndex(id);
   if (index === -1) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -36,14 +38,15 @@ export async function PUT(req: NextRequest, { params }: Context) {
     societeId:
       payload.societeId !== undefined
         ? Number(payload.societeId)
-        : mockDb.produits[index].societeId
+        : mockDb.produits[index].societeId,
   };
   mockDb.produits[index] = updated;
   return NextResponse.json(updated);
 }
 
 export async function DELETE(_: NextRequest, { params }: Context) {
-  const id = Number(params.id);
+  const { id: idParam } = await params;
+  const id = Number(idParam);
   const index = findIndex(id);
   if (index === -1) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

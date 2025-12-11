@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { mockDb } from "@/lib/mock-db";
 
-type Context = { params: { id: string } };
+type Context = { params: Promise<{ id: string }> };
 
 export async function GET(_: Request, { params }: Context) {
-  const chantierId = Number(params.id);
+  const { id: idParam } = await params;
+  const chantierId = Number(idParam);
   const items = mockDb.interventions.filter(
     (intervention) => intervention.chantierId === chantierId
   );
