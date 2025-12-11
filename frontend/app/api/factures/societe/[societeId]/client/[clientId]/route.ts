@@ -1,10 +1,14 @@
 import { NextRequest } from "next/server";
-import { proxyApi } from "../../../../../../proxy";
+import { proxyApi } from "../../../../../proxy";
 
-interface Params {
-  params: { societeId: string; clientId: string };
-}
+const getParams = async (
+  context: { params: Promise<{ societeId: string; clientId: string }> }
+) => context.params;
 
-export async function GET(req: NextRequest, { params }: Params) {
-  return proxyApi(req, `/factures/societe/${params.societeId}/client/${params.clientId}`);
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ societeId: string; clientId: string }> }
+) {
+  const { societeId, clientId } = await getParams(context);
+  return proxyApi(req, `/factures/societe/${societeId}/client/${clientId}`);
 }

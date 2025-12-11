@@ -1,14 +1,20 @@
 import { NextRequest } from "next/server";
 import { proxyApi } from "../../proxy";
 
-interface Params {
-  params: { id: string };
+const getParams = async (context: { params: Promise<{ id: string }> }) => context.params;
+
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await getParams(context);
+  return proxyApi(req, `/societes/${id}`);
 }
 
-export async function GET(req: NextRequest, { params }: Params) {
-  return proxyApi(req, `/societes/${params.id}`);
-}
-
-export async function DELETE(req: NextRequest, { params }: Params) {
-  return proxyApi(req, `/societes/${params.id}`);
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await getParams(context);
+  return proxyApi(req, `/societes/${id}`);
 }

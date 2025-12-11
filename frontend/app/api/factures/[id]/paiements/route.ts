@@ -1,10 +1,12 @@
 import { NextRequest } from "next/server";
 import { proxyApi } from "../../../proxy";
 
-interface Params {
-  params: { id: string };
-}
+const getParams = async (context: { params: Promise<{ id: string }> }) => context.params;
 
-export async function POST(req: NextRequest, { params }: Params) {
-  return proxyApi(req, `/factures/${params.id}/paiements`);
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await getParams(context);
+  return proxyApi(req, `/factures/${id}/paiements`);
 }

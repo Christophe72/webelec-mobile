@@ -1,10 +1,12 @@
 import { NextRequest } from "next/server";
-import { proxyApi } from "../../../../proxy";
+import { proxyApi } from "../../../proxy";
 
-interface Params {
-  params: { id: string };
-}
+const getParams = async (context: { params: Promise<{ id: string }> }) => context.params;
 
-export async function GET(req: NextRequest, { params }: Params) {
-  return proxyApi(req, `/devis/client/${params.id}`);
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await getParams(context);
+  return proxyApi(req, `/devis/client/${id}`);
 }

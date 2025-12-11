@@ -1,18 +1,29 @@
 import { NextRequest } from "next/server";
 import { proxyApi } from "../../proxy";
 
-interface Params {
-  params: { id: string };
+// Normalize params from validator (Promise) to plain object
+const getParams = async (context: { params: Promise<{ id: string }> }) => context.params;
+
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await getParams(context);
+  return proxyApi(req, `/clients/${id}`);
 }
 
-export async function GET(req: NextRequest, { params }: Params) {
-  return proxyApi(req, `/clients/${params.id}`);
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await getParams(context);
+  return proxyApi(req, `/clients/${id}`);
 }
 
-export async function PUT(req: NextRequest, { params }: Params) {
-  return proxyApi(req, `/clients/${params.id}`);
-}
-
-export async function DELETE(req: NextRequest, { params }: Params) {
-  return proxyApi(req, `/clients/${params.id}`);
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await getParams(context);
+  return proxyApi(req, `/clients/${id}`);
 }
