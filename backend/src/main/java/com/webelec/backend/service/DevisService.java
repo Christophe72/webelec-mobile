@@ -37,6 +37,10 @@ public class DevisService {
         if (repository.findByNumero(devis.getNumero()) != null) {
             throw new IllegalStateException("Numéro de devis déjà utilisé");
         }
+        // Rattacher chaque ligne au devis parent
+        if (devis.getLignes() != null) {
+            devis.getLignes().forEach(ligne -> ligne.setDevis(devis));
+        }
         return repository.save(devis);
     }
 
@@ -53,7 +57,11 @@ public class DevisService {
         existing.setStatut(payload.getStatut());
         existing.setSociete(payload.getSociete());
         existing.setClient(payload.getClient());
+        // Nettoyer et rattacher les lignes
         existing.setLignes(payload.getLignes());
+        if (existing.getLignes() != null) {
+            existing.getLignes().forEach(ligne -> ligne.setDevis(existing));
+        }
         return repository.save(existing);
     }
 

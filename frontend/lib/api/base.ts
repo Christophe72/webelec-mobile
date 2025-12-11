@@ -1,6 +1,6 @@
 import { getToken } from "@/lib/api/auth-storage";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080/api";
+const API_URL = process.env.NEXT_PUBLIC_API_BASE || "/api";
 
 interface ApiError extends Error {
   status?: number;

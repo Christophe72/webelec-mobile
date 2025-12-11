@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { login } from "@/lib/api/auth";
 import { setToken, clearToken, getToken } from "@/lib/api/auth-storage";
@@ -36,6 +37,12 @@ export default function LoginTestPage() {
     setHasToken(false);
     setMessage("Token supprimé.");
   }
+
+  const quickLinks = [
+    { href: "/modules", title: "Modules", description: "Activer les briques fonctionnelles" },
+    { href: "/chantiers", title: "Chantiers", description: "Piloter les interventions" },
+    { href: "/societes", title: "Sociétés", description: "Gérer vos clients finaux" }
+  ];
 
   return (
     <div className="mx-auto mt-12 max-w-md rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
@@ -95,6 +102,24 @@ export default function LoginTestPage() {
           {message}
         </div>
       )}
+
+      <div className="mt-6 space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+          Accès rapide
+        </p>
+        <div className="grid grid-cols-1 gap-2">
+          {quickLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-xl border border-zinc-200/80 px-4 py-3 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm dark:border-zinc-700/70"
+            >
+              <span className="block text-base font-semibold">{link.title}</span>
+              <span className="text-xs text-muted">{link.description}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

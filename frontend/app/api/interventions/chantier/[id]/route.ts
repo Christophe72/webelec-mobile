@@ -1,12 +1,12 @@
-import { NextRequest } from "next/server";
-import { proxyApi } from "../../../proxy";
+import { NextResponse } from "next/server";
+import { mockDb } from "@/lib/mock-db";
 
-const getParams = async (context: { params: Promise<{ id: string }> }) => context.params;
+type Context = { params: { id: string } };
 
-export async function GET(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await getParams(context);
-  return proxyApi(req, `/interventions/chantier/${id}`);
+export async function GET(_: Request, { params }: Context) {
+  const chantierId = Number(params.id);
+  const items = mockDb.interventions.filter(
+    (intervention) => intervention.chantierId === chantierId
+  );
+  return NextResponse.json(items);
 }

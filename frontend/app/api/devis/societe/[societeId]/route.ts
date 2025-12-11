@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
-import { proxyApi } from "../../../proxy";
+import { NextRequest, NextResponse } from "next/server";
+import { mockDb } from "@/lib/mock-db";
 
 const getParams = async (context: { params: Promise<{ societeId: string }> }) => context.params;
 
@@ -8,5 +8,7 @@ export async function GET(
   context: { params: Promise<{ societeId: string }> }
 ) {
   const { societeId } = await getParams(context);
-  return proxyApi(req, `/devis/societe/${societeId}`);
+  const numericId = Number(societeId);
+  const devis = mockDb.devis.filter((d) => d.societeId === numericId);
+  return NextResponse.json(devis);
 }

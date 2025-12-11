@@ -6,7 +6,7 @@ export async function getSocietes(): Promise<SocieteResponse[]> {
   try {
     return (await api<SocieteResponse[]>("/societes")) ?? [];
   } catch (err) {
-    console.error("[getSocietes] Erreur réseau, utilisation du fallback mockSocietes", err);
+    console.warn("[getSocietes] Erreur réseau, utilisation du fallback mockSocietes", err);
     return mockSocietes;
   }
 }

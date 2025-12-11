@@ -258,10 +258,15 @@ Ouvrir http://localhost:3000.
 Contrat principal actuellement branché dans le front : **Sociétés**.
 
 DTOs exposés côté backend :
-- `SocieteResponse` (sortie) : `id`, `nom`, `tva`, `email?`, `telephone?- DTO TypeScript (`types`) : toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
+
+- `SocieteResponse` (sortie) : `id`, `nom`, `tva`, `email?`, `telephone?`
+- DTO TypeScript (`types`): toutes les structures sont regroupées et exportées via `@/types` (voir `types/dto/*`), alignées sur les DTO backend.
 - Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
 
-## API consommée (backend Spring)
+<br/>
+
+### API consommée (backend Spring)
+
 Contrat principal actuellement branché dans le front : **Sociétés**.
 
 - `SocieteRequest` (entrée) : `nom` (string, obligatoire, ≤255), `tva` (string, obligatoire, ≤32), `email?` (email, ≤255), `telephone?` (regex `^[0-9+().\\/\\-\\s]{6,30}$`), `adresse?` (≤512).

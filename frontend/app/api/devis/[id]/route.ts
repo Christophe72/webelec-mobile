@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
-import { proxyApi } from "../../proxy";
+import { NextRequest, NextResponse } from "next/server";
+import { mockDb } from "@/lib/mock-db";
 
 const getParams = async (context: { params: Promise<{ id: string }> }) => context.params;
 
@@ -8,7 +8,12 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await getParams(context);
-  return proxyApi(req, `/devis/${id}`);
+  const numericId = Number(id);
+  const devis = mockDb.devis.find((d) => d.id === numericId);
+  if (!devis) {
+    return NextResponse.json({ message: "Devis introuvable" }, { status: 404 });
+  }
+  return NextResponse.json(devis);
 }
 
 export async function PUT(
@@ -16,7 +21,14 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await getParams(context);
-  return proxyApi(req, `/devis/${id}`);
+  const numericId = Number(id);
+  const devis = mockDb.devis.find((d) => d.id === numericId);
+  if (!devis) {
+    return NextResponse.json({ message: "Devis introuvable" }, { status: 404 });
+  }
+  const payload = await req.json();
+  Object.assign(devis, payload, { id: devis.id });
+  return NextResponse.json(devis);
 }
 
 export async function DELETE(
@@ -24,5 +36,11 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await getParams(context);
-  return proxyApi(req, `/devis/${id}`);
+  const numericId = Number(id);
+  const index = mockDb.devis.findIndex((d) => d.id === numericId);
+  if (index === -1) {
+    return NextResponse.json({ message: "Devis introuvable" }, { status: 404 });
+  }
+  mockDb.devis.splice(index, 1);
+  return NextResponse.json({ success: true });
 }

@@ -1,9 +1,14 @@
 import { api } from "./base";
 import { ClientDTO, ClientCreateDTO, ClientUpdateDTO } from "@/types";
 
-export function getClients(societeId?: number | string): Promise<ClientDTO[]> {
+export async function getClients(societeId?: number | string): Promise<ClientDTO[]> {
   const endpoint = societeId ? `/clients/societe/${societeId}` : "/clients";
-  return api(endpoint);
+  try {
+    return (await api<ClientDTO[]>(endpoint)) ?? [];
+  } catch (err) {
+    console.warn("[getClients] Erreur réseau, retour tableau vide", err);
+    return [];
+  }
 }
 
 export function getClient(id: number | string): Promise<ClientDTO> {

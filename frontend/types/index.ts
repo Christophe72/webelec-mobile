@@ -11,3 +11,4 @@ export * from "./dto/peppol";
 export * from "./dto/notification";
 export * from "./dto/societe";
 export * from "./dto/produit-avance";
+export * from "./dto/module";

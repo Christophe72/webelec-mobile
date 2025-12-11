@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { mockDb } from "@/lib/mock-db";
 
-// Next.js validator types surface params as Promise; normalize once here
 const getParams = async (context: { params: Promise<{ id: string }> }) => context.params;
 
 export async function GET(
@@ -8,7 +8,9 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await getParams(context);
-  // Exemple : récupération des chantiers pour la société id
-  // const chantiers = await getChantiersBySocieteId(id);
-  return NextResponse.json({ societeId: id });
+  const numericId = Number(id);
+  const chantiers = mockDb.chantiers.filter(
+    (chantier) => chantier.societe?.id === numericId
+  );
+  return NextResponse.json(chantiers);
 }
