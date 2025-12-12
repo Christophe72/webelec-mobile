@@ -129,7 +129,7 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
 
   return (
     <div className="file-manager">
-      <h2>File Manager</h2>
+      <h2>Gestionnaire de fichiers</h2>
 
       {error && (
         <div className="error-message" style={{ color: "red", padding: "10px", marginBottom: "10px" }}>
@@ -138,10 +138,10 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
       )}
 
       <div className="upload-section" style={{ marginBottom: "20px", padding: "15px", border: "1px solid #ddd" }}>
-        <h3>Upload a file</h3>
+        <h3>Uploader un fichier</h3>
         <div style={{ marginBottom: "10px" }}>
           <label>
-            Document type:
+            Type de document:
             <select
               value={documentType}
               onChange={(e) => setDocumentType(e.target.value)}
@@ -163,23 +163,23 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
           />
         </div>
         <button onClick={handleUpload} disabled={uploading || !selectedFile}>
-          {uploading ? "Uploading..." : "Upload"}
+          {uploading ? "Upload en cours..." : "Upload"}
         </button>
       </div>
 
       <div className="files-list">
-        <h3>Attached files ({files.length})</h3>
+        <h3>Fichiers attachés ({files.length})</h3>
         {loading ? (
-          <p>Loading...</p>
+          <p>Chargement...</p>
         ) : files.length === 0 ? (
-          <p>No files attached</p>
+          <p>Aucun fichier attaché</p>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "2px solid #ddd" }}>
-                <th style={{ padding: "10px", textAlign: "left" }}>Name</th>
+                <th style={{ padding: "10px", textAlign: "left" }}>Nom</th>
                 <th style={{ padding: "10px", textAlign: "left" }}>Type</th>
-                <th style={{ padding: "10px", textAlign: "left" }}>Size</th>
+                <th style={{ padding: "10px", textAlign: "left" }}>Taille</th>
                 <th style={{ padding: "10px", textAlign: "left" }}>Date</th>
                 <th style={{ padding: "10px", textAlign: "left" }}>Actions</th>
               </tr>
@@ -196,9 +196,9 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
                       onClick={() => handleDownload(file.id)}
                       style={{ marginRight: "5px" }}
                     >
-                      Download
+                      Télécharger
                     </button>
-                    <button onClick={() => handleDelete(file.id)}>Delete</button>
+                    <button onClick={() => handleDelete(file.id)}>Supprimer</button>
                   </td>
                 </tr>
               ))}
