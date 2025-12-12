@@ -1,6 +1,10 @@
 import { getToken } from "@/lib/api/auth-storage";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE || "/api";
+const API_URL = process.env.NEXT_PUBLIC_API_BASE;
+
+if (!API_URL) {
+  throw new Error("NEXT_PUBLIC_API_BASE is not defined");
+}
 
 interface ApiError extends Error {
   status?: number;

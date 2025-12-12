@@ -1,109 +1,238 @@
-# WebElec – Frontend
+# WebElec SaaS – Developer Documentation (README.dev.md)
 
-Frontend Next.js (App Router) du SaaS WebElec. Il consomme l’API Spring Boot exposée sous `/api`, propose des outils IA (chat RGIE, auditeur) et une page de test d’authentification JWT.
-
----
-
-## Stack & prérequis
-- Next.js 16 + React 19 + TypeScript
-- Tailwind v4
-- Node 18+
+Documentation technique destinée aux développeurs, DevOps et contributeurs.
+Ce document décrit l’architecture interne, les choix techniques, les conventions
+et les règles à respecter pour garantir la stabilité du SaaS WebElec.
 
 ---
 
-## Scripts npm
+## 1. Principes d’architecture
 
-- `npm run dev`   → mode développement
-- `npm run build` → build de production
-- `npm run start` → sert le build
-- `npm run lint`  → lint via ESLint 9
+### 1.1 Séparation stricte des responsabilités
+
+- Spring Boot = backend métier (source de vérité)
+- Next.js = frontend UI + orchestration
+- Aucune logique métier persistante côté Next.js
+- Aucun mock métier en production
+
+Cette séparation est volontaire et non négociable.
 
 ---
 
-## Variables d’environnement
+## 2. Architecture globale
 
-API (frontend)
-- `NEXT_PUBLIC_API_BASE` : base des appels API (ex : `http://localhost:8080/api`). Utilisé par `lib/api/base.ts`.
-- `NEXT_PUBLIC_API_URL`  : utilisé pour l’upload de pièces (`lib/api/piece.ts`). Mettre la même valeur que `NEXT_PUBLIC_API_BASE`.
+Client (Browser)
+↓
+Next.js (Frontend)
+↓
+Spring Boot (API REST)
+↓
+PostgreSQL
 
-Auth / JWT
-- `WEBELEC_JWT_SECRET` : secret partagé backend/frontend (obligatoire pour `lib/auth/server.ts`).
-- `JWT_ISSUER` / `JWT_AUDIENCE` : optionnels si vous les avez configurés côté backend.
+Next.js ne parle jamais directement à la base de données.
 
-IA / embeddings
-- `OPENAI_API_KEY` (obligatoire pour `/api/embedding`)
-- `OPENAI_BASE_URL` (optionnel, défaut `https://api.openai.com`)
-- `OPENAI_MODEL` (optionnel, défaut `text-embedding-3-large` côté embeddings ; `gpt-4o-mini` côté `/api/query` ; `gpt-4.1-mini` dans `components/OpenAI.tsx`)
-- `VECTOR_STORE_ID` : requis pour la recherche RGIE (file search) utilisée par l’assistant IA
+---
 
-Exemple `.env.local` :
-```env
+## 3. Backend – Spring Boot
+
+### 3.1 Stack technique
+
+- Java 21
+- Spring Boot 3.x
+- Spring Security (JWT)
+- JPA / Hibernate
+- PostgreSQL
+- Maven
+- Docker
+
+### 3.2 Rôles backend
+
+- Gestion des entités métier
+- Validation des règles
+- Sécurité (authentification + autorisation)
+- Conformité RGIE
+- Calculs et cohérence des données
+
+### 3.3 Endpoints REST (exemples)
+
+- GET /api/societes
+- POST /api/societes
+- GET /api/clients
+- GET /api/chantiers
+- POST /api/devis
+- POST /api/factures
+
+Tous les endpoints métier sont servis par Spring Boot.
+
+---
+
+## 4. Frontend – Next.js
+
+### 4.1 Stack technique
+
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Fetch API
+- Docker
+
+### 4.2 Règle fondamentale
+
+Le frontend refuse de démarrer sans URL backend explicite.
+
+Variable obligatoire :
+
 NEXT_PUBLIC_API_BASE=http://localhost:8080/api
-NEXT_PUBLIC_API_URL=http://localhost:8080/api
-WEBELEC_JWT_SECRET=dev-webelec-secret-change-me-please-0123456789
-OPENAI_API_KEY=sk-xxxx
-# OPENAI_BASE_URL=https://api.openai.com
-# OPENAI_MODEL=text-embedding-3-large
-# VECTOR_STORE_ID=vs_xxx
-# JWT_ISSUER=webelec-backend
-# JWT_AUDIENCE=your-audience
-```
+
+Aucun fallback implicite vers /api n’est autorisé.
 
 ---
 
-## Démarrer en local (sans Docker)
+## 5. Organisation du frontend
 
-```bash
-cd frontend
-npm install
-npm run dev
-# Frontend : http://localhost:3000
-# Backend attendu sur NEXT_PUBLIC_API_BASE / NEXT_PUBLIC_API_URL
-```
-
----
-
-## Notes Docker (dev)
-
-Dans `docker-compose.yml`, fournir les mêmes variables côté service `frontend` :
-```yaml
-environment:
-  NEXT_PUBLIC_API_BASE: "http://localhost:8080/api"
-  NEXT_PUBLIC_API_URL: "http://localhost:8080/api"
-  WEBELEC_JWT_SECRET: "dev-webelec-secret-change-me-please-0123456789"
-```
-Rappel : ces variables sont lues par le navigateur, pas par le conteneur. L’URL doit donc être accessible depuis le poste client.
+frontend/
+├─ app/
+│ ├─ api/ # routes proxy ou frontend spécifiques
+│ ├─ dashboard/
+│ ├─ societes/
+│ ├─ clients/
+│ ├─ chantiers/
+│ └─ ...
+│
+├─ lib/
+│ └─ api/
+│ └─ base.ts # configuration API backend (strict)
+│
+├─ public/
+├─ package.json
+└─ Dockerfile
 
 ---
 
-## Points fonctionnels utiles
-- Auth : page de login sur `/login` (`app/login/page.tsx`) qui stocke le token dans `localStorage` + cookie `token` (utilisé côté serveur).
-- Vérification JWT côté serveur : `proxy.ts` + `lib/auth/server.ts` (lecture du cookie `token`, validation du secret partagé).
-- `lib/api/base.ts` : client fetch avec ajout automatique du token côté navigateur.
-- `lib/api/piece.ts` : upload / récupération de pièces (nécessite `NEXT_PUBLIC_API_URL`).
-- IA : `app/rgie/chat/page.tsx` (chat RGIE), `app/rgie/auditeur-pro/page.tsx` (audit symbolique), SDK `lib/sdk/webelec-ai.ts`.
+## 6. Règles sur app/api
+
+### 6.1 Ce qui est autorisé
+
+- Proxy explicite vers le backend Spring
+- Auth frontend (login/logout/me)
+- Upload temporaire (fichiers, images)
+- Cas UI spécifiques sans logique métier
+
+### 6.2 Ce qui est interdit
+
+- CRUD métier réel
+- Accès base de données
+- Mocks en production
+- Logique RGIE côté Next.js
 
 ---
 
-## CI / vérifications locales
+## 7. Proxy API (pattern officiel)
 
-```bash
-npm run lint
-npm run build
-```
+### 7.1 Utilitaire proxy
 
-## Workflow Git (exemple)
+app/api/\_proxy/proxyApi.ts :
 
-```bash
-# Depuis la racine frontend
-npm install            # installe notamment jose et zod
-git add .
-git commit -m "chore: enforce jwt middleware and document auth"
-git push origin <branche>
-```
+- Reçoit la requête NextRequest
+- Forward vers Spring Boot
+- Retourne le status et le body sans modification métier
+
+Toutes les routes proxy doivent utiliser cet utilitaire.
 
 ---
 
-## Identifiants admin (test local)
-- Email : admin@webelec.fr
-- Mot de passe : Admin@12345
+## 8. Gestion des mocks
+
+### 8.1 Principe
+
+- Les mocks sont autorisés uniquement en développement
+- Jamais exposés sous /app/api en production
+
+### 8.2 Emplacement recommandé
+
+lib/mocks/
+
+- societes.mock.ts
+- clients.mock.ts
+- chantiers.mock.ts
+
+Activation conditionnelle via NODE_ENV.
+
+---
+
+## 9. Sécurité
+
+### 9.1 Backend
+
+- JWT
+- Rôles (ADMIN, GERANT, TECHNICIEN)
+- Sécurité centralisée
+- Contrôles d’accès stricts
+
+### 9.2 Frontend
+
+- Pas de règles de sécurité métier
+- Pas de validation critique
+- Simple relais vers backend
+
+---
+
+## 10. Environnement et Docker
+
+### 10.1 Docker Compose
+
+- backend
+- frontend
+- postgres
+- pgadmin
+
+Variables d’environnement injectées explicitement au build.
+
+### 10.2 Rebuild propre
+
+docker compose down
+docker compose build --no-cache frontend
+docker compose up -d
+
+---
+
+## 11. Bonnes pratiques obligatoires
+
+- Pas de fallback silencieux
+- Pas de logique dupliquée
+- Pas de mock caché
+- Les erreurs doivent casser tôt
+- Toute règle métier appartient au backend
+
+---
+
+## 12. Évolution prévue
+
+- RGIE avancé (audit automatique)
+- Assistant IA (RAG / MCP)
+- Multi-métiers (chauffage, HVAC)
+- Facturation électronique (Peppol)
+- Dashboards techniques et décisionnels
+
+---
+
+## 13. État du projet
+
+- Architecture validée
+- Backend opérationnel
+- Frontend connecté au backend réel
+- Base saine pour un SaaS long terme
+
+---
+
+## 14. Auteur
+
+Christophe Seyler  
+Électricien – Développeur – IoT – Bureau d’étude
+
+---
+
+## 15. Notes finales
+
+Ce document fait partie intégrante du projet.
+Toute modification architecturale doit être cohérente avec ce README.dev.md.

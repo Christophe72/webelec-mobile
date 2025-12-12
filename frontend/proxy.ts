@@ -1,18 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyJwtServer } from "@/lib/auth/server";
 import { z } from "zod";
 
 const ClaimsSchema = z.object({
   sub: z.string(),
-  role: z.string().optional()
+  role: z.string().optional(),
 });
 
+// JWT désactivé hors production
 const AUTH_DISABLED = process.env.NODE_ENV !== "production";
 
 export async function proxy(req: NextRequest) {
+  // ✅ DEV : on laisse tout passer
   if (AUTH_DISABLED) {
     return NextResponse.next();
   }
+
+  // ⚠️ IMPORT DYNAMIQUE (clé du correctif)
+  const { verifyJwtServer } = await import("@/lib/auth/server");
 
   const token = req.cookies.get("token")?.value;
   if (!token) {
@@ -23,8 +27,11 @@ export async function proxy(req: NextRequest) {
     const payload = await verifyJwtServer(token);
     const claims = ClaimsSchema.parse(payload);
 
-    // Garde simple: restriction des routes admin.
-    if (req.nextUrl.pathname.startsWith("/api/admin") && claims.role !== "admin") {
+    // Restriction simple des routes admin
+    if (
+      req.nextUrl.pathname.startsWith("/api/admin") &&
+      claims.role !== "admin"
+    ) {
       return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
     }
 
@@ -35,6 +42,7 @@ export async function proxy(req: NextRequest) {
   }
 }
 
+// Matcher Next.js
 export const config = {
-  matcher: ["/api/:path*"]
+  matcher: ["/api/:path*"],
 };
