@@ -28,6 +28,7 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
 
   useEffect(() => {
     loadFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entityType, entityId]);
 
   async function loadFiles() {
@@ -65,7 +66,13 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
     setUploading(true);
     setError(null);
     try {
-      const uploadData: any = {
+      const uploadData: {
+        file: File;
+        type: string;
+        interventionId?: number;
+        devisId?: number;
+        factureId?: number;
+      } = {
         file: selectedFile,
         type: documentType,
       };

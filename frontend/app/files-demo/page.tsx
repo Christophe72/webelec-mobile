@@ -22,7 +22,7 @@ export default function FilesDemoPage() {
             Type d&apos;entité:
             <select
               value={entityType}
-              onChange={(e) => setEntityType(e.target.value as any)}
+              onChange={(e) => setEntityType(e.target.value as "intervention" | "devis" | "facture")}
               style={{ marginLeft: "10px" }}
             >
               <option value="intervention">Intervention</option>
