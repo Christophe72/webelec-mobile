@@ -19,7 +19,7 @@ Fonctionnalités prévues :
 - Clients & chantiers  
 - Interventions  
 - Devis & factures  
-- Pièces justificatives (photos, PDF, tickets…)  
+- Pièces justificatives (photos, PDF, tickets…) ✅  
 - Conformité électrique (RGIE 2025)  
 - Intégration Peppol (facturation électronique)
 
@@ -86,6 +86,7 @@ mvnw.cmd test
 - **Produits avancés** : `/api/produits-avances` pour gérer le catalogue enrichi (prix achat/vente, fournisseur).
 - **Devis** : `/api/devis` avec filtres `/societe/{id}`/`/client/{id}`, gestion des lignes (`DevisLigne`).
 - **Factures** : `/api/factures` similaires aux devis mais avec échéance/statut d'encaissement.
+- **Pièces justificatives** : `/api/pieces` pour gérer les fichiers attachés (photos, PDFs, tickets) aux interventions, devis et factures.
 
 👉 Spec OpenAPI (Next.js friendly) : `src/main/resources/api-spec.yaml`
 
@@ -219,6 +220,66 @@ POST /api/factures
   "societe": { "id": 1 },
   "client": { "id": 5 },
   "lignes": [
+
+### Contrat API Pièces Justificatives (`/api/pieces`)
+
+**Description**
+Permet de gérer les fichiers (photos, PDFs, tickets, etc.) attachés aux interventions, devis et factures.
+
+**DTOs exposés**
+
+- `PieceJustificativeResponse` (payload sortant)
+  - `id` _(number)_
+  - `filename` _(string)_ - Nom du fichier sur le serveur
+  - `originalFilename` _(string)_ - Nom original du fichier
+  - `contentType` _(string)_ - Type MIME (image/jpeg, application/pdf, etc.)
+  - `fileSize` _(number)_ - Taille en octets
+  - `type` _(string)_ - Type de document (PHOTO, PDF, TICKET, FACTURE, DEVIS, AUTRE)
+  - `downloadUrl` _(string)_ - URL de téléchargement
+  - `uploadDate` _(string)_ - Date et heure d'upload (ISO 8601)
+  - `interventionId?` _(number)_ - ID de l'intervention associée (optionnel)
+  - `devisId?` _(number)_ - ID du devis associé (optionnel)
+  - `factureId?` _(number)_ - ID de la facture associée (optionnel)
+
+**Endpoints**
+
+1. `POST /api/pieces/upload` → Upload un fichier
+   - Content-Type: `multipart/form-data`
+   - Paramètres:
+     - `file` (required) - Le fichier à uploader
+     - `type` (required) - Type de document (PHOTO, PDF, TICKET, etc.)
+     - `interventionId` (optional) - ID de l'intervention
+     - `devisId` (optional) - ID du devis
+     - `factureId` (optional) - ID de la facture
+   - Réponse: `200 OK` avec `PieceJustificativeResponse`
+
+2. `GET /api/pieces/{id}` → Récupérer les métadonnées d'un fichier
+   - Réponse: `200 OK` avec `PieceJustificativeResponse`
+   - `404 Not Found` si le fichier n'existe pas
+
+3. `GET /api/pieces/{id}/download` → Télécharger un fichier
+   - Réponse: Fichier binaire avec headers appropriés
+   - `Content-Disposition: attachment; filename="..."`
+   - `Content-Type: [type MIME du fichier]`
+
+4. `GET /api/pieces/intervention/{interventionId}` → Lister les fichiers d'une intervention
+   - Réponse: `200 OK` avec `List<PieceJustificativeResponse>`
+
+5. `GET /api/pieces/devis/{devisId}` → Lister les fichiers d'un devis
+   - Réponse: `200 OK` avec `List<PieceJustificativeResponse>`
+
+6. `GET /api/pieces/facture/{factureId}` → Lister les fichiers d'une facture
+   - Réponse: `200 OK` avec `List<PieceJustificativeResponse>`
+
+7. `DELETE /api/pieces/{id}` → Supprimer un fichier
+   - Réponse: `204 No Content` si succès
+   - `404 Not Found` si le fichier n'existe pas
+
+**Configuration**
+
+Les fichiers uploadés sont stockés dans le répertoire `uploads/` (configurable via `app.file.upload-dir` dans `application.yml`).
+Taille maximale par fichier : 10 MB (configurable via `spring.servlet.multipart.max-file-size`).
+
 - `pom.xml` : gestion des dépendances et configuration Java 21
 
 
@@ -250,6 +311,14 @@ npm run dev
 # ou npm run build && npm run start pour la prod
 ```
 Ouvrir http://localhost:3000.
+
+### Composants et pages disponibles
+
+- **Page de démonstration des fichiers** : `/files-demo` - Interface pour tester l'upload et le téléchargement de pièces justificatives
+- **Composant FileManager** : Composant réutilisable (`components/FileManager.tsx`) pour gérer les fichiers attachés aux interventions, devis et factures
+  - Upload de fichiers avec sélection du type (PHOTO, PDF, TICKET, etc.)
+  - Liste des fichiers avec métadonnées (nom, taille, date)
+  - Boutons de téléchargement et suppression
 
 - Endpoints de test/proxy : `GET/POST /api/test/chantiers` et `GET/POST /api/test/produits` qui forwardent vers le backend Spring (pratique pour tester le back depuis le front).
 

@@ -12,3 +12,7 @@ Thumbs.db
 # Ignorer les fichiers de configuration locaux
 *.dat
 *.old
+
+# Ignorer les fichiers uploadés
+uploads/
+backend/uploads/

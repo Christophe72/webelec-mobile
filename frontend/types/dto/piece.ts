@@ -1,14 +1,24 @@
 export interface PieceUploadDTO {
   type: string;
   file: File | Blob;
-  interventionId?: string;
-  devisId?: string;
-  factureId?: string;
+  interventionId?: number;
+  devisId?: number;
+  factureId?: number;
 }
 
-export interface PieceDTO {
-  id: string;
-  url: string;
+export interface PieceJustificativeResponse {
+  id: number;
+  filename: string;
+  originalFilename: string;
+  contentType: string;
+  fileSize: number;
   type: string;
-  filename?: string;
+  downloadUrl: string;
+  uploadDate: string;
+  interventionId?: number;
+  devisId?: number;
+  factureId?: number;
 }
+
+// Legacy alias for backward compatibility
+export type PieceDTO = PieceJustificativeResponse;
