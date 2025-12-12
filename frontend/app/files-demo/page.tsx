@@ -9,17 +9,17 @@ export default function FilesDemoPage() {
 
   return (
     <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
-      <h1>Démonstration - Gestionnaire de Fichiers</h1>
+      <h1>Demo - File Manager</h1>
       <p>
-        Cette page permet de tester le système de gestion des pièces justificatives
-        (photos, PDFs, tickets, etc.) attachées aux interventions, devis et factures.
+        This page allows you to test the supporting documents management system
+        (photos, PDFs, tickets, etc.) attached to interventions, devis and factures.
       </p>
 
       <div style={{ marginBottom: "20px", padding: "15px", border: "1px solid #ddd", background: "#f9f9f9" }}>
         <h3>Configuration</h3>
         <div style={{ marginBottom: "10px" }}>
           <label>
-            Type d&apos;entité:
+            Entity type:
             <select
               value={entityType}
               onChange={(e) => setEntityType(e.target.value as "intervention" | "devis" | "facture")}
@@ -33,7 +33,7 @@ export default function FilesDemoPage() {
         </div>
         <div>
           <label>
-            ID de l&apos;entité:
+            Entity ID:
             <input
               type="number"
               value={entityId}
@@ -49,13 +49,13 @@ export default function FilesDemoPage() {
       <div style={{ marginTop: "30px", padding: "15px", border: "1px solid #ddd", background: "#f0f8ff" }}>
         <h3>Instructions</h3>
         <ul>
-          <li>Sélectionnez le type d&apos;entité (intervention, devis ou facture)</li>
-          <li>Entrez l&apos;ID de l&apos;entité (doit exister dans la base de données)</li>
-          <li>Sélectionnez un type de document (PHOTO, PDF, TICKET, etc.)</li>
-          <li>Choisissez un fichier à uploader</li>
-          <li>Cliquez sur &quot;Upload&quot; pour envoyer le fichier</li>
-          <li>Les fichiers apparaîtront dans la liste ci-dessous</li>
-          <li>Utilisez les boutons &quot;Télécharger&quot; et &quot;Supprimer&quot; pour gérer les fichiers</li>
+          <li>Select the entity type (intervention, devis or facture)</li>
+          <li>Enter the entity ID (must exist in the database)</li>
+          <li>Select a document type (PHOTO, PDF, TICKET, etc.)</li>
+          <li>Choose a file to upload</li>
+          <li>Click &quot;Upload&quot; to send the file</li>
+          <li>Files will appear in the list below</li>
+          <li>Use the &quot;Download&quot; and &quot;Delete&quot; buttons to manage files</li>
         </ul>
       </div>
     </div>
