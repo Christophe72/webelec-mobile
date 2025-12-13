@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
   const payload = await req.json();
   const produitId = Number(payload.produitId);
   const quantite = Number(payload.quantite);
-  const type = payload.type === "out" ? "out" : "in";
+  const type: "in" | "out" = payload.type === "out" ? "out" : "in";
 
   if (!Number.isFinite(produitId) || !Number.isFinite(quantite)) {
     return NextResponse.json(

@@ -11,9 +11,13 @@ export async function GET(_: Request, { params }: Context) {
     return NextResponse.json({ error: "Pièce introuvable" }, { status: 404 });
   }
 
-  const blob = new Blob([piece.data]);
+  const rawBuffer = piece.data.buffer as ArrayBuffer;
+  const arrayBuffer = rawBuffer.slice(
+    piece.data.byteOffset,
+    piece.data.byteOffset + piece.data.byteLength
+  );
 
-  return new NextResponse(blob, {
+  return new NextResponse(arrayBuffer, {
     headers: {
       "Content-Type": piece.contentType,
       "Content-Disposition": `attachment; filename="${piece.originalFilename}"`
