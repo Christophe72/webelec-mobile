@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mockDb } from "@/lib/mock-db";
 
-export async function GET() {
-  return NextResponse.json(mockDb.chantiers);
+export async function GET(req: NextRequest) {
+  const societeId = req.nextUrl.searchParams.get("societeId");
+  if (!societeId) {
+    return NextResponse.json(mockDb.chantiers);
+  }
+  const numericId = Number(societeId);
+  const filtered = mockDb.chantiers.filter(
+    (chantier) => chantier.societe?.id === numericId
+  );
+  return NextResponse.json(filtered);
 }
 
 export async function POST(req: NextRequest) {

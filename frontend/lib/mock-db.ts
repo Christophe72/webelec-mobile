@@ -12,8 +12,17 @@ import type {
   DevisDTO,
   ModuleDTO,
   ProduitDTO,
-  InterventionDTO
+  InterventionDTO,
+  PieceJustificativeResponse,
+  StockMouvementDTO
 } from "@/types";
+
+type PieceRecord = PieceJustificativeResponse & { data: Buffer };
+
+type StockMouvementRecord = StockMouvementDTO & {
+  id: number;
+  date: string;
+};
 
 type MockDb = {
   societes: SocieteResponse[];
@@ -23,6 +32,8 @@ type MockDb = {
   modules: ModuleDTO[];
   produits: ProduitDTO[];
   interventions: InterventionDTO[];
+  pieces: PieceRecord[];
+  stockMouvements: StockMouvementRecord[];
   nextSocieteId: number;
   nextClientId: number;
   nextChantierId: number;
@@ -30,6 +41,8 @@ type MockDb = {
   nextModuleId: number;
   nextProduitId: number;
   nextInterventionId: number;
+  nextPieceId: number;
+  nextStockMouvementId: number;
 };
 
 const globalStore = globalThis as typeof globalThis & {
@@ -52,13 +65,17 @@ if (!globalStore.__webelecMockDb) {
     modules: [...mockModules],
     produits: [...mockProduits],
     interventions: [...mockInterventions],
+    pieces: [],
+    stockMouvements: [],
     nextSocieteId: nextId(mockSocietes),
     nextClientId: nextId(mockClients),
     nextChantierId: nextId(mockChantiers),
     nextDevisId: nextId(mockDevis),
     nextModuleId: nextId(mockModules),
     nextProduitId: nextId(mockProduits),
-    nextInterventionId: nextId(mockInterventions)
+    nextInterventionId: nextId(mockInterventions),
+    nextPieceId: 1,
+    nextStockMouvementId: 1
   };
 }
 

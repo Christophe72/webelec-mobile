@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { z } from "zod";
+import { WebElecAuditorPro } from "@/lib/sdk/webelec-auditor";
+import type { InstallationInput } from "@/lib/rgie/audit.schema";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,14 +20,10 @@ const systemPrompt = [
   "Réponds en français adapté à un professionnel de terrain.",
 ].join(" ");
 
+const localAuditor = new WebElecAuditorPro();
+
 export async function POST(req: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: "OPENAI_API_KEY manquant côté serveur." },
-      { status: 500 }
-    );
-  }
 
   let parsedBody;
   try {
@@ -54,6 +52,29 @@ export async function POST(req: Request) {
     "Donne une réponse concise mais exploitable immédiatement (max ~250 mots).",
     "Ajoute les vérifications de sécurité (différentiels, IP, mesures d'isolement) quand c'est pertinent.",
   ].filter(Boolean);
+
+  if (!apiKey) {
+    const localResult = await localAuditor.run(
+      task,
+      [],
+      {} as InstallationInput
+    );
+    const formatted = [
+      "Analyse RGIE locale (mode démo)",
+      "",
+      localResult.summary,
+      "",
+      "Étapes recommandées :",
+      ...localResult.steps.map((step) => `- ${step}`),
+      "",
+      "Références RGIE :",
+      ...localResult.citations.map(
+        (citation) =>
+          `• Livre ${citation.rgie.livre}, Article ${citation.rgie.article} (${citation.rgie.nature})`
+      ),
+    ].join("\n");
+    return NextResponse.json({ result: formatted });
+  }
 
   const model = process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
   const openai = new OpenAI({ apiKey });
