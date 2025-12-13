@@ -11,7 +11,9 @@ export async function GET(_: Request, { params }: Context) {
     return NextResponse.json({ error: "Pièce introuvable" }, { status: 404 });
   }
 
-  return new NextResponse(piece.data, {
+  const blob = new Blob([piece.data]);
+
+  return new NextResponse(blob, {
     headers: {
       "Content-Type": piece.contentType,
       "Content-Disposition": `attachment; filename="${piece.originalFilename}"`
