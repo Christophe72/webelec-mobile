@@ -122,12 +122,25 @@ if ($Branch -eq "main") {
 # -------------------------------------------------
 # 8. Commit & push
 # -------------------------------------------------
-Step "Commit & push"
+try {
+    # ===== TON SCRIPT ICI (inchangé) =====
 
-git add .
-git commit -m "$Message"
+    git add .
+    git commit -m "$Message"
+    git pull --rebase
+    git push
 
-git pull --rebase
-git push
-
+    Write-Host ""
+    Write-Host "✔ PUSH TERMINÉ AVEC SUCCÈS" -ForegroundColor Green
+}
+catch {
+    Write-Host ""
+    Write-Host "❌ ERREUR BLOQUANTE :" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+}
+finally {
+    Write-Host ""
+    Write-Host "Appuie sur une touche pour fermer..." -ForegroundColor Yellow
+    Read-Host
+}
 Ok "Push effectué avec succès"
