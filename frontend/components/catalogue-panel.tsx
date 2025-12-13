@@ -1,18 +1,43 @@
+/**
+ * CataloguePanel gère l'intégralité du catalogue produits.
+ *
+ * Il propose une interface permettant de lister, créer, modifier et supprimer des
+ * produits tout en les rattachant à une société.
+ *
+ * Fonctionnalités :
+ * - Récupère et affiche les listes de produits et de sociétés.
+ * - Fournit un formulaire pour ajouter ou éditer un produit existant.
+ * - Permet de supprimer un produit et de rafraîchir les données.
+ * - Gère les états de chargement, d'erreur et les validations essentielles du formulaire.
+ *
+ * État local :
+ * - `produits` : liste des produits chargés.
+ * - `societes` : liste des sociétés utilisables dans le formulaire.
+ * - `form` : valeurs courantes du formulaire de création/édition.
+ * - `editingId` : identifiant du produit en cours de modification, `null` sinon.
+ * - `loading` : indique si les données sont en cours de chargement.
+ * - `saving` : indique si une sauvegarde est en cours.
+ * - `error` : message d'erreur éventuel.
+ *
+ * Exemple :
+ * ```tsx
+ * <CataloguePanel />
+ * ```
+ *
+ * @component
+ */
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import type {
-  ProduitDTO,
-  ProduitCreateDTO,
-  SocieteResponse
-} from "@/types";
+import type { ProduitDTO, ProduitCreateDTO, SocieteResponse } from "@/types";
 import {
   getProduits,
   createProduit,
   updateProduit,
-  deleteProduit
+  deleteProduit,
 } from "@/lib/api/catalogue";
 import { getSocietes } from "@/lib/api/societe";
+import { cn } from "@/lib/utils";
 
 const emptyProduit: ProduitCreateDTO = {
   reference: "",
@@ -20,7 +45,7 @@ const emptyProduit: ProduitCreateDTO = {
   description: "",
   quantiteStock: 0,
   prixUnitaire: 0,
-  societeId: 0
+  societeId: 0,
 };
 
 export function CataloguePanel() {
@@ -38,7 +63,7 @@ export function CataloguePanel() {
       setError(null);
       const [produitsData, societesData] = await Promise.all([
         getProduits(),
-        getSocietes()
+        getSocietes(),
       ]);
       setProduits(produitsData ?? []);
       setSocietes(societesData ?? []);
@@ -89,7 +114,7 @@ export function CataloguePanel() {
       description: produit.description ?? "",
       quantiteStock: produit.quantiteStock,
       prixUnitaire: produit.prixUnitaire,
-      societeId: produit.societeId
+      societeId: produit.societeId,
     });
   };
 
@@ -247,7 +272,7 @@ export function CataloguePanel() {
                     Stock : {produit.quantiteStock} • Prix :{" "}
                     {produit.prixUnitaire.toLocaleString("fr-FR", {
                       style: "currency",
-                      currency: "EUR"
+                      currency: "EUR",
                     })}
                   </p>
                 </div>

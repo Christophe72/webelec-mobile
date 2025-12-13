@@ -143,3 +143,5 @@ export function RgieQueryPanel(props: RgieQueryPanelProps) {
     </div>
   );
 }
+
+export default RgieQueryPanel;

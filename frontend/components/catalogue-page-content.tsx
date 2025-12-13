@@ -1,3 +1,9 @@
+/**
+ * CataloguePageContent structure la page Catalogue avec son en-tête
+ * et le panneau principal de gestion des produits.
+ *
+ * @component
+ */
 import CataloguePanel from "@/components/catalogue-panel";
 
 export function CataloguePageContent() {
