@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import type {
   ClientDTO,
   ClientCreateDTO,
@@ -24,6 +24,10 @@ const emptyClient: ClientCreateDTO = {
   societeId: 0,
 };
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneRegex = /^[+]?[\d\s().-]{6,}$/;
+const normalizePhone = (value: string) => value.replace(/[^+\d]/g, "");
+
 export function ClientsPanel() {
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [societes, setSocietes] = useState<SocieteResponse[]>([]);
@@ -32,6 +36,39 @@ export function ClientsPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
+  const [filterQuery, setFilterQuery] = useState("");
+
+  const societeById = useMemo(() => {
+    const map = new Map<number, SocieteResponse>();
+    societes.forEach((societe) => {
+      map.set(societe.id, societe);
+    });
+    return map;
+  }, [societes]);
+
+  const filteredClients = useMemo(() => {
+    const normalizedQuery = filterQuery.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return clients;
+    }
+    return clients.filter((client) => {
+      const valuesToSearch = [
+        client.nom,
+        client.prenom,
+        client.email,
+        client.telephone,
+        societeById.get(client.societeId)?.nom,
+      ]
+        .filter(Boolean)
+        .map((value) => value!.toLowerCase());
+      return valuesToSearch.some((value) =>
+        value.includes(normalizedQuery),
+      );
+    });
+  }, [clients, filterQuery, societeById]);
+
+  const hasFilter = Boolean(filterQuery.trim());
 
   const loadData = async () => {
     try {
@@ -56,23 +93,70 @@ export function ClientsPanel() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!form.nom.trim()) {
-      setError("Le nom est requis");
-      return;
+    setFormErrors([]);
+    const trimmedNom = form.nom.trim();
+    const trimmedEmail = (form.email ?? "").trim();
+    const trimmedTelephone = (form.telephone ?? "").trim();
+    const issues: string[] = [];
+
+    if (!trimmedNom) {
+      issues.push("Le nom est requis.");
     }
     if (!form.societeId) {
-      setError("Sélectionnez une société");
+      issues.push("Sélectionnez une société.");
+    }
+    if (trimmedEmail && !emailRegex.test(trimmedEmail)) {
+      issues.push("Format d'email invalide.");
+    }
+    if (trimmedTelephone && !phoneRegex.test(trimmedTelephone)) {
+      issues.push("Format de téléphone invalide.");
+    }
+    if (trimmedEmail) {
+      const normalizedEmail = trimmedEmail.toLowerCase();
+      const duplicateEmail = clients.some(
+        (client) =>
+          client.id !== editingId &&
+          client.email?.toLowerCase() === normalizedEmail,
+      );
+      if (duplicateEmail) {
+        issues.push("Cet email est déjà utilisé par un autre client.");
+      }
+    }
+    if (trimmedTelephone) {
+      const normalizedTelephone = normalizePhone(trimmedTelephone);
+      const duplicateTelephone = clients.some(
+        (client) =>
+          client.id !== editingId &&
+          client.telephone &&
+          normalizePhone(client.telephone) === normalizedTelephone,
+      );
+      if (duplicateTelephone) {
+        issues.push("Ce téléphone est déjà utilisé par un autre client.");
+      }
+    }
+
+    if (issues.length > 0) {
+      setFormErrors(issues);
       return;
     }
 
     try {
       setSaving(true);
       setError(null);
+      const payload: ClientCreateDTO = {
+        ...form,
+        nom: trimmedNom,
+        prenom: (form.prenom ?? "").trim(),
+        email: trimmedEmail,
+        telephone: trimmedTelephone,
+        adresse: (form.adresse ?? "").trim(),
+      };
+
       if (editingId) {
-        const payload: ClientUpdateDTO = { ...form };
-        await updateClient(editingId, payload);
+        const updatePayload: ClientUpdateDTO = { ...payload };
+        await updateClient(editingId, updatePayload);
       } else {
-        await createClient(form);
+        await createClient(payload);
       }
       setForm(emptyClient);
       setEditingId(null);
@@ -86,6 +170,7 @@ export function ClientsPanel() {
 
   const handleEdit = (client: ClientDTO) => {
     setEditingId(client.id);
+    setFormErrors([]);
     setForm({
       nom: client.nom,
       prenom: client.prenom ?? "",
@@ -98,6 +183,7 @@ export function ClientsPanel() {
 
   const handleDelete = async (id: number) => {
     try {
+      setFormErrors([]);
       setError(null);
       await deleteClient(id);
       await loadData();
@@ -109,9 +195,12 @@ export function ClientsPanel() {
   const cancelEdit = () => {
     setEditingId(null);
     setForm(emptyClient);
+    setFormErrors([]);
   };
 
-  const selectedSociete = societes.find((s) => s.id === form.societeId);
+  const selectedSociete = form.societeId
+    ? societeById.get(form.societeId)
+    : undefined;
 
   return (
     <section className="mx-auto mt-8 w-full max-w-5xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
@@ -210,26 +299,54 @@ export function ClientsPanel() {
         </div>
       </form>
 
+      {formErrors.length > 0 && (
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-500/60 dark:bg-amber-900/40 dark:text-amber-100">
+          <ul className="list-disc space-y-1 pl-5">
+            {formErrors.map((message) => (
+              <li key={message}>{message}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {error && (
         <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-700/60 dark:bg-red-900/40 dark:text-red-100">
           {error}
         </div>
       )}
 
-      <div className="mt-4 text-xs text-muted">
-        {loading
-          ? "Chargement des clients…"
-          : `Clients chargés : ${clients.length}`}
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex-1">
+          <label className="text-xs uppercase tracking-wide text-muted">
+            Recherche
+          </label>
+          <input
+            type="search"
+            value={filterQuery}
+            onChange={(event) => setFilterQuery(event.target.value)}
+            placeholder="Nom, société, email ou téléphone"
+            className="mt-1 w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div className="text-xs text-muted">
+          {loading
+            ? "Chargement des clients…"
+            : `Clients affichés : ${filteredClients.length}/${clients.length}`}
+        </div>
       </div>
 
       <div className="mt-4 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
         {loading && clients.length === 0 ? (
           <p className="py-4 text-muted">Chargement…</p>
-        ) : clients.length === 0 ? (
-          <p className="py-4 text-muted">Aucun client pour le moment.</p>
+        ) : filteredClients.length === 0 ? (
+          <p className="py-4 text-muted">
+            {hasFilter
+              ? "Aucun client ne correspond à votre recherche."
+              : "Aucun client pour le moment."}
+          </p>
         ) : (
-          clients.map((client) => {
-            const societe = societes.find((s) => s.id === client.societeId);
+          filteredClients.map((client) => {
+            const societe = societeById.get(client.societeId);
             return (
               <article
                 key={client.id}

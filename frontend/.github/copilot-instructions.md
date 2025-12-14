@@ -15,13 +15,13 @@ WebElec couvre :
 - métiers des électriciens belges (résidentiel, tertiaire, industrie légère)
 - conformité **RGIE 2025 – Livre 1**
 - modules ERP :
-  - clients, chantiers, interventions, planning  
-  - devis, factures, paiements, PDF, **Peppol BIS 3.0**  
-  - catalogue matériel, stock, fournisseurs  
-  - tableaux électriques, circuits, sections et protections  
-  - dépannage, diagnostic, recherche de panne guidée  
-  - IoT (ESP32, MQTT, Node-RED, Raspberry Pi)  
-  - dashboards de mesures en temps réel  
+  - clients, chantiers, interventions, planning
+  - devis, factures, paiements, PDF, **Peppol BIS 3.0**
+  - catalogue matériel, stock, fournisseurs
+  - tableaux électriques, circuits, sections et protections
+  - dépannage, diagnostic, recherche de panne guidée
+  - IoT (ESP32, MQTT, Node-RED, Raspberry Pi)
+  - dashboards de mesures en temps réel
   - documents techniques, images, schémas unifilaires
 
 Copilot doit toujours adapter le code à cet univers métier.
@@ -31,9 +31,11 @@ Copilot doit toujours adapter le code à cet univers métier.
 ## 2. Style de développement imposé
 
 ### Clarté
+
 Code lisible, structuré, maintenable.
 
 ### Architecture modulaire
+
 Chaque module possède son segment :
 
 - `/app/(erp)/clients/...`
@@ -43,19 +45,23 @@ Chaque module possède son segment :
 - `/app/(erp)/iot/...`
 
 ### Pas d’invention métier
-- Aucun article RGIE inventé.  
-- Aucun type de disjoncteur inexistant.  
-- Aucun champ fantaisiste dans les factures.  
+
+- Aucun article RGIE inventé.
+- Aucun type de disjoncteur inexistant.
+- Aucun champ fantaisiste dans les factures.
 - Toujours cohérent avec le métier d’un électricien PME.
 
 ### async/await obligatoire
+
 Pas de promesse oubliée.
 
 ### Séparation Server/Client
+
 - Calculs RGIE, Peppol, TVA → **serveur**
 - UI et interactions → **client**
 
 ### Pas de sur-ingénierie
+
 Pas besoin d’un automate Siemens pour allumer une LED.
 
 ---
@@ -69,10 +75,10 @@ Respect strict :
 - **Server Components par défaut**
 - `"use client"` uniquement si nécessaire
 - Actions Serveur pour :
-  - devis/factures  
-  - stock  
-  - PDF  
-  - opérations sensibles  
+  - devis/factures
+  - stock
+  - PDF
+  - opérations sensibles
 
 ---
 
@@ -100,10 +106,13 @@ Règles :
 
 - Interface simple, “artisan friendly”
 - shadcn/ui pour :
-  - formulaires  
-  - tables  
-  - dialogs  
-  - notifications  
+  - formulaires
+  - tables
+  - dialogs
+  - notifications
+  - modals
+  - barres de navigation etc...
+- Composants réutilisables
 - Tailwind structuré : layout → spacing → typo → couleurs
 - Responsive obligatoire (usage mobile en chantier)
 
@@ -112,17 +121,20 @@ Règles :
 ## 6. Modules ERP – Attentes pour Copilot
 
 ### 6.1 Clients / Chantiers / Interventions
+
 - Fiches clients claires
 - Chantiers liés au client
 - Interventions ordonnées (statut, matériel, photos)
 
 ### 6.2 Devis / Factures / Peppol
+
 - TVA correcte (21 % et 6 %)
 - Lignes typées : MO, fournitures, déplacement
 - Totaux, arrondis, mentions obligatoires
 - Préparation Peppol BIS 3.0 (UBL)
 
 ### 6.3 Stock / Fournisseurs
+
 - Quantité, prix, alertes
 - Structures :
   - `StockItem`
@@ -130,34 +142,37 @@ Règles :
   - `MinStockThreshold`
 
 ### 6.4 RGIE (2025 – Livre 1)
-- Articles existants uniquement  
+
+- Articles existants uniquement
 - Standards obligatoires :
-  - 2.5 mm² / 20 A  
-  - 1.5 mm² / 16 A  
-  - circuits spécialisés  
-  - différentiel 30 mA / 300 mA  
+  - 2.5 mm² / 20 A
+  - 1.5 mm² / 16 A
+  - circuits spécialisés
+  - différentiel 30 mA / 300 mA
 - Données servies depuis le serveur
 
 ### 6.5 Tableaux électriques
-- rangées  
-- modules  
-- protections  
-- différentiels  
-- circuits liés  
+
+- rangées
+- modules
+- protections
+- différentiels
+- circuits liés
 
 ### 6.6 IoT (ESP32 / MQTT / Node-RED)
-- Types valides  
-- WebSocket/SSE pour le temps réel  
-- Pas de secrets ni de logique IoT sensible côté client  
+
+- Types valides
+- WebSocket/SSE pour le temps réel
+- Pas de secrets ni de logique IoT sensible côté client
 
 ---
 
 ## 7. Sécurité
 
-- Jamais de clés IoT, MQTT, API côté client  
-- Vérifier permissions `UserRole`  
-- Validation systématique (zod)  
-- Aucune confiance envers le front  
+- Jamais de clés IoT, MQTT, API côté client
+- Vérifier permissions `UserRole`
+- Validation systématique (zod)
+- Aucune confiance envers le front
 
 ---
 
@@ -173,7 +188,6 @@ Règles :
 ## 9. Commit Messages
 
 Format **Conventional Commits** :
-
 
 ---
 
@@ -192,9 +206,9 @@ Format **Conventional Commits** :
 
 Toujours choisir :
 
-1. la solution la plus simple  
-2. la plus maintenable  
-3. la plus adaptée à un artisan PME  
-4. et la plus proche du RGIE / ERP réel  
+1. la solution la plus simple
+2. la plus maintenable
+3. la plus adaptée à un artisan PME
+4. et la plus proche du RGIE / ERP réel
 
 ---

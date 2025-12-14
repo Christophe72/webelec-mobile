@@ -1,3 +1,13 @@
+/**
+ * Authentification JWT côté serveur pour WebElec.
+ *
+ * - Vérifie la présence et la validité de la clé secrète (WEBELEC_JWT_SECRET).
+ * - Supporte les clés en texte brut ou encodées en base64.
+ * - Utilise les variables d'environnement pour l'issuer et l'audience.
+ * - Fournit la fonction principale `verifyJwtServer` pour valider un JWT côté serveur.
+ * - Typage strict adapté à l'ERP WebElec.
+ */
+
 // lib/auth/server.ts
 import { jwtVerify, type JWTPayload, type JWTVerifyOptions } from "jose";
 

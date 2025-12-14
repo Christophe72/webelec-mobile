@@ -82,9 +82,18 @@ Le frontend refuse de démarrer sans URL backend explicite.
 
 Variable obligatoire :
 
-NEXT_PUBLIC_API_BASE=http://localhost:8080/api
+NEXT_PUBLIC_API_BASE=<http://localhost:8080/api>
 
 Aucun fallback implicite vers /api n’est autorisé.
+
+### 4.3 Identifiants de test (backend Spring)
+
+Le backend seedé via `DataSeeder` crée automatiquement plusieurs utilisateurs sur la base locale. Le compte administrateur par défaut est :
+
+- Email : `admin@webelec.fr`
+- Mot de passe : `Admin@12345`
+
+Connectez-vous via `/login` côté frontend, ou directement sur `/api/auth/login`. D’autres comptes existent (Laura/Hugo/Clara/Nabil – mot de passe `demo123!`). Dès que vous créez vos propres utilisateurs via `/api/auth/register`, pensez à mettre à jour cette section si nécessaire.
 
 ---
 

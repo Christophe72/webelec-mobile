@@ -115,7 +115,7 @@ export function RgieQueryPanel(props: RgieQueryPanelProps) {
         </form>
       </section>
 
-      <section className="flex min-h-[260px] flex-col rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.5)] backdrop-blur">
+      <section className="flex min-h-65 flex-col rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.5)] backdrop-blur">
         <div className="flex items-center justify-between pb-3">
           <h2 className="text-xl font-semibold text-white">{resultTitle}</h2>
           <span className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">

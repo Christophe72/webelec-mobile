@@ -1,3 +1,63 @@
+
+/**
+ * Thèmes RGIE disponibles.
+ * 
+ * @remarks
+ * Représente les différents thèmes pour lesquels des règles RGIE sont disponibles.
+ */
+
+/**
+ * Interface étendue pour une règle RGIE avec information sur le thème.
+ * 
+ * @remarks
+ * Ajoute la propriété `theme` à une règle RGIE pour indiquer son appartenance thématique.
+ */
+
+/**
+ * Datasets RGIE indexés par thème.
+ * 
+ * @remarks
+ * Permet d'accéder aux règles RGIE selon leur thème respectif.
+ */
+
+/**
+ * Récupère le dataset RGIE pour un thème donné.
+ * 
+ * @param theme - Le thème RGIE souhaité.
+ * @returns Un tableau de règles RGIE correspondant au thème.
+ */
+
+/**
+ * Récupère toutes les règles RGIE, chaque règle étant annotée avec son thème.
+ * 
+ * @returns Un tableau de toutes les règles RGIE avec leur thème associé.
+ */
+
+/**
+ * Recherche les règles RGIE par tag.
+ * 
+ * @param tag - Le tag à rechercher (insensible à la casse).
+ * @returns Un tableau de règles RGIE dont au moins un tag correspond au critère.
+ */
+
+/**
+ * Recherche les règles RGIE par article.
+ * 
+ * @param article - L'article à rechercher (insensible à la casse).
+ * @returns Un tableau de règles RGIE dont l'article correspond au critère.
+ */
+
+/**
+ * Récupère le rapport de validation RGIE.
+ * 
+ * @returns Un tableau d'éléments du rapport de validation RGIE.
+ */
+
+/**
+ * Récupère le schéma RGIE utilisé par Webelec.
+ * 
+ * @returns Le schéma RGIE (type inconnu).
+ */
 import ddr from "@/data/rgie/ddr.json";
 import influencesExternes from "@/data/rgie/influences_externes.json";
 import installationsExistantes from "@/data/rgie/installations_existantes.json";
