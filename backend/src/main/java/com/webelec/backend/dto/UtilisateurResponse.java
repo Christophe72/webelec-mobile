@@ -1,6 +1,8 @@
 package com.webelec.backend.dto;
 
 import com.webelec.backend.model.Utilisateur;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UtilisateurResponse {
 
@@ -8,29 +10,29 @@ public class UtilisateurResponse {
     private String nom;
     private String prenom;
     private String email;
-    private String role;
-    private SocieteSummary societe;
+    private List<UtilisateurSummary> societes;
 
     public UtilisateurResponse() {}
 
     private UtilisateurResponse(Long id, String nom, String prenom, String email,
-                                String role, SocieteSummary societe) {
+                                List<UtilisateurSummary> societes) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
-        this.role = role;
-        this.societe = societe;
+        this.societes = societes;
     }
 
     public static UtilisateurResponse from(Utilisateur entity) {
+        List<UtilisateurSummary> societes = entity.getSocietes().stream()
+                .map(UtilisateurSummary::from)
+                .collect(Collectors.toList());
         return new UtilisateurResponse(
                 entity.getId(),
                 entity.getNom(),
                 entity.getPrenom(),
                 entity.getEmail(),
-                entity.getRole() != null ? entity.getRole().name() : null,
-                entity.getSociete() != null ? SocieteSummary.from(entity.getSociete()) : null
+                societes
         );
     }
 
@@ -66,19 +68,11 @@ public class UtilisateurResponse {
         this.email = email;
     }
 
-    public String getRole() {
-        return role;
+    public List<UtilisateurSummary> getSocietes() {
+        return societes;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public SocieteSummary getSociete() {
-        return societe;
-    }
-
-    public void setSociete(SocieteSummary societe) {
-        this.societe = societe;
+    public void setSocietes(List<UtilisateurSummary> societes) {
+        this.societes = societes;
     }
 }

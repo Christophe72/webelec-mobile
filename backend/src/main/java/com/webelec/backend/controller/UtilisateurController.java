@@ -53,7 +53,7 @@ public class UtilisateurController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@Valid @RequestBody UtilisateurRequest request) {
         try {
-            var created = service.create(request.toEntity());
+            var created = service.create(request);
             return ResponseEntity.ok(UtilisateurResponse.from(created));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(409).body(e.getMessage());
@@ -64,7 +64,7 @@ public class UtilisateurController {
     @PreAuthorize("hasRole('ADMIN')")
     public UtilisateurResponse update(@PathVariable Long id,
                                       @Valid @RequestBody UtilisateurRequest request) {
-        var updated = service.update(id, request.toEntity());
+        var updated = service.update(id, request);
         return UtilisateurResponse.from(updated);
     }
 

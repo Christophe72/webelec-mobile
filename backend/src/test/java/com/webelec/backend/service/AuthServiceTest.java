@@ -5,14 +5,17 @@ import com.webelec.backend.dto.AuthRegisterRequest;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.Utilisateur;
 import com.webelec.backend.model.UtilisateurRole;
+import com.webelec.backend.model.UserSocieteRole;
 import com.webelec.backend.repository.SocieteRepository;
 import com.webelec.backend.repository.UtilisateurRepository;
+import com.webelec.backend.repository.UserSocieteRoleRepository;
 import com.webelec.backend.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,6 +26,7 @@ class AuthServiceTest {
 
     private UtilisateurRepository utilisateurRepository;
     private SocieteRepository societeRepository;
+    private UserSocieteRoleRepository userSocieteRoleRepository;
     private PasswordEncoder passwordEncoder;
     private JwtService jwtService;
     private AuthService authService;
@@ -31,9 +35,10 @@ class AuthServiceTest {
     void setUp() {
         utilisateurRepository = mock(UtilisateurRepository.class);
         societeRepository = mock(SocieteRepository.class);
+        userSocieteRoleRepository = mock(UserSocieteRoleRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
         jwtService = mock(JwtService.class);
-        authService = new AuthService(utilisateurRepository, societeRepository, passwordEncoder, jwtService);
+        authService = new AuthService(utilisateurRepository, societeRepository, userSocieteRoleRepository, passwordEncoder, jwtService);
     }
 
     @Test
@@ -44,6 +49,14 @@ class AuthServiceTest {
                 .motDePasse("encoded")
                 .role(UtilisateurRole.ADMIN)
                 .build();
+        Societe societe = new Societe();
+        societe.setId(1L);
+        societe.setNom("WebElec");
+        UserSocieteRole us = new UserSocieteRole();
+        us.setUtilisateur(utilisateur);
+        us.setSociete(societe);
+        us.setRole(UtilisateurRole.ADMIN);
+        utilisateur.setSocietes(List.of(us));
         when(utilisateurRepository.findByEmail("user@test.fr")).thenReturn(Optional.of(utilisateur));
         when(passwordEncoder.matches("secret", "encoded")).thenReturn(true);
         when(jwtService.generateAccessToken(utilisateur)).thenReturn("access");
@@ -63,14 +76,22 @@ class AuthServiceTest {
         when(utilisateurRepository.existsByEmail("new@test.fr")).thenReturn(false);
         when(societeRepository.findById(1L)).thenReturn(Optional.of(societe));
         when(passwordEncoder.encode("secret")).thenReturn("encoded");
-        var saved = Utilisateur.builder().id(2L).email("new@test.fr").role(UtilisateurRole.ADMIN).societe(societe).build();
+        // Préparer la liste de liaisons UserSocieteRole pour le mock utilisateur
+        var userSocieteRole = mock(com.webelec.backend.model.UserSocieteRole.class);
+        when(userSocieteRole.getSociete()).thenReturn(societe);
+        when(userSocieteRole.getRole()).thenReturn(UtilisateurRole.ADMIN);
+        java.util.List<com.webelec.backend.model.UserSocieteRole> societesList = java.util.List.of(userSocieteRole);
+        Utilisateur saved = Utilisateur.builder().id(2L).email("new@test.fr").role(UtilisateurRole.ADMIN).societes(societesList).build();
         when(utilisateurRepository.save(any(Utilisateur.class))).thenReturn(saved);
-        when(jwtService.generateAccessToken(saved)).thenReturn("access");
-        when(jwtService.generateRefreshToken(saved)).thenReturn("refresh");
+        when(jwtService.generateAccessToken(any(Utilisateur.class))).thenReturn("access");
+        when(jwtService.generateRefreshToken(any(Utilisateur.class))).thenReturn("refresh");
+        // Mock la création de la liaison user_societes
+        when(userSocieteRoleRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         var response = authService.register(request);
 
         assertEquals("access", response.accessToken());
         verify(utilisateurRepository).save(any(Utilisateur.class));
+        verify(userSocieteRoleRepository).save(any());
     }
 }

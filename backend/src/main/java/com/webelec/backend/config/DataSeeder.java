@@ -11,6 +11,7 @@ import com.webelec.backend.model.Produit;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.Utilisateur;
 import com.webelec.backend.model.UtilisateurRole;
+import com.webelec.backend.model.UserSocieteRole;
 import com.webelec.backend.repository.ChantierRepository;
 import com.webelec.backend.repository.ClientRepository;
 import com.webelec.backend.repository.DevisRepository;
@@ -19,6 +20,7 @@ import com.webelec.backend.repository.InterventionRepository;
 import com.webelec.backend.repository.ProduitRepository;
 import com.webelec.backend.repository.SocieteRepository;
 import com.webelec.backend.repository.UtilisateurRepository;
+import com.webelec.backend.repository.UserSocieteRoleRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,6 +45,7 @@ public class DataSeeder {
     private final DevisRepository devisRepository;
     private final FactureRepository factureRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserSocieteRoleRepository userSocieteRoleRepository;
 
     public DataSeeder(SocieteRepository societeRepository,
                       SocieteSeedProperties seedProperties,
@@ -53,7 +56,8 @@ public class DataSeeder {
                       InterventionRepository interventionRepository,
                       DevisRepository devisRepository,
                       FactureRepository factureRepository,
-                      PasswordEncoder passwordEncoder) {
+                      PasswordEncoder passwordEncoder,
+                      UserSocieteRoleRepository userSocieteRoleRepository) {
         this.societeRepository = societeRepository;
         this.seedProperties = seedProperties;
         this.utilisateurRepository = utilisateurRepository;
@@ -64,6 +68,7 @@ public class DataSeeder {
         this.devisRepository = devisRepository;
         this.factureRepository = factureRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userSocieteRoleRepository = userSocieteRoleRepository;
     }
 
     @PostConstruct
@@ -117,36 +122,32 @@ public class DataSeeder {
                 .prenom("Laura")
                 .email("laura.lefevre@elecpro.fr")
                 .motDePasse(passwordEncoder.encode("demo123!"))
-                .role(UtilisateurRole.GERANT)
-                .societe(elecPro)
                 .build());
+        userSocieteRoleRepository.save(new UserSocieteRole(laura, elecPro, UtilisateurRole.GERANT));
 
         Utilisateur hugo = utilisateurRepository.save(Utilisateur.builder()
                 .nom("Martin")
                 .prenom("Hugo")
                 .email("hugo.martin@elecpro.fr")
                 .motDePasse(passwordEncoder.encode("demo123!"))
-                .role(UtilisateurRole.TECHNICIEN)
-                .societe(elecPro)
                 .build());
+        userSocieteRoleRepository.save(new UserSocieteRole(hugo, elecPro, UtilisateurRole.TECHNICIEN));
 
         Utilisateur clara = utilisateurRepository.save(Utilisateur.builder()
                 .nom("Gonzales")
                 .prenom("Clara")
                 .email("clara.gonzales@voltservices.fr")
                 .motDePasse(passwordEncoder.encode("demo123!"))
-                .role(UtilisateurRole.GERANT)
-                .societe(voltServices)
                 .build());
+        userSocieteRoleRepository.save(new UserSocieteRole(clara, voltServices, UtilisateurRole.GERANT));
 
         Utilisateur nabil = utilisateurRepository.save(Utilisateur.builder()
                 .nom("Benali")
                 .prenom("Nabil")
                 .email("nabil.benali@voltservices.fr")
                 .motDePasse(passwordEncoder.encode("demo123!"))
-                .role(UtilisateurRole.TECHNICIEN)
-                .societe(voltServices)
                 .build());
+        userSocieteRoleRepository.save(new UserSocieteRole(nabil, voltServices, UtilisateurRole.TECHNICIEN));
 
         Client marcDupont = clientRepository.save(Client.builder()
                 .nom("Dupont")
@@ -325,13 +326,12 @@ public class DataSeeder {
             return;
         }
         Societe societe = societes.get(0);
-        utilisateurRepository.save(Utilisateur.builder()
+        Utilisateur admin = utilisateurRepository.save(Utilisateur.builder()
                 .nom("Admin")
                 .prenom("WebElec")
                 .email("admin@webelec.fr")
                 .motDePasse(passwordEncoder.encode("Admin@12345"))
-                .role(UtilisateurRole.ADMIN)
-                .societe(societe)
                 .build());
+        userSocieteRoleRepository.save(new UserSocieteRole(admin, societe, UtilisateurRole.ADMIN));
     }
 }

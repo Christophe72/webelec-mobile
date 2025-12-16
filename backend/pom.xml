@@ -171,6 +171,7 @@
 						--add-opens java.base/java.lang=ALL-UNNAMED
 						--add-opens java.base/java.util=ALL-UNNAMED
 						-XX:+EnableDynamicAgentLoading
+						-javaagent:"${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar"
 					</argLine>
 					<systemPropertyVariables>
 						<spring.profiles.active>test</spring.profiles.active>

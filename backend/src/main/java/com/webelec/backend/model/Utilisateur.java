@@ -2,6 +2,9 @@ package com.webelec.backend.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "utilisateurs")
 public class Utilisateur {
@@ -19,23 +22,29 @@ public class Utilisateur {
     private String motDePasse;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", insertable = false, updatable = false)
+    @Transient
     private UtilisateurRole role;
 
-    @ManyToOne
-    @JoinColumn(name = "societe_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "societe_id", insertable = false, updatable = false)
+    @Transient
     private Societe societe;
+
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserSocieteRole> societes = new ArrayList<>();
 
     public Utilisateur() {}
 
     public Utilisateur(Long id, String nom, String prenom, String email,
-                       String motDePasse, UtilisateurRole role, Societe societe) {
+                       String motDePasse, UtilisateurRole role, List<UserSocieteRole> societes) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
         this.motDePasse = motDePasse;
         this.role = role;
-        this.societe = societe;
+        this.societes = societes;
     }
 
     public static Builder builder() { return new Builder(); }
@@ -61,6 +70,14 @@ public class Utilisateur {
     public Societe getSociete() { return societe; }
     public void setSociete(Societe societe) { this.societe = societe; }
 
+    public List<UserSocieteRole> getSocietes() {
+        return societes;
+    }
+
+    public void setSocietes(List<UserSocieteRole> societes) {
+        this.societes = societes;
+    }
+
     public static final class Builder {
         private Long id;
         private String nom;
@@ -68,7 +85,7 @@ public class Utilisateur {
         private String email;
         private String motDePasse;
         private UtilisateurRole role;
-        private Societe societe;
+        private List<UserSocieteRole> societes;
 
         public Builder id(Long id) { this.id = id; return this; }
         public Builder nom(String nom) { this.nom = nom; return this; }
@@ -76,10 +93,10 @@ public class Utilisateur {
         public Builder email(String email) { this.email = email; return this; }
         public Builder motDePasse(String motDePasse) { this.motDePasse = motDePasse; return this; }
         public Builder role(UtilisateurRole role) { this.role = role; return this; }
-        public Builder societe(Societe societe) { this.societe = societe; return this; }
+        public Builder societes(List<UserSocieteRole> societes) { this.societes = societes; return this; }
 
         public Utilisateur build() {
-            return new Utilisateur(id, nom, prenom, email, motDePasse, role, societe);
+            return new Utilisateur(id, nom, prenom, email, motDePasse, role, societes);
         }
     }
 }

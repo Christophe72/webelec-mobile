@@ -6,6 +6,7 @@ import com.webelec.backend.model.Intervention;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.Utilisateur;
 import com.webelec.backend.model.UtilisateurRole;
+import com.webelec.backend.model.UserSocieteRole;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -15,15 +16,35 @@ import static org.junit.jupiter.api.Assertions.*;
 class InterventionResponseTest {
     @Test
     void from_maps_entity_to_response() {
-        Societe societe = new Societe(); societe.setId(1L); societe.setNom("WebElec");
-        Chantier chantier = new Chantier(); chantier.setId(2L); chantier.setNom("Garage");
-        Client client = new Client(); client.setId(3L); client.setNom("Dupont"); client.setPrenom("Marc");
-        Utilisateur utilisateur = new Utilisateur(); utilisateur.setId(4L); utilisateur.setNom("Tech"); utilisateur.setPrenom("Alex"); utilisateur.setRole(UtilisateurRole.TECHNICIEN);
+        Societe societe = new Societe();
+        societe.setId(1L);
+        societe.setNom("WebElec");
+        Client client = new Client();
+        client.setId(3L);
+        client.setNom("Dupont");
+        client.setPrenom("Marc");
+        client.setSociete(societe);
+        Chantier chantier = new Chantier();
+        chantier.setId(2L);
+        chantier.setNom("Garage");
+        chantier.setSociete(societe);
+        chantier.setClient(client);
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setId(4L);
+        utilisateur.setNom("Tech");
+        utilisateur.setPrenom("Alex");
+        utilisateur.setRole(UtilisateurRole.TECHNICIEN);
+        // Ajout d'une société à l'utilisateur (multi-sociétés)
+        UserSocieteRole us = new UserSocieteRole();
+        us.setUtilisateur(utilisateur);
+        us.setSociete(societe);
+        us.setRole(UtilisateurRole.TECHNICIEN);
+        utilisateur.setSocietes(java.util.List.of(us));
         Intervention intervention = new Intervention();
         intervention.setId(5L);
         intervention.setTitre("Interv");
         intervention.setDescription("Desc");
-        intervention.setDateIntervention(LocalDate.of(2025, 12, 2));
+        intervention.setDateIntervention(java.time.LocalDate.of(2025, 12, 2));
         intervention.setSociete(societe);
         intervention.setChantier(chantier);
         intervention.setClient(client);
@@ -34,7 +55,7 @@ class InterventionResponseTest {
         assertEquals(5L, dto.getId());
         assertEquals("Interv", dto.getTitre());
         assertEquals("Desc", dto.getDescription());
-        assertEquals(LocalDate.of(2025, 12, 2), dto.getDateIntervention());
+        assertEquals(java.time.LocalDate.of(2025, 12, 2), dto.getDateIntervention());
         assertNotNull(dto.getSociete());
         assertEquals(1L, dto.getSociete().getId());
         assertEquals("WebElec", dto.getSociete().getNom());

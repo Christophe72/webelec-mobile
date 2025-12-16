@@ -6,28 +6,34 @@ import com.webelec.backend.dto.AuthRegisterRequest;
 import com.webelec.backend.dto.AuthResponse;
 import com.webelec.backend.dto.UtilisateurResponse;
 import com.webelec.backend.model.Societe;
+import com.webelec.backend.model.UserSocieteRole;
 import com.webelec.backend.model.Utilisateur;
 import com.webelec.backend.model.UtilisateurRole;
 import com.webelec.backend.repository.SocieteRepository;
+import com.webelec.backend.repository.UserSocieteRoleRepository;
 import com.webelec.backend.repository.UtilisateurRepository;
 import com.webelec.backend.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
 
     private final UtilisateurRepository utilisateurRepository;
     private final SocieteRepository societeRepository;
+    private final UserSocieteRoleRepository userSocieteRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public AuthService(UtilisateurRepository utilisateurRepository,
                        SocieteRepository societeRepository,
+                       UserSocieteRoleRepository userSocieteRoleRepository,
                        PasswordEncoder passwordEncoder,
                        JwtService jwtService) {
         this.utilisateurRepository = utilisateurRepository;
         this.societeRepository = societeRepository;
+        this.userSocieteRoleRepository = userSocieteRoleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -39,27 +45,28 @@ public class AuthService {
         if (!passwordEncoder.matches(request.motDePasse(), utilisateur.getMotDePasse())) {
             throw new IllegalArgumentException("Identifiants invalides");
         }
-
+        // Pour un vrai SaaS multi-sociétés, il faudrait ici choisir la société active (via le token ou le contexte)
         return buildTokens(utilisateur);
     }
 
+    @Transactional
     public AuthResponse register(AuthRegisterRequest request) {
         if (utilisateurRepository.existsByEmail(request.email())) {
             throw new IllegalStateException("Email déjà utilisé");
         }
-        UtilisateurRole role = parseRole(request.role());
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setNom(request.nom());
+        utilisateur.setPrenom(request.prenom());
+        utilisateur.setEmail(request.email());
+        utilisateur.setMotDePasse(passwordEncoder.encode(request.motDePasse()));
+        utilisateur = utilisateurRepository.save(utilisateur);
+
         Societe societe = societeRepository.findById(request.societeId())
                 .orElseThrow(() -> new IllegalArgumentException("Société inconnue"));
-        Utilisateur utilisateur = Utilisateur.builder()
-                .nom(request.nom())
-                .prenom(request.prenom())
-                .email(request.email())
-                .motDePasse(passwordEncoder.encode(request.motDePasse()))
-                .role(role)
-                .societe(societe)
-                .build();
-        Utilisateur saved = utilisateurRepository.save(utilisateur);
-        return buildTokens(saved);
+        UtilisateurRole role = parseRole(request.role());
+        UserSocieteRole link = new UserSocieteRole(utilisateur, societe, role);
+        userSocieteRoleRepository.save(link);
+        return buildTokens(utilisateur);
     }
 
     public AuthResponse refresh(AuthRefreshRequest request) {
@@ -73,6 +80,8 @@ public class AuthService {
     }
 
     private AuthResponse buildTokens(Utilisateur utilisateur) {
+        // Sécurisation : éviter NPE si la liste des sociétés est nulle
+        utilisateur.setSocietes(java.util.Optional.ofNullable(utilisateur.getSocietes()).orElse(java.util.List.of()));
         return new AuthResponse(
                 jwtService.generateAccessToken(utilisateur),
                 jwtService.generateRefreshToken(utilisateur),

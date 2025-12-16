@@ -19,7 +19,7 @@ public class Societe {
     private String adresse;
 
     @OneToMany(mappedBy = "societe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Utilisateur> utilisateurs = new ArrayList<>();
+    private List<UserSocieteRole> utilisateurs = new ArrayList<>();
 
     @OneToMany(mappedBy = "societe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Client> clients = new ArrayList<>();
@@ -62,11 +62,11 @@ public class Societe {
     public String getAdresse() { return adresse; }
     public void setAdresse(String adresse) { this.adresse = adresse; }
 
-    public List<Utilisateur> getUtilisateurs() { return utilisateurs; }
     public List<Client> getClients() { return clients; }
     public List<Chantier> getChantiers() { return chantiers; }
     public List<Produit> getProduits() { return produits; }
     public List<Intervention> getInterventions() { return interventions; }
+    public List<UserSocieteRole> getUtilisateurs() { return utilisateurs; }
 
     public static final class Builder {
         private Long id;

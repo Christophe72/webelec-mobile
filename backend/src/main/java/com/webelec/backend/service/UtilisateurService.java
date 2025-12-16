@@ -1,10 +1,17 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.dto.UtilisateurRequest;
 import com.webelec.backend.exception.ResourceNotFoundException;
+import com.webelec.backend.model.Societe;
+import com.webelec.backend.model.UserSocieteRole;
 import com.webelec.backend.model.Utilisateur;
+import com.webelec.backend.model.UtilisateurRole;
+import com.webelec.backend.repository.SocieteRepository;
+import com.webelec.backend.repository.UserSocieteRoleRepository;
 import com.webelec.backend.repository.UtilisateurRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,10 +20,14 @@ import java.util.Optional;
 public class UtilisateurService {
 
     private final UtilisateurRepository repository;
+    private final UserSocieteRoleRepository userSocieteRoleRepository;
+    private final SocieteRepository societeRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UtilisateurService(UtilisateurRepository repository, PasswordEncoder passwordEncoder) {
+    public UtilisateurService(UtilisateurRepository repository, UserSocieteRoleRepository userSocieteRoleRepository, SocieteRepository societeRepository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.userSocieteRoleRepository = userSocieteRoleRepository;
+        this.societeRepository = societeRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -29,29 +40,61 @@ public class UtilisateurService {
     }
 
     public List<Utilisateur> findBySociete(Long societeId) {
-        return repository.findBySocieteId(societeId);
+        return userSocieteRoleRepository.findBySocieteId(societeId).stream()
+                .map(UserSocieteRole::getUtilisateur)
+                .toList();
     }
 
-    public Utilisateur create(Utilisateur utilisateur) {
-        if (repository.existsByEmail(utilisateur.getEmail())) {
+    @Transactional
+    public Utilisateur create(UtilisateurRequest request) {
+        if (repository.existsByEmail(request.getEmail())) {
             throw new IllegalStateException("Email déjà utilisé");
         }
-        utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
-        return repository.save(utilisateur);
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setNom(request.getNom());
+        utilisateur.setPrenom(request.getPrenom());
+        utilisateur.setEmail(request.getEmail());
+        utilisateur.setMotDePasse(passwordEncoder.encode(request.getMotDePasse()));
+        utilisateur = repository.save(utilisateur);
+
+        Societe societe = societeRepository.findById(request.getSocieteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Société non trouvée"));
+        UtilisateurRole role;
+        try {
+            role = UtilisateurRole.valueOf(request.getRole());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Rôle utilisateur invalide : " + request.getRole());
+        }
+        UserSocieteRole link = new UserSocieteRole(utilisateur, societe, role);
+        userSocieteRoleRepository.save(link);
+        return utilisateur;
     }
 
-    public Utilisateur update(Long id, Utilisateur utilisateur) {
-        Utilisateur existing = repository.findById(id)
+    @Transactional
+    public Utilisateur update(Long id, UtilisateurRequest request) {
+        Utilisateur utilisateur = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé"));
-        existing.setNom(utilisateur.getNom());
-        existing.setPrenom(utilisateur.getPrenom());
-        existing.setEmail(utilisateur.getEmail());
-        if (utilisateur.getMotDePasse() != null) {
-            existing.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
+        utilisateur.setNom(request.getNom());
+        utilisateur.setPrenom(request.getPrenom());
+        utilisateur.setEmail(request.getEmail());
+        if (request.getMotDePasse() != null) {
+            utilisateur.setMotDePasse(passwordEncoder.encode(request.getMotDePasse()));
         }
-        existing.setRole(utilisateur.getRole());
-        existing.setSociete(utilisateur.getSociete());
-        return repository.save(existing);
+        utilisateur = repository.save(utilisateur);
+        Societe societe = societeRepository.findById(request.getSocieteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Société non trouvée"));
+        UtilisateurRole role;
+        try {
+            role = UtilisateurRole.valueOf(request.getRole());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Rôle utilisateur invalide : " + request.getRole());
+        }
+        // Met à jour ou crée la liaison pour cette société
+        UserSocieteRole link = userSocieteRoleRepository.findById(new com.webelec.backend.model.UserSocieteRoleId(utilisateur.getId(), societe.getId()))
+                .orElse(new UserSocieteRole(utilisateur, societe, role));
+        link.setRole(role);
+        userSocieteRoleRepository.save(link);
+        return utilisateur;
     }
 
     public void delete(Long id) {

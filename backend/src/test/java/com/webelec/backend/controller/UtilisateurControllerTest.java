@@ -43,7 +43,7 @@ class UtilisateurControllerTest {
         req.setMotDePasse("secret123");
         req.setRole("ADMIN");
         req.setSocieteId(1L);
-        Mockito.when(service.create(any(Utilisateur.class))).thenThrow(new IllegalStateException("Email déjà utilisé"));
+        Mockito.when(service.create(any(UtilisateurRequest.class))).thenThrow(new IllegalStateException("Email déjà utilisé"));
         mockMvc.perform(post("/api/utilisateurs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
