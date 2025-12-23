@@ -177,3 +177,4 @@ NEXT_PUBLIC_API_URL=http://localhost:8080/api
 **Christophe Seyler**
 Électricien – Développeur – IoT – RGIE
 Belgique
+<img src="docs/bdd.svg" alt="Schéma BDD WebElec" width="720" />
