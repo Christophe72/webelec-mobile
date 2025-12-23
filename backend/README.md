@@ -494,3 +494,6 @@ Sans ces données, appliquer la règle stricte : `Données insuffisantes pour un
 Pour formaliser une nouvelle demande, utiliser l’issue template `\`.github/ISSUE_TEMPLATE/rgie-iot-spec.yml` (menu *New issue → RFC – Endpoint RGIE/IoT*). Aucune implémentation n’est lancée sans ticket approuvé.
 
 ---
+<img src="docs/bdd.svg" alt="Schéma BDD WebElec" width="720" />
+
+
