@@ -35,14 +35,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                		 .requestMatchers("/api/auth/**").permitAll()
-                		    .requestMatchers(HttpMethod.POST, "/api/utilisateurs").permitAll()
-                		    .requestMatchers("/api/societes/**").permitAll()
-                		    .requestMatchers("/api/chantiers/**").permitAll() // <— ajout
-                		    .requestMatchers("/api/interventions/**").permitAll()
-                		    .requestMatchers("/api/devis/**").permitAll()
-                		    .requestMatchers("/api/factures/**").permitAll()
-                		    .anyRequest().authenticated()
+                    .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
