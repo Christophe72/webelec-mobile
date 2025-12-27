@@ -64,7 +64,7 @@ class FactureControllerTest {
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
         Facture facture = new Facture(1L, "FA-2025-001", LocalDate.of(2025, 12, 2), LocalDate.of(2025, 12, 31), new java.math.BigDecimal("1000.00"), new java.math.BigDecimal("210.00"), new java.math.BigDecimal("1210.00"), "EN_ATTENTE", societe, client);
-        Mockito.when(service.create(any(Facture.class))).thenReturn(facture);
+        Mockito.when(service.create(any())).thenReturn(facture);
         mockMvc.perform(post("/api/factures")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
@@ -106,7 +106,7 @@ class FactureControllerTest {
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
         Facture facture = new Facture(2L, "FA-2025-002", LocalDate.of(2025, 12, 3), LocalDate.of(2026, 1, 10), new java.math.BigDecimal("2000.00"), new java.math.BigDecimal("420.00"), new java.math.BigDecimal("2420.00"), "VALIDE", societe, client);
-        Mockito.when(service.update(Mockito.eq(2L), any(Facture.class))).thenReturn(facture);
+        Mockito.when(service.update(Mockito.eq(2L), any())).thenReturn(facture);
         mockMvc.perform(put("/api/factures/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
@@ -143,11 +143,11 @@ class FactureControllerTest {
         ligne.setTotal(new java.math.BigDecimal("1000.00"));
         req.setLignes(java.util.Collections.singletonList(ligne));
         
-        Mockito.when(service.create(any(Facture.class))).thenThrow(new IllegalStateException("Numéro de facture déjà utilisé"));
+        Mockito.when(service.create(any())).thenThrow(new IllegalStateException("Numéro de facture déjà utilisé"));
         mockMvc.perform(post("/api/factures")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Numéro de facture déjà utilisé"));
     }
 

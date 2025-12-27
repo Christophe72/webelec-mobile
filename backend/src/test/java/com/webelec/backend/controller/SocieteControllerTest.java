@@ -72,6 +72,6 @@ class SocieteControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict())
-                .andExpect(content().string("Email déjà utilisé"));
+                .andExpect(jsonPath("$.message").value("Email déjà utilisé"));
     }
 }
