@@ -65,13 +65,9 @@ public class SocieteController {
      */
     @PostMapping
     @PreAuthorize("@societeSecurityService.isAdmin()")
-    public ResponseEntity<?> create(@Valid @RequestBody SocieteRequest request) {
-        try {
-            var created = service.create(request.toEntity());
-            return ResponseEntity.ok(SocieteResponse.from(created));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(409).body(e.getMessage());
-        }
+    public ResponseEntity<SocieteResponse> create(@Valid @RequestBody SocieteRequest request) {
+        var created = service.create(request.toEntity());
+        return ResponseEntity.ok(SocieteResponse.from(created));
     }
 
     /**
@@ -80,15 +76,9 @@ public class SocieteController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("@societeSecurityService.isAdminOrGerantInSociete(#id)")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody SocieteRequest request) {
-        try {
-            var updated = service.update(id, request.toEntity());
-            return ResponseEntity.ok(SocieteResponse.from(updated));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(409).body(e.getMessage());
-        }
+    public ResponseEntity<SocieteResponse> update(@PathVariable Long id, @Valid @RequestBody SocieteRequest request) {
+        var updated = service.update(id, request.toEntity());
+        return ResponseEntity.ok(SocieteResponse.from(updated));
     }
 
     /**

@@ -63,7 +63,7 @@ class DevisControllerTest {
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
         Devis devis = new Devis(1L, "DV-2025-001", LocalDate.of(2025, 12, 2), LocalDate.of(2025, 12, 31), new java.math.BigDecimal("1000.00"), new java.math.BigDecimal("210.00"), new java.math.BigDecimal("1210.00"), "EN_ATTENTE", societe, client);
-        Mockito.when(service.create(any(Devis.class))).thenReturn(devis);
+        Mockito.when(service.create(any(DevisRequest.class))).thenReturn(devis);
         mockMvc.perform(post("/api/devis")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
@@ -105,7 +105,7 @@ class DevisControllerTest {
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
         Devis devis = new Devis(2L, "DV-2025-002", LocalDate.of(2025, 12, 3), LocalDate.of(2026, 1, 10), new java.math.BigDecimal("2000.00"), new java.math.BigDecimal("420.00"), new java.math.BigDecimal("2420.00"), "VALIDE", societe, client);
-        Mockito.when(service.update(Mockito.eq(2L), any(Devis.class))).thenReturn(devis);
+        Mockito.when(service.update(Mockito.eq(2L), any(DevisRequest.class))).thenReturn(devis);
         mockMvc.perform(put("/api/devis/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))

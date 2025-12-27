@@ -1,5 +1,6 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.exception.ConflictException;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.repository.SocieteRepository;
@@ -27,7 +28,7 @@ public class SocieteService {
 
     public Societe create(Societe societe) {
         if (repository.findByEmail(societe.getEmail()) != null) {
-            throw new IllegalStateException("Email déjà utilisé");
+            throw new ConflictException("Email déjà utilisé");
         }
         return repository.save(societe);
     }
@@ -36,10 +37,9 @@ public class SocieteService {
         Societe existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Societe non trouvée"));
 
-        // Vérifie l'unicité de l'email (hors société courante)
         Societe byEmail = repository.findByEmail(societe.getEmail());
         if (byEmail != null && !byEmail.getId().equals(id)) {
-            throw new IllegalStateException("Email déjà utilisé");
+            throw new ConflictException("Email déjà utilisé");
         }
 
         existing.setNom(societe.getNom());

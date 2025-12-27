@@ -50,22 +50,16 @@ public class UtilisateurController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> create(@Valid @RequestBody UtilisateurRequest request) {
-        try {
-            var created = service.create(request);
-            return ResponseEntity.ok(UtilisateurResponse.from(created));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(409).body(e.getMessage());
-        }
+    public ResponseEntity<UtilisateurResponse> create(@Valid @RequestBody UtilisateurRequest request) {
+        var created = service.create(request);
+        return ResponseEntity.ok(UtilisateurResponse.from(created));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public UtilisateurResponse update(@PathVariable Long id,
-                                      @Valid @RequestBody UtilisateurRequest request) {
+    public ResponseEntity<UtilisateurResponse> update(@PathVariable Long id,
+                                                       @Valid @RequestBody UtilisateurRequest request) {
         var updated = service.update(id, request);
-        return UtilisateurResponse.from(updated);
+        return ResponseEntity.ok(UtilisateurResponse.from(updated));
     }
 
     @DeleteMapping("/{id}")

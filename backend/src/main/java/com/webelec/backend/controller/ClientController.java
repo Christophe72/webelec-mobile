@@ -2,25 +2,15 @@ package com.webelec.backend.controller;
 
 import com.webelec.backend.dto.ClientRequest;
 import com.webelec.backend.dto.ClientResponse;
-import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.service.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/clients")
-@CrossOrigin(origins = "*")
 public class ClientController {
 
     private final ClientService service;
@@ -31,35 +21,27 @@ public class ClientController {
 
     @GetMapping
     public List<ClientResponse> getAll() {
-        return service.findAll().stream().map(ClientResponse::from).toList();
-    }
-
-    @GetMapping("/societe/{societeId}")
-    public List<ClientResponse> getBySociete(@PathVariable Long societeId) {
-        return service.findBySociete(societeId).stream().map(ClientResponse::from).toList();
+        return service.findAll().stream()
+                .map(ClientResponse::from)
+                .toList();
     }
 
     @GetMapping("/{id}")
     public ClientResponse getById(@PathVariable Long id) {
-        return service.findById(id)
-                .map(ClientResponse::from)
-                .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"));
+        return ClientResponse.from(service.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody ClientRequest request) {
-        try {
-            var created = service.create(request.toEntity());
-            return ResponseEntity.ok(ClientResponse.from(created));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(409).body(e.getMessage());
-        }
+    public ResponseEntity<ClientResponse> create(@Valid @RequestBody ClientRequest request) {
+        var created = service.create(request);
+        return ResponseEntity.ok(ClientResponse.from(created));
     }
 
     @PutMapping("/{id}")
-    public ClientResponse update(@PathVariable Long id, @Valid @RequestBody ClientRequest request) {
-        var updated = service.update(id, request.toEntity());
-        return ClientResponse.from(updated);
+    public ResponseEntity<ClientResponse> update(@PathVariable Long id,
+                                                 @Valid @RequestBody ClientRequest request) {
+        var updated = service.update(id, request);
+        return ResponseEntity.ok(ClientResponse.from(updated));
     }
 
     @DeleteMapping("/{id}")

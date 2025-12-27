@@ -1,6 +1,7 @@
 package com.webelec.backend.service;
 
 import com.webelec.backend.dto.UtilisateurRequest;
+import com.webelec.backend.exception.ConflictException;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.UserSocieteRole;
@@ -48,7 +49,7 @@ public class UtilisateurService {
     @Transactional
     public Utilisateur create(UtilisateurRequest request) {
         if (repository.existsByEmail(request.getEmail())) {
-            throw new IllegalStateException("Email déjà utilisé");
+            throw new ConflictException("Email déjà utilisé");
         }
         Utilisateur utilisateur = new Utilisateur();
         utilisateur.setNom(request.getNom());

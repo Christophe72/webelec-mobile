@@ -9,4 +9,5 @@ public interface DevisRepository extends JpaRepository<Devis, Long> {
     List<Devis> findBySocieteId(Long societeId);
     List<Devis> findByClientId(Long clientId);
     Devis findByNumero(String numero);
+    boolean existsByNumero(String numero);
 }

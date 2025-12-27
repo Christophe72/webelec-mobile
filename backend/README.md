@@ -307,6 +307,42 @@ Impossible de générer cette logique : règle RGIE non fournie dans le projet
 
 ---
 
+## 8ter. Format d'erreur (ApiError)
+
+Toutes les erreurs sont normalisées via `ApiError` :
+
+```json
+{
+  "timestamp": "2025-12-27T11:00:00Z",
+  "status": 409,
+  "error": "Conflict",
+  "message": "Email déjà utilisé",
+  "details": [],
+  "path": "/api/societes"
+}
+```
+
+- `timestamp` : horodatage ISO 8601
+- `status` / `error` : code HTTP et libellé officiel
+- `message` : texte exploitable côté front (pas de stacktrace)
+- `details` : liste des champs invalides (validation)
+- `path` : endpoint ayant généré l'erreur
+
+Mapping des principales erreurs :
+
+| Scénario | Code | Message |
+|----------|------|---------|
+| Validation DTO | 400 | `Requête invalide` + détails sur les champs |
+| Ressource absente | 404 | `Societe non trouvée`, `Client non trouvé`, etc. |
+| Conflit métier (doublon email/numéro) | 409 | Message métier ciblé |
+| Non authentifié | 401 | `Token JWT invalide ou expiré` |
+| Rôle insuffisant | 403 | `Accès refusé : vous n'avez pas les droits nécessaires` |
+| Erreur interne | 500 | `Erreur interne inattendue` |
+
+Le front peut s'appuyer sur ce format pour afficher les messages ou tracer les erreurs.
+
+---
+
 ## 9. Exemples de requêtes REST (curl, Windows)
 ```bash
 curl.exe -X GET http://localhost:8080/api/chantiers

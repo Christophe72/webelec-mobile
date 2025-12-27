@@ -3,6 +3,7 @@ package com.webelec.backend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webelec.backend.config.TestSecurityConfig;
 import com.webelec.backend.dto.ClientRequest;
+import com.webelec.backend.exception.ConflictException;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.security.JwtAuthenticationFilter;
@@ -38,15 +39,9 @@ class ClientControllerTest {
 
     @Test
     void createClient_success() throws Exception {
-        ClientRequest req = new ClientRequest();
-        req.setNom("Martin");
-        req.setPrenom("Lucie");
-        req.setEmail("lucie@test.com");
-        req.setTelephone("0488/000000");
-        req.setAdresse("Rue neuve 10");
-        req.setSocieteId(2L);
-        Client client = Client.builder().id(1L).nom("Martin").prenom("Lucie").email("lucie@test.com").telephone("0488/000000").adresse("Rue neuve 10").societe(Societe.builder().id(2L).build()).build();
-        Mockito.when(service.create(any(Client.class))).thenReturn(client);
+        ClientRequest req = buildRequest();
+        Client client = buildClient(1L);
+        Mockito.when(service.create(any(ClientRequest.class))).thenReturn(client);
         mockMvc.perform(post("/api/clients")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
@@ -74,7 +69,7 @@ class ClientControllerTest {
         req.setAdresse("Rue neuve 10");
         req.setSocieteId(2L);
         Client client = Client.builder().id(1L).nom("Martin").prenom("Lucie").email("lucie@test.com").telephone("0488/000000").adresse("Rue neuve 10").societe(Societe.builder().id(2L).build()).build();
-        Mockito.when(service.update(Mockito.eq(1L), any(Client.class))).thenReturn(client);
+        Mockito.when(service.update(Mockito.eq(1L), any(ClientRequest.class))).thenReturn(client);
         mockMvc.perform(put("/api/clients/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
@@ -99,11 +94,34 @@ class ClientControllerTest {
         req.setTelephone("0488/000000");
         req.setAdresse("Rue neuve 10");
         req.setSocieteId(2L);
-        Mockito.when(service.create(any(Client.class))).thenThrow(new IllegalStateException("Email déjà utilisé"));
+        Mockito.when(service.create(any(ClientRequest.class))).thenThrow(new ConflictException("Email déjà utilisé"));
         mockMvc.perform(post("/api/clients")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict())
-                .andExpect(content().string("Email déjà utilisé"));
+                .andExpect(jsonPath("$.message").value("Email déjà utilisé"));
+    }
+
+    private ClientRequest buildRequest() {
+        ClientRequest req = new ClientRequest();
+        req.setNom("Martin");
+        req.setPrenom("Lucie");
+        req.setEmail("lucie@test.com");
+        req.setTelephone("0488/000000");
+        req.setAdresse("Rue neuve 10");
+        req.setSocieteId(2L);
+        return req;
+    }
+
+    private Client buildClient(Long id) {
+        return Client.builder()
+                .id(id)
+                .nom("Martin")
+                .prenom("Lucie")
+                .email("lucie@test.com")
+                .telephone("0488/000000")
+                .adresse("Rue neuve 10")
+                .societe(Societe.builder().id(2L).build())
+                .build();
     }
 }

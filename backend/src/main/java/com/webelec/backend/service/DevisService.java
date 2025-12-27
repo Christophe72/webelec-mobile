@@ -1,12 +1,13 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.dto.DevisRequest;
+import com.webelec.backend.exception.ConflictException;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Devis;
 import com.webelec.backend.repository.DevisRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DevisService {
@@ -21,47 +22,36 @@ public class DevisService {
         return repository.findAll();
     }
 
-    public List<Devis> findBySociete(Long societeId) {
-        return repository.findBySocieteId(societeId);
+    public Devis findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Devis non trouvé"));
     }
 
-    public List<Devis> findByClient(Long clientId) {
-        return repository.findByClientId(clientId);
-    }
-
-    public Optional<Devis> findById(Long id) {
-        return repository.findById(id);
-    }
-
-    public Devis create(Devis devis) {
-        if (repository.findByNumero(devis.getNumero()) != null) {
-            throw new IllegalStateException("Numéro de devis déjà utilisé");
+    public Devis create(DevisRequest request) {
+        if (repository.existsByNumero(request.getNumero())) {
+            throw new ConflictException("Numéro de devis déjà utilisé");
         }
-        // Rattacher chaque ligne au devis parent
-        if (devis.getLignes() != null) {
-            devis.getLignes().forEach(ligne -> ligne.setDevis(devis));
-        }
-        return repository.save(devis);
+        return repository.save(request.toEntity());
     }
 
-    public Devis update(Long id, Devis payload) {
+    public Devis update(Long id, DevisRequest request) {
         Devis existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Devis non trouvé"));
 
-        existing.setNumero(payload.getNumero());
-        existing.setDateEmission(payload.getDateEmission());
-        existing.setDateExpiration(payload.getDateExpiration());
-        existing.setMontantHT(payload.getMontantHT());
-        existing.setMontantTVA(payload.getMontantTVA());
-        existing.setMontantTTC(payload.getMontantTTC());
-        existing.setStatut(payload.getStatut());
-        existing.setSociete(payload.getSociete());
-        existing.setClient(payload.getClient());
-        // Nettoyer et rattacher les lignes
-        existing.setLignes(payload.getLignes());
-        if (existing.getLignes() != null) {
-            existing.getLignes().forEach(ligne -> ligne.setDevis(existing));
+        if (!existing.getNumero().equals(request.getNumero()) && repository.existsByNumero(request.getNumero())) {
+            throw new ConflictException("Numéro de devis déjà utilisé");
         }
+
+        existing.setNumero(request.getNumero());
+        existing.setSociete(request.toEntity().getSociete());
+        existing.setClient(request.toEntity().getClient());
+        existing.setMontantHT(request.getMontantHT());
+        existing.setMontantTVA(request.getMontantTVA());
+        existing.setMontantTTC(request.getMontantTTC());
+        existing.setStatut(request.getStatut());
+        existing.setDateEmission(request.getDateEmission());
+        existing.setDateExpiration(request.getDateExpiration());
+        existing.setLignes(request.toEntity().getLignes());
         return repository.save(existing);
     }
 

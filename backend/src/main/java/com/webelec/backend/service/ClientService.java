@@ -1,12 +1,14 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.dto.ClientRequest;
+import com.webelec.backend.exception.ConflictException;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Client;
+import com.webelec.backend.model.Societe;
 import com.webelec.backend.repository.ClientRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ClientService {
@@ -25,26 +27,40 @@ public class ClientService {
         return repository.findBySocieteId(societeId);
     }
 
-    public Optional<Client> findById(Long id) {
-        return repository.findById(id);
+    public Client findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"));
     }
 
-    public Client create(Client client) {
-        if (repository.findByEmail(client.getEmail()) != null) {
-            throw new IllegalStateException("Email déjà utilisé");
+    public Client create(ClientRequest request) {
+        if (request.getEmail() != null && repository.existsByEmail(request.getEmail())) {
+            throw new ConflictException("Email déjà utilisé");
         }
+        Client client = request.toEntity();
         return repository.save(client);
     }
 
-    public Client update(Long id, Client client) {
+    public Client update(Long id, ClientRequest request) {
         Client existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"));
-        existing.setNom(client.getNom());
-        existing.setPrenom(client.getPrenom());
-        existing.setEmail(client.getEmail());
-        existing.setTelephone(client.getTelephone());
-        existing.setAdresse(client.getAdresse());
-        existing.setSociete(client.getSociete());
+
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            Client other = repository.findByEmail(request.getEmail());
+            if (other != null && !other.getId().equals(id)) {
+                throw new ConflictException("Email déjà utilisé");
+            }
+        }
+
+        existing.setNom(request.getNom());
+        existing.setPrenom(request.getPrenom());
+        existing.setEmail(request.getEmail());
+        existing.setTelephone(request.getTelephone());
+        existing.setAdresse(request.getAdresse());
+        if (existing.getSociete() == null || !existing.getSociete().getId().equals(request.getSocieteId())) {
+            Societe societe = new Societe();
+            societe.setId(request.getSocieteId());
+            existing.setSociete(societe);
+        }
         return repository.save(existing);
     }
 

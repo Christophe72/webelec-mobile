@@ -1,5 +1,7 @@
 package com.webelec.backend.service;
 
+import com.webelec.backend.dto.ClientRequest;
+import com.webelec.backend.exception.ConflictException;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.model.Societe;
@@ -31,9 +33,12 @@ class ClientServiceTest {
     @InjectMocks
     private ClientService service;
 
+    private ClientRequest request;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        request = buildRequest();
     }
 
     @Test
@@ -67,9 +72,9 @@ class ClientServiceTest {
         Client expected = buildClient(4L);
         when(repository.findById(4L)).thenReturn(Optional.of(expected));
 
-        Optional<Client> actual = service.findById(4L);
+        Client actual = service.findById(4L);
 
-        assertThat(actual).contains(expected);
+        assertThat(actual).isEqualTo(expected);
         verify(repository, times(1)).findById(4L);
     }
 
@@ -78,23 +83,28 @@ class ClientServiceTest {
     void testFindByIdNotFound() {
         when(repository.findById(8L)).thenReturn(Optional.empty());
 
-        Optional<Client> actual = service.findById(8L);
-
-        assertThat(actual).isEmpty();
+        assertThrows(ResourceNotFoundException.class, () -> service.findById(8L));
         verify(repository, times(1)).findById(8L);
     }
 
     @Test
     @DisplayName("create sauvegarde le client")
     void testCreate() {
-        Client input = buildClient(null);
         Client saved = buildClient(9L);
-        when(repository.save(input)).thenReturn(saved);
+        when(repository.save(any(Client.class))).thenReturn(saved);
 
-        Client actual = service.create(input);
+        Client actual = service.create(request);
 
         assertThat(actual).isEqualTo(saved);
-        verify(repository, times(1)).save(input);
+        verify(repository, times(1)).save(any(Client.class));
+    }
+
+    @Test
+    @DisplayName("create lève ConflictException si email déjà pris")
+    void testCreateConflict() {
+        when(repository.existsByEmail(request.getEmail())).thenReturn(true);
+
+        assertThrows(ConflictException.class, () -> service.create(request));
     }
 
     @Test
@@ -102,27 +112,27 @@ class ClientServiceTest {
     void testUpdate() {
         Long id = 6L;
         Client existing = buildClient(id);
-        Client payload = Client.builder()
-                .nom("Martin")
-                .prenom("Lucie")
-                .email("lucie@test.com")
-                .telephone("0488/000000")
-                .adresse("Rue neuve 10")
-                .societe(Societe.builder().id(2L).nom("Societe B").build())
-                .build();
-
         when(repository.findById(id)).thenReturn(Optional.of(existing));
         when(repository.save(existing)).thenReturn(existing);
 
-        Client updated = service.update(id, payload);
+        Client updated = service.update(id, request);
 
-        assertThat(updated.getNom()).isEqualTo("Martin");
-        assertThat(updated.getPrenom()).isEqualTo("Lucie");
-        assertThat(updated.getEmail()).isEqualTo("lucie@test.com");
-        assertThat(updated.getTelephone()).isEqualTo("0488/000000");
-        assertThat(updated.getAdresse()).isEqualTo("Rue neuve 10");
-        assertThat(updated.getSociete().getId()).isEqualTo(2L);
+        assertThat(updated.getNom()).isEqualTo(request.getNom());
+        assertThat(updated.getPrenom()).isEqualTo(request.getPrenom());
+        assertThat(updated.getEmail()).isEqualTo(request.getEmail());
         verify(repository, times(1)).save(existing);
+    }
+
+    @Test
+    @DisplayName("update lève ConflictException si email déjà pris")
+    void testUpdateConflict() {
+        Long id = 6L;
+        Client existing = buildClient(id);
+        when(repository.findById(id)).thenReturn(Optional.of(existing));
+        Client other = buildClient(10L);
+        when(repository.findByEmail(request.getEmail())).thenReturn(other);
+
+        assertThrows(ConflictException.class, () -> service.update(id, request));
     }
 
     @Test
@@ -130,7 +140,7 @@ class ClientServiceTest {
     void testUpdateNotFound() {
         when(repository.findById(77L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> service.update(77L, buildClient(null)));
+        assertThrows(ResourceNotFoundException.class, () -> service.update(77L, request));
         verify(repository, times(1)).findById(77L);
     }
 
@@ -156,6 +166,17 @@ class ClientServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> service.delete(55L));
         verify(repository).existsById(55L);
         verify(repository, times(0)).deleteById(any());
+    }
+
+    private ClientRequest buildRequest() {
+        ClientRequest req = new ClientRequest();
+        req.setNom("Dupont");
+        req.setPrenom("Jean");
+        req.setEmail("jean@exemple.com");
+        req.setTelephone("0470/123456");
+        req.setAdresse("Rue test 1");
+        req.setSocieteId(1L);
+        return req;
     }
 
     private Client buildClient(Long id) {

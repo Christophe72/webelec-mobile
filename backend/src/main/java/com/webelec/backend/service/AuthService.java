@@ -5,6 +5,7 @@ import com.webelec.backend.dto.AuthRefreshRequest;
 import com.webelec.backend.dto.AuthRegisterRequest;
 import com.webelec.backend.dto.AuthResponse;
 import com.webelec.backend.dto.UtilisateurResponse;
+import com.webelec.backend.exception.ConflictException;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.UserSocieteRole;
 import com.webelec.backend.model.Utilisateur;
@@ -52,7 +53,7 @@ public class AuthService {
     @Transactional
     public AuthResponse register(AuthRegisterRequest request) {
         if (utilisateurRepository.existsByEmail(request.email())) {
-            throw new IllegalStateException("Email déjà utilisé");
+            throw new ConflictException("Email déjà utilisé");
         }
         Utilisateur utilisateur = new Utilisateur();
         utilisateur.setNom(request.nom());
