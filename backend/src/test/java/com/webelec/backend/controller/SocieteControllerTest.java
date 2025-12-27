@@ -5,6 +5,7 @@ import com.webelec.backend.config.TestSecurityConfig;
 import com.webelec.backend.dto.SocieteRequest;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.security.JwtAuthenticationFilter;
+import com.webelec.backend.security.SocieteSecurityService;
 import com.webelec.backend.service.SocieteService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -30,6 +31,8 @@ class SocieteControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private SocieteService service;
+    @MockBean
+    private SocieteSecurityService societeSecurityService;
     @MockBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 

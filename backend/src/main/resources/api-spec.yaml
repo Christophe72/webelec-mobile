@@ -2,26 +2,188 @@ openapi: 3.0.3
 info:
   title: WebElec Backend API
   version: 1.0.0
-  description: API contract for the WebElec ERP backend.
+  description: |
+    API REST du SaaS WebElec pour électriciens belges.
+    
+    ## Authentification
+    Tous les endpoints (sauf `/api/auth/*`) nécessitent un token JWT dans le header :
+    ```
+    Authorization: Bearer <token>
+    ```
+    
+    ## Codes de réponse
+    - `200` : Succès
+    - `201` : Créé
+    - `204` : Supprimé (pas de contenu)
+    - `400` : Requête invalide (validation)
+    - `401` : Non authentifié (token absent ou expiré)
+    - `403` : Accès refusé (rôle insuffisant)
+    - `404` : Ressource non trouvée
+    - `409` : Conflit (email déjà utilisé, etc.)
+
 servers:
   - url: http://localhost:8080
+    description: Serveur de développement
+
+tags:
+  - name: Auth
+    description: Authentification et gestion des tokens
+  - name: Societes
+    description: Gestion des sociétés (multi-tenant)
+  - name: Clients
+    description: Gestion des clients
+  - name: Chantiers
+    description: Gestion des chantiers
+  - name: Produits
+    description: Gestion des produits
+  - name: Interventions
+    description: Gestion des interventions
+  - name: Devis
+    description: Gestion des devis
+  - name: Factures
+    description: Gestion des factures
+
 paths:
   /api/societes:
     get:
-      summary: List all societies
+      summary: Lister les sociétés
+      description: |
+        Retourne la liste des sociétés accessibles à l'utilisateur.
+        - **ADMIN** : voit toutes les sociétés
+        - **GERANT/TECHNICIEN** : voit uniquement les sociétés auxquelles il appartient
       tags: [Societes]
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: List of societies
+          description: Liste des sociétés
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/SocieteResponse'
+              example:
+                - id: 1
+                  nom: "WebElec SPRL"
+                  tva: "BE0123456789"
+                  email: "contact@webelec.be"
+                  telephone: "+32 2 123 45 67"
+                  adresse: "Rue de l'Électricité 42, 1000 Bruxelles"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     post:
-      summary: Create a society
+      summary: Créer une société
+      description: |
+        Crée une nouvelle société.
+        
+        **Rôle requis** : `ADMIN` uniquement
+        
+        **Règles de validation** :
+        - `nom` : obligatoire, max 255 caractères
+        - `tva` : obligatoire, max 32 caractères
+        - `email` : optionnel, doit être un email valide et unique
+        - `telephone` : optionnel, format belge accepté (6-30 caractères, chiffres et +()-./\s)
+        - `adresse` : optionnel, max 512 caractères
       tags: [Societes]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocieteRequest'
+            examples:
+              valide:
+                summary: Exemple valide
+                value:
+                  nom: "WebElec SPRL"
+                  tva: "BE0123456789"
+                  email: "contact@webelec.be"
+                  telephone: "+32 2 123 45 67"
+                  adresse: "Rue de l'Électricité 42, 1000 Bruxelles"
+              minimum:
+                summary: Exemple minimal (champs obligatoires uniquement)
+                value:
+                  nom: "Ma Société"
+                  tva: "BE9876543210"
+              invalide:
+                summary: Exemple invalide (nom vide)
+                value:
+                  nom: ""
+                  tva: "BE0123456789"
+      responses:
+        '200':
+          description: Société créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocieteResponse'
+        '400':
+          description: Requête invalide (validation échouée)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: "2025-12-27T10:00:00Z"
+                status: 400
+                error: "Bad Request"
+                message: "Requête invalide"
+                details:
+                  - "nom: Le nom de la société est obligatoire"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Conflit (email déjà utilisé)
+          content:
+            application/json:
+              schema:
+                type: string
+              example: "Email déjà utilisé"
+  /api/societes/{id}:
+    get:
+      summary: Récupérer une société
+      description: |
+        Récupère les détails d'une société par son ID.
+        
+        **Rôle requis** : 
+        - `ADMIN` : peut voir toutes les sociétés
+        - Autres rôles : doit appartenir à la société
+      tags: [Societes]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Société trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocieteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Mettre à jour une société
+      description: |
+        Met à jour les informations d'une société existante.
+        
+        **Rôle requis** : `ADMIN` ou `GERANT` de la société
+        
+        **Règles** : mêmes validations que POST
+      tags: [Societes]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
       requestBody:
         required: true
         content:
@@ -30,34 +192,49 @@ paths:
               $ref: '#/components/schemas/SocieteRequest'
       responses:
         '200':
-          description: Newly created society
+          description: Société mise à jour
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocieteResponse'
-  /api/societes/{id}:
-    get:
-      summary: Get society by id
-      tags: [Societes]
-      parameters:
-        - $ref: '#/components/parameters/IdParam'
-      responses:
-        '200':
-          description: Found society
+        '400':
+          description: Requête invalide
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SocieteResponse'
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          description: Conflit (email déjà utilisé par une autre société)
+          content:
+            application/json:
+              schema:
+                type: string
     delete:
-      summary: Delete society
+      summary: Supprimer une société
+      description: |
+        Supprime une société.
+        
+        **Rôle requis** : `ADMIN` uniquement
+        
+        **Attention** : cette opération est irréversible.
       tags: [Societes]
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/IdParam'
       responses:
         '204':
-          description: Deleted
+          description: Société supprimée
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
   /api/chantiers:
@@ -579,6 +756,12 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT obtenu via /api/auth/login
   parameters:
     IdParam:
       in: path
@@ -587,56 +770,122 @@ components:
       schema:
         type: integer
         format: int64
+      description: Identifiant unique de la ressource
   responses:
     NotFound:
-      description: Resource not found
+      description: Ressource non trouvée
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
+          example:
+            timestamp: "2025-12-27T10:00:00Z"
+            status: 404
+            error: "Not Found"
+            message: "Societe non trouvée"
+            details: []
+    Unauthorized:
+      description: Non authentifié (token absent ou expiré)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            timestamp: "2025-12-27T10:00:00Z"
+            status: 401
+            error: "Unauthorized"
+            message: "Token JWT invalide ou expiré"
+            details: []
+    Forbidden:
+      description: Accès refusé (rôle insuffisant)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            timestamp: "2025-12-27T10:00:00Z"
+            status: 403
+            error: "Forbidden"
+            message: "Accès refusé : vous n'avez pas les droits nécessaires"
+            details: []
   schemas:
     ApiError:
       type: object
+      description: Format standard des erreurs API
       properties:
         timestamp:
           type: string
           format: date-time
+          description: Date et heure de l'erreur
         status:
           type: integer
+          description: Code HTTP
         error:
           type: string
+          description: Nom de l'erreur HTTP
         message:
           type: string
+          description: Message d'erreur lisible
         details:
           type: array
           items:
             type: string
+          description: Détails supplémentaires (erreurs de validation)
     SocieteRequest:
       type: object
+      description: Données pour créer ou mettre à jour une société
       required: [nom, tva]
       properties:
         nom:
           type: string
           maxLength: 255
+          description: Nom de la société
+          example: "WebElec SPRL"
         tva:
           type: string
           maxLength: 32
+          description: Numéro de TVA (format belge recommandé)
+          example: "BE0123456789"
         email:
           type: string
           format: email
+          maxLength: 255
+          description: Email de contact (doit être unique)
+          example: "contact@webelec.be"
         telephone:
           type: string
+          pattern: "^[0-9+().\\/\\-\\s]{6,30}$"
+          description: Numéro de téléphone (6-30 caractères, chiffres et +()-./\s)
+          example: "+32 2 123 45 67"
         adresse:
           type: string
           maxLength: 512
+          description: Adresse postale complète
+          example: "Rue de l'Électricité 42, 1000 Bruxelles"
     SocieteResponse:
-      allOf:
-        - $ref: '#/components/schemas/SocieteRequest'
-        - type: object
-          properties:
-            id:
-              type: integer
-              format: int64
+      type: object
+      description: Société retournée par l'API
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identifiant unique
+          example: 1
+        nom:
+          type: string
+          example: "WebElec SPRL"
+        tva:
+          type: string
+          example: "BE0123456789"
+        email:
+          type: string
+          example: "contact@webelec.be"
+        telephone:
+          type: string
+          example: "+32 2 123 45 67"
+        adresse:
+          type: string
+          example: "Rue de l'Électricité 42, 1000 Bruxelles"
     ChantierRequest:
       type: object
       required: [nom, societeId, clientId]

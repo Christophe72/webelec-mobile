@@ -53,14 +53,16 @@ Next.js ne parle jamais directement à la base de données.
 - Conformité RGIE
 - Calculs et cohérence des données
 
-### 3.3 Endpoints REST (exemples)
+### 3.3 Endpoints REST (statuts/erreurs attendus)
 
-- GET /api/societes
-- POST /api/societes
-- GET /api/clients
-- GET /api/chantiers
-- POST /api/devis
-- POST /api/factures
+- 200/201 : payload JSON métier
+- 400 : validation (message + `details` optionnels)
+- 401 : JWT manquant/expiré
+- 403 : rôle insuffisant (`ADMIN`/`GERANT`/`TECHNICIEN`)
+- 404 : ressource absente
+- 409 : conflit (numéro devis/facture déjà utilisé)
+- 422 : données incohérentes métier
+- 500/502/504 : erreur serveur/proxy
 
 Tous les endpoints métier sont servis par Spring Boot.
 
@@ -78,13 +80,27 @@ Tous les endpoints métier sont servis par Spring Boot.
 
 ### 4.2 Règle fondamentale
 
-Le frontend refuse de démarrer sans URL backend explicite.
+Le frontend refuse de démarrer sans URL backend explicite. Valeurs recommandées :
 
-Variable obligatoire :
+- Dév : `NEXT_PUBLIC_API_BASE=http://localhost:8080/api`
+- Prod : `NEXT_PUBLIC_API_BASE=https://api.webelec.be/api` (à adapter à votre déploiement)
 
-NEXT_PUBLIC_API_BASE=<http://localhost:8080/api>
+Comportement :
 
-Aucun fallback implicite vers /api n’est autorisé.
+- Pas de fallback vers `/api` ou vers une valeur par défaut.
+- Le code lève une erreur tôt si la variable est absente (voir `lib/api/base.ts`).
+- Pour toute exécution Docker/CI, injectez explicitement `NEXT_PUBLIC_API_BASE` au build/run.
+
+Exemple `.env.example` :
+
+```
+NEXT_PUBLIC_API_BASE="http://localhost:8080/api" # Dev backend (Spring Boot)
+# NEXT_PUBLIC_API_BASE="https://api.webelec.be/api" # Prod backend URL
+# Legacy alias (à supprimer dès migration complète) :
+# NEXT_PUBLIC_API_URL="http://localhost:8080/api"
+OPENAI_API_KEY="sk-xxxx"
+WEBELEC_JWT_SECRET="dev-webelec-secret-change-me-please-0123456789"
+```
 
 ### 4.3 Identifiants de test (backend Spring)
 
@@ -140,68 +156,62 @@ frontend/
 
 ### 7.1 Utilitaire proxy
 
-app/api/\_proxy/proxyApi.ts :
+app/api/proxy.ts
 
-- Reçoit la requête NextRequest
-- Forward vers Spring Boot
-- Retourne le status et le body sans modification métier
+- Signature : `proxyApi(req: NextRequest, path: string): Promise<NextResponse>`
+- Construction d’URL : concatène `NEXT_PUBLIC_API_BASE` + `path` + querystring
+- Headers : recopie des headers entrants (Host/Connection supprimés)
+- Corps : pass-through sauf GET/HEAD
+- Timeout : 10s via `AbortController`
+- Erreurs : 504 si timeout, 502 sinon, payload `{ error: message }`
+- Cache : `no-store`
 
-Toutes les routes proxy doivent utiliser cet utilitaire.
+### 7.2 Exemple de route proxy
+
+app/api/factures/route.ts
+
+```ts
+import { proxyApi } from "../proxy";
+import { NextRequest } from "next/server";
+
+export async function GET(req: NextRequest) {
+  return proxyApi(req, "/factures");
+}
+
+export async function POST(req: NextRequest) {
+  return proxyApi(req, "/factures");
+}
+```
 
 ---
 
 ## 8. Gestion des mocks
 
-### 8.1 Principe
-
-- Les mocks sont autorisés uniquement en développement
-- Jamais exposés sous /app/api en production
-
-### 8.2 Emplacement recommandé
-
-lib/mocks/
-
-- societes.mock.ts
-- clients.mock.ts
-- chantiers.mock.ts
-
-Activation conditionnelle via NODE_ENV.
+- Emplacement : `lib/mocks/`
+- Activation : uniquement si `NODE_ENV !== "production"`
+- Interdiction : aucun mock servi en prod (condition explicite dans chaque route)
+- Usage : démo/maquette uniquement; la logique métier reste côté backend
 
 ---
 
-## 9. Sécurité
+## 9. Sécurité / séparation serveur-client
 
-### 9.1 Backend
-
-- JWT
-- Rôles (ADMIN, GERANT, TECHNICIEN)
-- Sécurité centralisée
-- Contrôles d’accès stricts
-
-### 9.2 Frontend
-
-- Pas de règles de sécurité métier
-- Pas de validation critique
-- Simple relais vers backend
+- Calculs RGIE/TVA/Peppol et validations métier côté backend uniquement
+- Front = UI + orchestration; pas de règles critiques ni de secrets côté client
+- Opérations sensibles (devis, factures, stock) : Server Actions ou routes API côté serveur, jamais en client
+- JWT backend : durée courte (ex : 15 min) + refresh token côté Spring; vérifications rôles (`ADMIN`, `GERANT`, `TECHNICIEN`) dans les contrôleurs
+- Limitations front : aucun stockage de données sensibles (pas de clés IoT/MQTT, pas de secrets API), simple portage du JWT côté navigateur
 
 ---
 
-## 10. Environnement et Docker
+## 10. Tests et qualité
 
-### 10.1 Docker Compose
-
-- backend
-- frontend
-- postgres
-- pgadmin
-
-Variables d’environnement injectées explicitement au build.
-
-### 10.2 Rebuild propre
-
-docker compose down
-docker compose build --no-cache frontend
-docker compose up -d
+- Emplacement des tests : `**/*.test.ts`
+- Commandes :
+  - `npm test` (Jest)
+  - `npm run lint` (ESLint)
+  - `npm run format` ou `npx prettier --check .`
+- Règles : pas de warnings volontaires, typage strict, mocks interdits en prod, tester la logique utilitaire
 
 ---
 
@@ -482,3 +492,25 @@ CREATE TABLE non_conformites (
 ```
 
 <img src="public/dioagrams/bdd.svg" alt="Schéma BDD WebElec" width="720" />
+
+## Guide rapide (dev)
+
+```
+npm install
+npm run dev
+```
+
+Backend Spring à lancer avant le front. En Docker :
+
+```
+docker compose up backend frontend postgres
+```
+
+## Check-list avant merge
+
+- Pas de fallback implicite (API front → backend explicite)
+- Aucun mock servi en production (`NODE_ENV === "production"`)
+- Validations présentes (backend) et appels front alignés
+- Connexion front → backend vérifiée avec `NEXT_PUBLIC_API_BASE`
+- Lint/format/tests exécutés
+

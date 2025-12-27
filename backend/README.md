@@ -53,31 +53,35 @@ Variables d'environnement attendues en production : `DB_HOST`, `DB_PORT`, `DB_NA
 
 ## 4bis. Authentification et sécurité (décembre 2025)
 
-- Les endpoints d’authentification sont désormais exposés sous `/api/auth` :
-  - `POST /api/auth/login`
-  - `POST /api/auth/register`
-  - `POST /api/auth/refresh`
-  - `GET /api/auth/me`
+### Endpoints publics
+- `POST /api/auth/login` — Connexion
+- `POST /api/auth/register` — Inscription  
+- `POST /api/auth/refresh` — Rafraîchissement du token
+- `GET /api/auth/me` — Profil de l'utilisateur connecté
 
-- La configuration Spring Security autorise temporairement :
-  - `/api/auth/**` (authentification front)
-  - `/api/societes/**` (pour tests front)
-  - `POST /api/utilisateurs` (création utilisateur)
-  Toutes les autres routes nécessitent un JWT valide.
+### Sécurité des endpoints
+Tous les autres endpoints nécessitent un **token JWT** dans le header :
+```
+Authorization: Bearer <token>
+```
 
-- Exemple de requête de login :
-  ```bash
-  curl.exe -X POST http://localhost:8080/api/auth/login ^
-    -H "Content-Type: application/json" ^
-    -d "{\"email\":\"user@example.com\",\"password\":\"monmotdepasse\"}"
-  ```
+### Codes de réponse sécurité
+| Code | Signification |
+|------|---------------|
+| `401` | Non authentifié (token absent ou expiré) |
+| `403` | Accès refusé (rôle insuffisant) |
 
-- Pour tester rapidement :
-  ```bash
-  mvnw.cmd spring-boot:run -Dspring.profiles.active=dev
-  curl.exe -i http://localhost:8080/api/auth/login
-  ```
-  (Une réponse 400 est normale si le body est absent.)
+### Exemple de requête authentifiée
+```bash
+# 1. Login
+curl.exe -X POST http://localhost:8080/api/auth/login ^
+  -H "Content-Type: application/json" ^
+  -d "{\"email\":\"admin@webelec.be\",\"password\":\"admin123\"}"
+
+# 2. Utiliser le token reçu
+curl.exe -X GET http://localhost:8080/api/societes ^
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9..."
+```
 
 ---
 
@@ -170,20 +174,70 @@ Pour des exemples de payloads et le contrat détaillé, consultez `src/main/reso
 
 ## 8bis. Payloads attendus par endpoint
 
-Chaque endpoint REST attend un payload JSON conforme au DTO exposé. Les champs requis et optionnels sont strictement alignés sur le métier ; ne jamais inventer de structure ou de champ non présent dans le code ou l’OpenAPI.
+Chaque endpoint REST attend un payload JSON conforme au DTO exposé. Les champs requis et optionnels sont strictement alignés sur le métier ; ne jamais inventer de structure ou de champ non présent dans le code ou l'OpenAPI.
 
-### Sociétés (`/api/societes`)
-- **POST /api/societes**
-  ```json
-  {
-    "nom": "ElecPro",
-    "tva": "FR12345678901",
-    "email": "contact@elecpro.fr",
-    "telephone": "01 23 45 67 89",
-    "adresse": "12 rue des Ouvriers, Paris"
-  }
-  ```
-  Champs requis : `nom`, `tva`. Les autres sont optionnels.
+### Sociétés (`/api/societes`) — Documentation complète
+
+#### Permissions par rôle
+
+| Endpoint | ADMIN | GERANT | TECHNICIEN | Non auth |
+|----------|:-----:|:------:|:----------:|:--------:|
+| `GET /api/societes` | ✅ (toutes) | ✅ (ses sociétés) | ✅ (ses sociétés) | ❌ 401 |
+| `GET /api/societes/{id}` | ✅ | ✅ (si membre) | ✅ (si membre) | ❌ 401 |
+| `POST /api/societes` | ✅ | ❌ 403 | ❌ 403 | ❌ 401 |
+| `PUT /api/societes/{id}` | ✅ | ✅ (si membre) | ❌ 403 | ❌ 401 |
+| `DELETE /api/societes/{id}` | ✅ | ❌ 403 | ❌ 403 | ❌ 401 |
+
+#### Champs du payload
+
+| Champ | Type | Obligatoire | Validation | Exemple |
+|-------|------|:-----------:|------------|---------|
+| `nom` | string | ✅ | max 255 car. | `"WebElec SPRL"` |
+| `tva` | string | ✅ | max 32 car. | `"BE0123456789"` |
+| `email` | string | ❌ | format email, unique | `"contact@webelec.be"` |
+| `telephone` | string | ❌ | 6-30 car., format `[0-9+()-./\s]` | `"+32 2 123 45 67"` |
+| `adresse` | string | ❌ | max 512 car. | `"Rue de l'Électricité 42"` |
+
+#### Exemples
+
+**✅ Création valide (ADMIN requis)** :
+```bash
+curl.exe -X POST http://localhost:8080/api/societes ^
+  -H "Authorization: Bearer <token>" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"nom\":\"WebElec SPRL\",\"tva\":\"BE0123456789\",\"email\":\"contact@webelec.be\"}"
+```
+
+**✅ Exemple minimal** :
+```json
+{
+  "nom": "Ma Société",
+  "tva": "BE9876543210"
+}
+```
+
+**❌ Exemple invalide** (nom vide → 400) :
+```json
+{
+  "nom": "",
+  "tva": "BE0123456789"
+}
+```
+Réponse :
+```json
+{
+  "timestamp": "2025-12-27T10:00:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Requête invalide",
+  "details": ["nom: Le nom de la société est obligatoire"]
+}
+```
+
+**❌ Email déjà utilisé** → 409 :
+```
+"Email déjà utilisé"
+```
 
 ### Utilisateurs (`/api/utilisateurs`)
 - **POST /api/utilisateurs**
@@ -495,5 +549,3 @@ Pour formaliser une nouvelle demande, utiliser l’issue template `\`.github/ISS
 
 ---
 <img src="docs/bdd.svg" alt="Schéma BDD WebElec" width="720" />
-
-

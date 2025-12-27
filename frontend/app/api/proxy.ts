@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const PROXY_TIMEOUT_MS = 10000;
 // ⚠️ En Docker, tu pourras remplacer localhost plus tard
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080/api";
@@ -11,6 +12,13 @@ function buildHeaders(req: NextRequest): HeadersInit {
   return headers;
 }
 
+/**
+ * Proxies an API request to the upstream API server.
+ *
+ * @param req - The incoming request object.
+ * @param path - The path to proxy to, relative to the API base.
+ * @returns A NextResponse object containing the response from the upstream server.
+ */
 export async function proxyApi(
   req: NextRequest,
   path: string
@@ -22,18 +30,30 @@ export async function proxyApi(
   const body =
     method === "GET" || method === "HEAD" ? undefined : await req.text();
 
-  const res = await fetch(upstreamUrl, {
-    method,
-    headers: buildHeaders(req),
-    body,
-    cache: "no-store",
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), PROXY_TIMEOUT_MS);
 
-  const resBody = await res.arrayBuffer();
+  try {
+    const res = await fetch(upstreamUrl, {
+      method,
+      headers: buildHeaders(req),
+      body,
+      cache: "no-store",
+      signal: controller.signal,
+    });
 
-  return new NextResponse(resBody, {
-    status: res.status,
-    statusText: res.statusText,
-    headers: res.headers,
-  });
+    const resBody = await res.arrayBuffer();
+
+    return new NextResponse(resBody, {
+      status: res.status,
+      statusText: res.statusText,
+      headers: res.headers,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Proxy error";
+    const status = err instanceof Error && err.name === "AbortError" ? 504 : 502;
+    return NextResponse.json({ error: message }, { status });
+  } finally {
+    clearTimeout(timeout);
+  }
 }

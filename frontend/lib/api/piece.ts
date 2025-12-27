@@ -1,10 +1,9 @@
 import { PieceJustificativeResponse, PieceUploadDTO } from "@/types";
 import { getToken } from "@/lib/api/auth-storage";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  process.env.NEXT_PUBLIC_API_BASE ||
-  "http://localhost:8080/api";
+const API_URL: string = process.env.NEXT_PUBLIC_API_BASE ?? (() => {
+  throw new Error("NEXT_PUBLIC_API_BASE is not defined");
+})();
 const LOCAL_API_BASE = "/api";
 
 function withAuth(init: RequestInit = {}): RequestInit {
