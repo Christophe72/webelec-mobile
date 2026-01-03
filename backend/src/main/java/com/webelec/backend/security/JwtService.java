@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -37,16 +38,13 @@ public class JwtService {
     private String buildToken(Utilisateur utilisateur, java.time.Duration validity) {
         Instant now = Instant.now();
         Instant expiry = now.plus(validity);
+        Map<String, Object> claims = buildClaims(utilisateur);
         return Jwts.builder()
                 .subject(utilisateur.getEmail())
                 .issuer(properties.getIssuer())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
-                .claims(Map.of(
-                        "uid", utilisateur.getId(),
-                        "role", utilisateur.getRole() != null ? utilisateur.getRole().name() : null,
-                        "societeId", utilisateur.getSociete() != null ? utilisateur.getSociete().getId() : null
-                ))
+                .claims(claims)
                 .signWith(signingKey)
                 .compact();
     }
@@ -82,5 +80,34 @@ public class JwtService {
             return secret;
         }
         return java.util.Base64.getEncoder().encodeToString(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    private Map<String, Object> buildClaims(Utilisateur utilisateur) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("uid", utilisateur.getId());
+
+        String role = utilisateur.getRole() != null ? utilisateur.getRole().name() : null;
+        Long societeId = utilisateur.getSociete() != null ? utilisateur.getSociete().getId() : null;
+
+        if ((role == null || societeId == null)
+                && utilisateur.getSocietes() != null
+                && !utilisateur.getSocietes().isEmpty()) {
+            var link = utilisateur.getSocietes().get(0);
+            if (role == null && link.getRole() != null) {
+                role = link.getRole().name();
+            }
+            if (societeId == null && link.getSociete() != null) {
+                societeId = link.getSociete().getId();
+            }
+        }
+
+        if (role != null) {
+            claims.put("role", role);
+        }
+        if (societeId != null) {
+            claims.put("societeId", societeId);
+        }
+
+        return claims;
     }
 }

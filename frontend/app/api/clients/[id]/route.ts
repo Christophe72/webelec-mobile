@@ -28,7 +28,17 @@ export async function PUT(
     return NextResponse.json({ message: "Client introuvable" }, { status: 404 });
   }
   const payload = await req.json();
-  Object.assign(client, payload, { id: client.id });
+  const societe =
+    payload.societeId !== undefined
+      ? mockDb.societes.find((item) => item.id === Number(payload.societeId)) ?? null
+      : client.societe;
+  Object.assign(client, {
+    nom: payload.nom ?? client.nom,
+    prenom: payload.prenom ?? client.prenom,
+    telephone: payload.telephone ?? client.telephone,
+    adresse: payload.adresse ?? client.adresse,
+    societe: societe ? { id: societe.id, nom: societe.nom } : null
+  });
   return NextResponse.json(client);
 }
 

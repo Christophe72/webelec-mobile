@@ -18,13 +18,11 @@ import { getSocietes } from "@/lib/api/societe";
 const emptyClient: ClientCreateDTO = {
   nom: "",
   prenom: "",
-  email: "",
   telephone: "",
   adresse: "",
   societeId: 0,
 };
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^[+]?[\d\s().-]{6,}$/;
 const normalizePhone = (value: string) => value.replace(/[^+\d]/g, "");
 
@@ -56,17 +54,15 @@ export function ClientsPanel() {
       const valuesToSearch = [
         client.nom,
         client.prenom,
-        client.email,
         client.telephone,
-        societeById.get(client.societeId)?.nom,
+        client.societe?.nom,
+        client.adresse,
       ]
         .filter(Boolean)
         .map((value) => value!.toLowerCase());
-      return valuesToSearch.some((value) =>
-        value.includes(normalizedQuery),
-      );
+      return valuesToSearch.some((value) => value.includes(normalizedQuery));
     });
-  }, [clients, filterQuery, societeById]);
+  }, [clients, filterQuery]);
 
   const hasFilter = Boolean(filterQuery.trim());
 
@@ -95,32 +91,21 @@ export function ClientsPanel() {
     event.preventDefault();
     setFormErrors([]);
     const trimmedNom = form.nom.trim();
-    const trimmedEmail = (form.email ?? "").trim();
+    const trimmedPrenom = form.prenom.trim();
     const trimmedTelephone = (form.telephone ?? "").trim();
     const issues: string[] = [];
 
     if (!trimmedNom) {
       issues.push("Le nom est requis.");
     }
+    if (!trimmedPrenom) {
+      issues.push("Le prénom est requis.");
+    }
     if (!form.societeId) {
       issues.push("Sélectionnez une société.");
     }
-    if (trimmedEmail && !emailRegex.test(trimmedEmail)) {
-      issues.push("Format d'email invalide.");
-    }
     if (trimmedTelephone && !phoneRegex.test(trimmedTelephone)) {
       issues.push("Format de téléphone invalide.");
-    }
-    if (trimmedEmail) {
-      const normalizedEmail = trimmedEmail.toLowerCase();
-      const duplicateEmail = clients.some(
-        (client) =>
-          client.id !== editingId &&
-          client.email?.toLowerCase() === normalizedEmail,
-      );
-      if (duplicateEmail) {
-        issues.push("Cet email est déjà utilisé par un autre client.");
-      }
     }
     if (trimmedTelephone) {
       const normalizedTelephone = normalizePhone(trimmedTelephone);
@@ -128,7 +113,7 @@ export function ClientsPanel() {
         (client) =>
           client.id !== editingId &&
           client.telephone &&
-          normalizePhone(client.telephone) === normalizedTelephone,
+          normalizePhone(client.telephone) === normalizedTelephone
       );
       if (duplicateTelephone) {
         issues.push("Ce téléphone est déjà utilisé par un autre client.");
@@ -146,10 +131,9 @@ export function ClientsPanel() {
       const payload: ClientCreateDTO = {
         ...form,
         nom: trimmedNom,
-        prenom: (form.prenom ?? "").trim(),
-        email: trimmedEmail,
-        telephone: trimmedTelephone,
-        adresse: (form.adresse ?? "").trim(),
+        prenom: trimmedPrenom,
+        telephone: trimmedTelephone || undefined,
+        adresse: (form.adresse ?? "").trim() || undefined,
       };
 
       if (editingId) {
@@ -174,10 +158,9 @@ export function ClientsPanel() {
     setForm({
       nom: client.nom,
       prenom: client.prenom ?? "",
-      email: client.email ?? "",
       telephone: client.telephone ?? "",
       adresse: client.adresse ?? "",
-      societeId: client.societeId,
+      societeId: client.societe?.id ?? 0,
     });
   };
 
@@ -203,10 +186,10 @@ export function ClientsPanel() {
     : undefined;
 
   return (
-    <section className="mx-auto mt-8 w-full max-w-5xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+    <section className="w-full max-w-5xl p-6 mx-auto mt-8 border shadow-sm rounded-2xl border-zinc-200/70 bg-white/60 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted">CRM</p>
+          <p className="text-xs tracking-widest uppercase text-muted">CRM</p>
           <h2 className="text-xl font-semibold">Clients</h2>
           <p className="mt-1 text-xs text-muted">
             Créez, modifiez ou supprimez les contacts liés à vos sociétés.
@@ -215,33 +198,26 @@ export function ClientsPanel() {
         <button
           type="button"
           onClick={loadData}
-          className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
+          className="px-3 py-2 text-sm font-medium border rounded-lg shadow-sm border-zinc-200 text-foreground hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
         >
           Rafraîchir
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-2">
+      <form onSubmit={handleSubmit} className="grid gap-3 mt-6 sm:grid-cols-2">
         <input
           type="text"
           value={form.nom}
           onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
           placeholder="Nom*"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="px-3 py-2 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
           type="text"
           value={form.prenom ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, prenom: e.target.value }))}
-          placeholder="Prénom"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <input
-          type="email"
-          value={form.email ?? ""}
-          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-          placeholder="Email"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          placeholder="Prénom*"
+          className="px-3 py-2 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
           type="tel"
@@ -250,22 +226,26 @@ export function ClientsPanel() {
             setForm((f) => ({ ...f, telephone: e.target.value }))
           }
           placeholder="Téléphone"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="px-3 py-2 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <textarea
           value={form.adresse ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, adresse: e.target.value }))}
           placeholder="Adresse"
           rows={2}
-          className="sm:col-span-2 rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="px-3 py-2 text-sm border rounded-lg shadow-inner sm:col-span-2 border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
         />
+        <label htmlFor="societeId-select" className="sr-only">
+          Société liée*
+        </label>
         <select
+          id="societeId-select"
           name="societeId"
           value={form.societeId || ""}
           onChange={(e) =>
             setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
           }
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="px-3 py-2 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
         >
           <option value="">Société liée*</option>
           {societes.map((societe) => (
@@ -279,12 +259,12 @@ export function ClientsPanel() {
             Société sélectionnée : {selectedSociete.nom}
           </div>
         )}
-        <div className="sm:col-span-2 flex justify-end gap-2">
+        <div className="flex justify-end gap-2 sm:col-span-2">
           {editingId && (
             <button
               type="button"
               onClick={cancelEdit}
-              className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
+              className="px-4 py-2 text-sm font-medium border rounded-lg shadow-sm border-zinc-200 text-foreground hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
             >
               Annuler
             </button>
@@ -292,7 +272,7 @@ export function ClientsPanel() {
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black disabled:opacity-70"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white transition bg-black rounded-lg shadow-sm hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black disabled:opacity-70"
           >
             {saving ? "Sauvegarde…" : editingId ? "Mettre à jour" : "Créer"}
           </button>
@@ -300,8 +280,8 @@ export function ClientsPanel() {
       </form>
 
       {formErrors.length > 0 && (
-        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-500/60 dark:bg-amber-900/40 dark:text-amber-100">
-          <ul className="list-disc space-y-1 pl-5">
+        <div className="px-3 py-2 mt-4 text-sm border rounded-lg border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/60 dark:bg-amber-900/40 dark:text-amber-100">
+          <ul className="pl-5 space-y-1 list-disc">
             {formErrors.map((message) => (
               <li key={message}>{message}</li>
             ))}
@@ -310,22 +290,22 @@ export function ClientsPanel() {
       )}
 
       {error && (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-700/60 dark:bg-red-900/40 dark:text-red-100">
+        <div className="px-3 py-2 mt-4 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50 dark:border-red-700/60 dark:bg-red-900/40 dark:text-red-100">
           {error}
         </div>
       )}
 
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 mt-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex-1">
-          <label className="text-xs uppercase tracking-wide text-muted">
+          <label className="text-xs tracking-wide uppercase text-muted">
             Recherche
           </label>
           <input
             type="search"
             value={filterQuery}
             onChange={(event) => setFilterQuery(event.target.value)}
-            placeholder="Nom, société, email ou téléphone"
-            className="mt-1 w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+            placeholder="Nom, société ou téléphone"
+            className="w-full px-3 py-2 mt-1 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
           />
         </div>
         <div className="text-xs text-muted">
@@ -335,7 +315,7 @@ export function ClientsPanel() {
         </div>
       </div>
 
-      <div className="mt-4 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+      <div className="mt-4 text-sm divide-y divide-zinc-200 dark:divide-zinc-800">
         {loading && clients.length === 0 ? (
           <p className="py-4 text-muted">Chargement…</p>
         ) : filteredClients.length === 0 ? (
@@ -346,7 +326,10 @@ export function ClientsPanel() {
           </p>
         ) : (
           filteredClients.map((client) => {
-            const societe = societeById.get(client.societeId);
+            const societe = client.societe?.id
+              ? societeById.get(client.societe.id)
+              : undefined;
+            const societeLabel = client.societe?.nom ?? societe?.nom;
             return (
               <article
                 key={client.id}
@@ -356,15 +339,14 @@ export function ClientsPanel() {
                   <p className="font-medium text-foreground">
                     {client.prenom} {client.nom}
                   </p>
-                  {societe && (
-                    <p className="text-xs uppercase tracking-wide text-muted">
-                      {societe.nom}
+                  {societeLabel && (
+                    <p className="text-xs tracking-wide uppercase text-muted">
+                      {societeLabel}
                     </p>
                   )}
-                  {(client.email || client.telephone) && (
+                  {client.telephone && (
                     <p className="text-xs text-muted">
-                      {client.email ? `✉ ${client.email}` : ""}{" "}
-                      {client.telephone ? `• ☎ ${client.telephone}` : ""}
+                      {`☎ ${client.telephone}`}
                     </p>
                   )}
                   {client.adresse && (

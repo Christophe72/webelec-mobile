@@ -96,7 +96,7 @@ export function ChantierPanel() {
     }
     const selectedSocieteId = Number(form.societeId);
     return clients.filter(
-      (client) => Number(client.societeId) === selectedSocieteId
+      (client) => client.societe?.id === selectedSocieteId
     );
   }, [clients, form.societeId]);
 
@@ -233,7 +233,7 @@ export function ChantierPanel() {
                 clients.some(
                   (client) =>
                     String(client.id) === f.clientId &&
-                    String(client.societeId) === newSocieteId
+                    String(client.societe?.id ?? "") === newSocieteId
                 )
               ) {
                 return { ...f, societeId: newSocieteId };
@@ -267,7 +267,7 @@ export function ChantierPanel() {
                 ...f,
                 clientId: newClientId,
                 societeId: client
-                  ? String(client.societeId)
+                  ? String(client.societe?.id ?? "")
                   : f.societeId,
               };
             });
