@@ -584,4 +584,62 @@ Sans ces données, appliquer la règle stricte : `Données insuffisantes pour un
 Pour formaliser une nouvelle demande, utiliser l’issue template `\`.github/ISSUE_TEMPLATE/rgie-iot-spec.yml` (menu *New issue → RFC – Endpoint RGIE/IoT*). Aucune implémentation n’est lancée sans ticket approuvé.
 
 ---
-<img src="docs/bdd.svg" alt="Schéma BDD WebElec" width="720" />
+
+## 4ter. Secrets et variables d'environnement (non locaux)
+Pour tout environnement autre que votre machine de développement (staging, préprod, production), configurez les variables suivantes **en dehors du dépôt** (GitHub Secrets, variables système, paramètres Docker/Kubernetes). Elles alimentent directement `application-prod.yml` et la configuration JWT.
+
+| Nom | Obligatoire | Portée recommandée | Description |
+| --- | :---: | --- | --- |
+| `SPRING_PROFILES_ACTIVE` | ✅ | Service/runner | Toujours `prod` pour forcer l'usage d'`application-prod.yml`. |
+| `DB_HOST` | ✅ | Secret serveur / GitHub | Hôte PostgreSQL (ex. `db.internal` ou IP privée). |
+| `DB_PORT` | ✅ | Secret serveur / GitHub | Port PostgreSQL (par défaut `5432`). |
+| `DB_NAME` | ✅ | Secret serveur / GitHub | Nom de la base (`webelec_db`, `webelec_stage`, …). |
+| `DB_USER` | ✅ | Secret serveur / GitHub | Utilisateur dédié à l'environnement ciblé. |
+| `DB_PASSWORD` | ✅ | Secret serveur / GitHub | Mot de passe associé, jamais versionné. |
+| `WEBELEC_JWT_SECRET` | ✅ | Secret serveur / GitHub | Secret 256 bits pour signer les tokens (remplace la valeur de dev). |
+| `APP_FILE_UPLOAD_DIR` | ⚠️ | Variable serveur | Si vous stockez les uploads hors du répertoire par défaut `uploads`. |
+
+### Exemple : GitHub Actions / Environments
+Dans `Settings > Environments > production`, créez les secrets ci-dessus. Le workflow GitHub Actions peut ensuite les injecter :
+```
+    env:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: ${{ secrets.PROD_DB_HOST }}
+      DB_PORT: ${{ secrets.PROD_DB_PORT }}
+      DB_NAME: ${{ secrets.PROD_DB_NAME }}
+      DB_USER: ${{ secrets.PROD_DB_USER }}
+      DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+      WEBELEC_JWT_SECRET: ${{ secrets.PROD_JWT_SECRET }}
+```
+
+### Exemple : service systemd sur un VPS
+```
+[Service]
+Environment="SPRING_PROFILES_ACTIVE=prod"
+Environment="DB_HOST=10.10.0.5"
+Environment="DB_PORT=5432"
+Environment="DB_NAME=webelec_prod"
+Environment="DB_USER=webelec_app"
+Environment="DB_PASSWORD=${WE_BELEC_DB_PWD}"
+Environment="WEBELEC_JWT_SECRET=${WEBELEC_JWT_SECRET}"
+Environment="APP_FILE_UPLOAD_DIR=/var/lib/webelec/uploads"
+```
+
+> 💡 Remplacez les variables `${…}` par des entrées sécurisées (`/etc/environment`, coffre-fort, export `systemctl set-environment`, etc.).
+
+### Exemple : Docker Compose (staging)
+```
+services:
+  backend:
+    image: registry/webelec/backend:staging
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: webelec_stage
+      DB_USER: webelec_stage
+      DB_PASSWORD: ${WEBELEC_STAGE_DB_PASSWORD}
+      WEBELEC_JWT_SECRET: ${WEBELEC_STAGE_JWT_SECRET}
+```
+
+Gardez une politique de rotation régulière des secrets (DB/JWT) et attribuez des credentials distincts par environnement pour limiter l'impact d'un incident.

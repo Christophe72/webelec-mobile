@@ -29,3 +29,4 @@ logging:
     org.springframework.web: INFO
     org.hibernate.SQL: OFF          # jamais afficher les requêtes en prod
     org.hibernate.type: OFF
+    com.zaxxer.hikari: WARN         # réduire le bruit des logs HikariCP

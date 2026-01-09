@@ -263,7 +263,11 @@ export function DevisPanel() {
           placeholder="Date d'expiration"
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
+        <label htmlFor="societeId" className="sr-only">
+          Société*
+        </label>
         <select
+          id="societeId"
           value={form.societeId || ""}
           onChange={(e) =>
             setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
@@ -277,7 +281,11 @@ export function DevisPanel() {
             </option>
           ))}
         </select>
+        <label htmlFor="clientId" className="sr-only">
+          Client*
+        </label>
         <select
+          id="clientId"
           value={form.clientId || ""}
           onChange={(e) => handleClientSelect(e.target.value)}
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
