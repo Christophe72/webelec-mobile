@@ -125,7 +125,7 @@ export function InterventionsPanel() {
 
   const filteredClients = useMemo(() => {
     if (!form.societeId) return clients;
-    return clients.filter((client) => client.societeId === form.societeId);
+    return clients.filter((client) => client.societe?.id === form.societeId);
   }, [clients, form.societeId]);
 
   const filteredChantiers = useMemo(() => {
@@ -145,7 +145,7 @@ export function InterventionsPanel() {
     setForm((f) => ({
       ...f,
       clientId,
-      societeId: selectedClient ? selectedClient.societeId : f.societeId,
+      societeId: selectedClient?.societe?.id ?? f.societeId,
     }));
   };
 

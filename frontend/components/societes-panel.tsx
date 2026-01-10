@@ -37,13 +37,22 @@ export function SocietesPanel() {
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!form.nom.trim() || !form.tva.trim()) {
+    const trimmedNom = form.nom.trim();
+    const trimmedTva = form.tva.trim();
+    if (!trimmedNom || !trimmedTva) {
       setError("Le nom et la TVA sont requis");
       return;
     }
     try {
       setError(null);
-      await createSociete(form);
+      const payload: SocieteRequest = {
+        nom: trimmedNom,
+        tva: trimmedTva,
+        email: form.email?.trim() || undefined,
+        telephone: form.telephone?.trim() || undefined,
+        adresse: form.adresse?.trim() || undefined
+      };
+      await createSociete(payload);
       setForm(emptyForm);
       await load();
     } catch (err) {
@@ -81,6 +90,9 @@ export function SocietesPanel() {
 
       <form onSubmit={onSubmit} className="mt-6 grid gap-3 sm:grid-cols-3">
         <input
+          id="societe-nom"
+          name="nom"
+          autoComplete="organization"
           type="text"
           value={form.nom}
           onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
@@ -88,6 +100,9 @@ export function SocietesPanel() {
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
+          id="societe-tva"
+          name="tva"
+          autoComplete="tax-id"
           type="text"
           value={form.tva}
           onChange={(e) => setForm((f) => ({ ...f, tva: e.target.value }))}
@@ -95,6 +110,9 @@ export function SocietesPanel() {
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
+          id="societe-email"
+          name="email"
+          autoComplete="email"
           type="email"
           value={form.email || ""}
           onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
@@ -102,6 +120,9 @@ export function SocietesPanel() {
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
+          id="societe-telephone"
+          name="telephone"
+          autoComplete="tel"
           type="text"
           value={form.telephone || ""}
           onChange={(e) =>
@@ -111,6 +132,9 @@ export function SocietesPanel() {
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
+          id="societe-adresse"
+          name="adresse"
+          autoComplete="street-address"
           type="text"
           value={form.adresse || ""}
           onChange={(e) =>

@@ -4,16 +4,12 @@ import { mockClients } from "./mockClients";
 
 const LOCAL_API_BASE = "/api";
 
-function buildEndpoint(societeId?: number | string): string {
-  return societeId ? `/clients/societe/${societeId}` : "/clients";
-}
-
 function filterMockClients(societeId?: number | string): ClientDTO[] {
   if (societeId === undefined || societeId === null || societeId === "") {
     return mockClients;
   }
   const numericId = Number(societeId);
-  return mockClients.filter((client) => client.societeId === numericId);
+  return mockClients.filter((client) => client.societe?.id === numericId);
 }
 
 async function localClientFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -58,9 +54,13 @@ async function requestWithLocalFallback<T>(
 }
 
 export async function getClients(societeId?: number | string): Promise<ClientDTO[]> {
-  const endpoint = buildEndpoint(societeId);
   try {
-    return await requestWithLocalFallback<ClientDTO[]>(endpoint);
+    const data = await requestWithLocalFallback<ClientDTO[]>("/clients");
+    if (societeId === undefined || societeId === null || societeId === "") {
+      return data;
+    }
+    const numericId = Number(societeId);
+    return data.filter((client) => client.societe?.id === numericId);
   } catch (err) {
     console.error("[getClients] Fallback local indisponible, utilisation des mocks", err);
     return filterMockClients(societeId);

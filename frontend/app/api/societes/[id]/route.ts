@@ -27,7 +27,7 @@ export async function DELETE(
     return NextResponse.json({ message: "Société introuvable" }, { status: 404 });
   }
   mockDb.societes.splice(index, 1);
-  mockDb.clients = mockDb.clients.filter((client) => client.societeId !== numericId);
+  mockDb.clients = mockDb.clients.filter((client) => client.societe?.id !== numericId);
   mockDb.chantiers = mockDb.chantiers.filter((chantier) => chantier.societe?.id !== numericId);
   return NextResponse.json({ success: true });
 }

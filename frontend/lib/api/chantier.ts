@@ -6,7 +6,7 @@ const LOCAL_API_BASE = "/api";
 
 function buildChantierEndpoint(societeId?: number | string): string {
   if (societeId !== undefined && societeId !== null && societeId !== "") {
-    return `/chantiers?societeId=${societeId}`;
+    return `/chantiers/societe/${societeId}`;
   }
   return "/chantiers";
 }
@@ -75,18 +75,7 @@ export async function getChantiers(
 ): Promise<ChantierDTO[]> {
   const endpoint = buildChantierEndpoint(societeId);
   try {
-    const data = await requestWithLocalFallback<ChantierDTO[]>(endpoint);
-    if (
-      societeId !== undefined &&
-      societeId !== null &&
-      societeId !== "" &&
-      !endpoint.startsWith("/chantiers/societe")
-    ) {
-      // local route utilise query string -> re-filtre côté client pour aligner avec l'API backend
-      const numericId = Number(societeId);
-      return data.filter((chantier) => chantier.societe?.id === numericId);
-    }
-    return data;
+    return await requestWithLocalFallback<ChantierDTO[]>(endpoint);
   } catch (err) {
     console.error(
       "[getChantiers] Fallback local indisponible, retour mockChantiers",

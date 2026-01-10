@@ -9,6 +9,6 @@ export async function GET(
 ) {
   const { id } = await getParams(context);
   const numericId = Number(id);
-  const clients = mockDb.clients.filter((client) => client.societeId === numericId);
+  const clients = mockDb.clients.filter((client) => client.societe?.id === numericId);
   return NextResponse.json(clients);
 }

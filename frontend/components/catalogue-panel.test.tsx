@@ -58,7 +58,8 @@ describe("CataloguePanel", () => {
     expect(
       await screen.findByText("REF001 — Produit test")
     ).toBeInTheDocument();
-    expect(screen.getByText("Electro SARL")).toBeInTheDocument();
+    // Vérifie qu'au moins une occurrence de "Electro SARL" (dans la fiche produit) est présente
+    expect(screen.getAllByText("Electro SARL").length).toBeGreaterThan(0);
     expect(
       screen.getByText((content) => content.includes("Produits chargés : 1"))
     ).toBeInTheDocument();
@@ -97,10 +98,7 @@ describe("CataloguePanel", () => {
       "Produit user"
     );
     await user.type(screen.getByPlaceholderText("Description"), "Essai");
-    await user.type(
-      screen.getByPlaceholderText("Quantité en stock"),
-      "8"
-    );
+    await user.type(screen.getByPlaceholderText("Quantité en stock"), "8");
     await user.type(screen.getByPlaceholderText("Prix unitaire (€)"), "45");
     await user.selectOptions(screen.getByRole("combobox"), ["1"]);
 
