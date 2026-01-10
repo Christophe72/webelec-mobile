@@ -1,32 +1,53 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:webelec_db}
+    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      pool-name: HikariProd
+      minimum-idle: 2
+      maximum-pool-size: 10
+      auto-commit: false
+      validation-timeout: 3000
+      connection-timeout: 30000
+      max-lifetime: 1800000
 
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        format_sql: false     # pas d’affichage SQL en prod
-    show-sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        show_sql: false
+        jdbc:
+          time_zone: UTC
 
-  datasource.hikari:
-    maximum-pool-size: 10       # adapté pour un SaaS sur VPS 2-4 CPU
-    minimum-idle: 2
-    idle-timeout: 30000
-    connection-timeout: 30000
-    max-lifetime: 1800000       # stabilité des connexions
+  sql:
+    init:
+      mode: never
+
+  h2:
+    console:
+      enabled: false
 
 server:
-  port: 8080
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
 
 logging:
   level:
     root: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: OFF          # jamais afficher les requêtes en prod
-    org.hibernate.type: OFF
-    com.zaxxer.hikari: WARN         # réduire le bruit des logs HikariCP
+    org.hibernate.SQL: WARN
+    org.hibernate.type: WARN
