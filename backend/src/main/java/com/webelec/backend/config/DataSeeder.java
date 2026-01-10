@@ -23,9 +23,13 @@ import com.webelec.backend.repository.UtilisateurRepository;
 import com.webelec.backend.repository.UserSocieteRoleRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Profile;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,6 +38,8 @@ import java.util.List;
 @Component
 @Profile("!test")
 public class DataSeeder {
+
+    private static final Logger log = LoggerFactory.getLogger(DataSeeder.class);
 
     private final SocieteRepository societeRepository;
     private final SocieteSeedProperties seedProperties;
@@ -73,8 +79,14 @@ public class DataSeeder {
 
     @PostConstruct
     public void seed() {
-        seedSocietes();
-        seedDemoData();
+        try {
+            seedSocietes();
+            seedDemoData();
+        } catch (DataAccessException ex) {
+            // Typiquement: première exécution, schéma pas encore créé => tables inexistantes.
+            // On ne bloque pas le démarrage en dev; les seeds seront rejoués au prochain restart.
+            log.warn("Seed ignoré car la base n'est pas prête (tables absentes ou schéma indisponible): {}", ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage());
+        }
     }
 
     private void seedSocietes() {
