@@ -49,7 +49,7 @@ export default function LoginTestPage() {
   ];
 
   return (
-    <div className="mx-auto mt-12 max-w-md rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+    <div className="mx-auto mt-12 max-w-md rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur">
       <h1 className="text-xl font-semibold mb-4">Test login JWT</h1>
 
       {hasToken === null ? (
@@ -60,7 +60,7 @@ export default function LoginTestPage() {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm dark:border-zinc-700"
+            className="w-full rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm transition-all"
           >
             Déconnexion
           </button>
@@ -74,16 +74,16 @@ export default function LoginTestPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
           />
           <input
            type="password"
           name="password"
-          autoComplete="current-password" // ou "new-password" si c’est pour créer un compte
+          autoComplete="current-password" // ou "new-password" si c'est pour créer un compte
           placeholder="Mot de passe"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
           />
           <button
             type="submit"
@@ -94,7 +94,7 @@ export default function LoginTestPage() {
         </form>
       )}
 
-      <div className="mt-4 text-xs text-muted">
+      <div className="mt-4 text-xs text-muted-foreground">
         <p>
           Token actuel :{" "}
           {hasToken === null ? "..." : hasToken ? "présent" : "absent"}
@@ -102,13 +102,13 @@ export default function LoginTestPage() {
       </div>
 
       {message && (
-        <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-foreground dark:border-zinc-700/50 dark:bg-zinc-900/40">
+        <div className="mt-4 rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm text-foreground">
           {message}
         </div>
       )}
 
       <div className="mt-6 space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Accès rapide
         </p>
         <div className="grid grid-cols-1 gap-2">
@@ -116,10 +116,10 @@ export default function LoginTestPage() {
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-xl border border-zinc-200/80 px-4 py-3 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm dark:border-zinc-700/70"
+              className="rounded-xl border border-border px-4 py-3 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm hover:border-primary/50 transition-all"
             >
               <span className="block text-base font-semibold">{link.title}</span>
-              <span className="text-xs text-muted">{link.description}</span>
+              <span className="text-xs text-muted-foreground">{link.description}</span>
             </Link>
           ))}
         </div>
