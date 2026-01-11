@@ -6,40 +6,42 @@ Ce document liste toutes les variables d'environnement utilisées par l'applicat
 
 ## 🗄️ Base de données PostgreSQL
 
-### Développement (Docker)
+### Développement (Backend et Frontend locaux, PostgreSQL dans Docker)
 
 | Variable | Valeur | Localisation | Description |
 |----------|--------|--------------|-------------|
 | `POSTGRES_DB` | `webelec` | docker-compose.yml | Nom de la base de données |
 | `POSTGRES_USER` | `postgres` | docker-compose.yml | Utilisateur PostgreSQL |
 | `POSTGRES_PASSWORD` | `postgres` | docker-compose.yml | Mot de passe PostgreSQL |
-| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://postgres:5432/webelec` | docker-compose.yml → backend | URL JDBC pour Spring Boot |
-| `SPRING_DATASOURCE_USERNAME` | `postgres` | docker-compose.yml → backend | Utilisateur pour Spring Boot |
-| `SPRING_DATASOURCE_PASSWORD` | `postgres` | docker-compose.yml → backend | Mot de passe pour Spring Boot |
 
-**Fichier de configuration Spring Boot** : `backend/src/main/resources/application-dev.yml`
+**Configuration du backend local** : `backend/src/main/resources/application-dev.yml`
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/webelec?currentSchema=public
+    url: jdbc:postgresql://localhost:5432/webelec?currentSchema=public
     username: postgres
     password: postgres
 ```
 
-### Production
+**Note** : Le backend tourne localement (hors Docker) et se connecte à PostgreSQL via `localhost:5432`.
+
+### Production (Tous les services dans Docker)
 
 | Variable | Valeur | Localisation | Description | Obligatoire |
 |----------|--------|--------------|-------------|-------------|
-| `DATABASE_URL` | À définir | application-prod.yml | URL JDBC complète | ✅ Oui |
-| `DB_USER` | À définir | application-prod.yml | Utilisateur PostgreSQL | ✅ Oui |
-| `DB_PASSWORD` | À définir | application-prod.yml | Mot de passe PostgreSQL | ✅ Oui |
+| `SPRING_DATASOURCE_URL` | À définir | docker-compose.prod.yml | URL JDBC complète | ✅ Oui |
+| `SPRING_DATASOURCE_USERNAME` | À définir | docker-compose.prod.yml | Utilisateur PostgreSQL | ✅ Oui |
+| `SPRING_DATASOURCE_PASSWORD` | À définir | docker-compose.prod.yml | Mot de passe PostgreSQL | ✅ Oui |
 
 **Exemple de configuration production** :
 ```bash
-export DATABASE_URL="jdbc:postgresql://prod-db-host:5432/webelec?currentSchema=public&ssl=true"
-export DB_USER="webelec_prod"
-export DB_PASSWORD="STRONG_PASSWORD_HERE"
+export POSTGRES_DB="webelec"
+export POSTGRES_USER="webelec_prod"
+export POSTGRES_PASSWORD="STRONG_PASSWORD_HERE"
+export WEBELEC_JWT_SECRET="your-strong-jwt-secret-here"
 ```
+
+**Note** : En production, tous les services tournent dans Docker et communiquent via le réseau Docker interne.
 
 ---
 
@@ -67,8 +69,9 @@ dev-f5e447b965abff7ed55be72b26a0bc68e26efd05ba43937db5c243dd65a4e4bb300c1ed326f4
 
 | Variable | Valeur par défaut | Localisation | Description | Obligatoire |
 |----------|-------------------|--------------|-------------|-------------|
-| `SPRING_PROFILES_ACTIVE` | `dev` | docker-compose.yml | Profil Spring Boot actif (`dev`, `prod`, `test`) | ✅ Oui |
-| `PORT` | `8080` | application-prod.yml | Port du serveur Spring Boot | ❌ Non |
+| `SPRING_PROFILES_ACTIVE` | `dev` | application.yml ou docker-compose.prod.yml | Profil Spring Boot actif (`dev`, `prod`, `test`) | ✅ Oui |
+| `SERVER_PORT` | `8080` | docker-compose.prod.yml | Port du serveur Spring Boot | ❌ Non |
+| `BACKEND_PORT` | `8080` | docker-compose.prod.yml | Port exposé du backend | ❌ Non |
 
 ---
 
@@ -76,10 +79,12 @@ dev-f5e447b965abff7ed55be72b26a0bc68e26efd05ba43937db5c243dd65a4e4bb300c1ed326f4
 
 | Variable | Valeur (Dev) | Localisation | Description | Obligatoire |
 |----------|--------------|--------------|-------------|-------------|
-| `NEXT_PUBLIC_API_BASE` | `http://localhost:8080/api` | docker-compose.yml | URL de base de l'API backend | ✅ Oui |
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8080/api` | docker-compose.yml | URL de l'API (même valeur) | ✅ Oui |
-| `OPENAI_API_KEY` | À définir | .env.example | Clé API OpenAI pour embeddings | ✅ Oui (si IA activée) |
-| `VECTOR_STORE_ID` | À définir | .env.example | ID du vector store OpenAI | ✅ Oui (si recherche RGIE) |
+| `NEXT_PUBLIC_API_BASE` | `http://localhost:8080/api` | frontend/.env.local | URL de base de l'API backend | ✅ Oui |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8080/api` | frontend/.env.local | URL de l'API (même valeur) | ✅ Oui |
+| `OPENAI_API_KEY` | À définir | frontend/.env.local | Clé API OpenAI pour embeddings | ✅ Oui (si IA activée) |
+| `VECTOR_STORE_ID` | À définir | frontend/.env.local | ID du vector store OpenAI | ✅ Oui (si recherche RGIE) |
+
+**Note** : En développement, le frontend tourne localement. Créez un fichier `frontend/.env.local` avec ces variables.
 
 **Configuration Production Frontend** :
 ```bash
@@ -140,44 +145,53 @@ export NEXT_PUBLIC_API_URL="https://api.webelec.be/api"
 
 ## 📋 Résumé des configurations par environnement
 
-### Développement (Docker Compose)
+### Développement (Backend et Frontend locaux)
 
+**Docker Compose (docker-compose.yml)** :
 ```bash
-# PostgreSQL
+# PostgreSQL uniquement
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_DB=webelec
+```
 
-# Backend
-SPRING_PROFILES_ACTIVE=dev
-SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/webelec
-SPRING_DATASOURCE_USERNAME=postgres
-SPRING_DATASOURCE_PASSWORD=postgres
+**Backend (application-dev.yml)** :
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/webelec?currentSchema=public
+    username: postgres
+    password: postgres
+```
 
-# Frontend
+**Frontend (frontend/.env.local)** :
+```bash
 NEXT_PUBLIC_API_BASE=http://localhost:8080/api
 NEXT_PUBLIC_API_URL=http://localhost:8080/api
 ```
 
-### Production
+### Production (Docker Compose)
 
+**Fichier .env pour docker-compose.prod.yml** :
 ```bash
-# PostgreSQL (environnement externe ou service managé)
-DATABASE_URL=jdbc:postgresql://<host>:<port>/<database>?currentSchema=public&ssl=true
-DB_USER=<production_user>
-DB_PASSWORD=<strong_password>
+# PostgreSQL
+POSTGRES_DB=webelec
+POSTGRES_USER=webelec_prod
+POSTGRES_PASSWORD=<strong_password>
 
 # Backend
-SPRING_PROFILES_ACTIVE=prod
+BACKEND_PORT=8080
 WEBELEC_JWT_SECRET=<your_strong_secret_key>
-PORT=8080
 
 # Frontend
+FRONTEND_PORT=3000
 NEXT_PUBLIC_API_BASE=https://api.webelec.be/api
 NEXT_PUBLIC_API_URL=https://api.webelec.be/api
 OPENAI_API_KEY=<your_openai_key>
 VECTOR_STORE_ID=<your_vector_store_id>
 ```
+
+**Note** : Spring Boot utilise automatiquement `SPRING_DATASOURCE_*` définis dans docker-compose.prod.yml.
 
 ---
 
@@ -186,11 +200,14 @@ VECTOR_STORE_ID=<your_vector_store_id>
 ### Vérifier que PostgreSQL est accessible
 
 ```bash
-# Depuis le host
+# Depuis le host (développement)
 docker exec -it webelec-postgres psql -U postgres -d webelec -c "\dt"
 
-# Depuis le backend
-docker exec -it webelec-backend curl http://localhost:8080/actuator/health
+# Vérifier le backend local (développement)
+curl http://localhost:8080/actuator/health
+
+# Vérifier le backend en production (dans Docker)
+docker exec -it webelec-backend-prod curl http://localhost:8080/actuator/health
 ```
 
 ### Vérifier que le frontend communique avec le backend
@@ -217,15 +234,27 @@ docker-compose restart
 
 ### Accéder aux logs
 
+**Développement** :
 ```bash
-# Logs du backend
-docker-compose logs -f backend
-
-# Logs de PostgreSQL
+# Logs PostgreSQL (Docker)
 docker-compose logs -f postgres
 
+# Logs du backend
+# Affichés dans le terminal où vous avez démarré Spring Boot (./mvnw spring-boot:run)
+
 # Logs du frontend
-docker-compose logs -f frontend
+# Affichés dans le terminal où vous avez démarré Next.js (npm run dev)
+```
+
+**Production** :
+```bash
+# Logs de tous les services
+docker-compose -f docker-compose.prod.yml logs -f
+
+# Logs individuels
+docker-compose -f docker-compose.prod.yml logs -f backend
+docker-compose -f docker-compose.prod.yml logs -f frontend
+docker-compose -f docker-compose.prod.yml logs -f postgres
 ```
 
 ### Exécuter des commandes SQL

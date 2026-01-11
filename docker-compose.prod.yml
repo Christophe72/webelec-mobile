@@ -32,11 +32,11 @@ services:
     restart: always
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-webelec}?currentSchema=public
-      DB_USER: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-webelec}?currentSchema=public
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
       WEBELEC_JWT_SECRET: ${WEBELEC_JWT_SECRET:?WEBELEC_JWT_SECRET must be set}
-      PORT: ${BACKEND_PORT:-8080}
+      SERVER_PORT: ${BACKEND_PORT:-8080}
     ports:
       - "${BACKEND_PORT:-8080}:${BACKEND_PORT:-8080}"
     depends_on:
@@ -45,7 +45,7 @@ services:
     networks:
       - webelec-net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_PORT:-8080}/actuator/health"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${BACKEND_PORT:-8080}/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -72,7 +72,7 @@ services:
     networks:
       - webelec-net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

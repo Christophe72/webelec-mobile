@@ -24,6 +24,9 @@ FROM eclipse-temurin:21-jre AS runtime
 
 WORKDIR /app
 
+# Installer wget pour les healthchecks
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
 # Copier le jar compilé
 COPY --from=build /app/target/*.jar app.jar
 

@@ -276,7 +276,16 @@ spring:
 docker logs webelec-postgres
 
 # Vérifier que le port 5432 n'est pas déjà utilisé
+# Windows
 netstat -an | findstr 5432
+
+# Linux / macOS
+netstat -an | grep 5432
+# ou
+lsof -i :5432
+
+# Alternative multi-plateforme : vérifier que le conteneur PostgreSQL est en cours d'exécution
+docker ps | grep webelec-postgres
 ```
 
 ### Erreur "database already exists"

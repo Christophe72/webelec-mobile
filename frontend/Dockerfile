@@ -22,6 +22,9 @@ FROM node:24.1.0-slim AS runtime
 
 WORKDIR /app
 
+# Installer wget pour les healthchecks
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
 COPY --from=build /app/package.json .
