@@ -9,6 +9,7 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     ports:
       - "5432:5432"
     networks:
@@ -27,40 +28,6 @@ services:
       - "5050:80"
     depends_on:
       - postgres
-    networks:
-      - webelec-net
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: webelec-backend
-    restart: always
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/webelec
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-    networks:
-      - webelec-net
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: webelec-frontend
-    restart: always
-    environment:
-      NEXT_PUBLIC_API_BASE: "http://localhost:8080/api"
-      NEXT_PUBLIC_API_URL: "http://localhost:8080/api"
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
     networks:
       - webelec-net
 
