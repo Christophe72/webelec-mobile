@@ -233,7 +233,7 @@ export default function ChatRgiePage() {
 
             {msg.steps && msg.steps.length > 0 && (
               <div className="mt-4">
-                <h4 className="font-bold mb-2 text-sm">Étapes d'analyse :</h4>
+                <h4 className="font-bold mb-2 text-sm">Étapes d&apos;analyse :</h4>
                 <ul className="text-xs space-y-1 text-muted-foreground">
                   {msg.steps.map((s, i) => (
                     <li key={i}>{s}</li>
