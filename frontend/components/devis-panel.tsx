@@ -250,7 +250,7 @@ export function DevisPanel() {
           onChange={(e) =>
             setForm((f) => ({ ...f, dateEmission: e.target.value }))
           }
-          placeholder="Date d'émission"
+          placeholder="Date d&apos;émission"
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
@@ -260,7 +260,7 @@ export function DevisPanel() {
           onChange={(e) =>
             setForm((f) => ({ ...f, dateExpiration: e.target.value }))
           }
-          placeholder="Date d'expiration"
+          placeholder="Date d&apos;expiration"
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <label htmlFor="societeId" className="sr-only">

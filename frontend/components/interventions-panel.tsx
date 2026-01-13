@@ -205,7 +205,7 @@ export function InterventionsPanel() {
           <option value="ANNULEE">Annulée</option>
         </select>
         <input
-          title="Date de l'intervention"
+          title="Date de l&apos;intervention"
           type="date"
           value={form.dateIntervention}
           onChange={(e) =>
