@@ -11,10 +11,15 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtService jwtService;
     private final UtilisateurDetailsService utilisateurDetailsService;
@@ -28,8 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String path = request.getRequestURI();
-        System.out.println("[JWT FILTER] URI: " + path);
+        if (log.isDebugEnabled()) {
+            log.debug("[JWT FILTER] URI: {}", request.getRequestURI());
+        }
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -58,9 +64,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         // Ne pas filtrer les endpoints publics
-        return path.startsWith("/api/auth/") ||
-               path.startsWith("/actuator/") ||
-               path.startsWith("/swagger-ui/") ||
-               path.startsWith("/v3/api-docs");
+        return path.startsWith("/api/auth/")
+                || path.startsWith("/actuator/")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
+                || path.equals("/swagger-ui.html");
     }
 }

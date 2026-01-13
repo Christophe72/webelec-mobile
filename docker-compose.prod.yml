@@ -32,11 +32,11 @@ services:
     restart: always
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-webelec}?currentSchema=public
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-webelec}?currentSchema=public
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
       WEBELEC_JWT_SECRET: ${WEBELEC_JWT_SECRET:?WEBELEC_JWT_SECRET must be set}
-      SERVER_PORT: ${BACKEND_PORT:-8080}
+      PORT: ${BACKEND_PORT:-8080}
     ports:
       - "${BACKEND_PORT:-8080}:${BACKEND_PORT:-8080}"
     depends_on:
