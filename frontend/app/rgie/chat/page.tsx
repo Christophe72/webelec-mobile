@@ -200,7 +200,7 @@ export default function ChatRgiePage() {
 
     return (
       <div key={index} className="mb-6">
-        <Card className={isAI ? "border-blue-300" : "border-gray-300"}>
+        <Card className={isAI ? "border-primary/30 bg-primary/5" : "border-border"}>
           <CardHeader>
             <CardTitle className="text-lg">
               {isAI ? "Assistant RGIE" : "Vous"}
@@ -214,7 +214,7 @@ export default function ChatRgiePage() {
                 <h4 className="font-bold mb-2">📚 Citations RGIE :</h4>
                 <ul className="text-sm space-y-2">
                   {msg.rules.map((r, i) => (
-                    <li key={i} className="p-2 border rounded bg-muted">
+                    <li key={i} className="p-2 border border-border rounded bg-muted/50">
                       <strong>
                         Livre {r.rgie.livre}, Article {r.rgie.article}
                       </strong>
@@ -233,8 +233,8 @@ export default function ChatRgiePage() {
 
             {msg.steps && msg.steps.length > 0 && (
               <div className="mt-4">
-                <h4 className="font-bold mb-2 text-sm">Étapes d’analyse :</h4>
-                <ul className="text-xs space-y-1">
+                <h4 className="font-bold mb-2 text-sm">Étapes d&apos;analyse :</h4>
+                <ul className="text-xs space-y-1 text-muted-foreground">
                   {msg.steps.map((s, i) => (
                     <li key={i}>{s}</li>
                   ))}
@@ -244,8 +244,8 @@ export default function ChatRgiePage() {
 
             {isAI && (
               <p
-                className={`mt-4 text-xs ${
-                  msg.selfCheck ? "text-green-700" : "text-red-700"
+                className={`mt-4 text-xs font-medium ${
+                  msg.selfCheck ? "text-green-600 dark:text-green-400" : "text-destructive"
                 }`}
               >
                 {msg.selfCheck

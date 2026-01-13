@@ -12,7 +12,7 @@ on:
       - 'backend/**'
 
 jobs:
-  build-and-test:
+  backend:
     runs-on: ubuntu-latest
 
     defaults:
@@ -32,9 +32,9 @@ jobs:
 
       - name: Show Java version
         run: java -version
-        
-      - name: Run tests
+
+      - name: Run tests (H2 / test profile)
         run: mvn -B clean test
 
-      - name: Build backend jar
+      - name: Build backend JAR
         run: mvn -B package -DskipTests

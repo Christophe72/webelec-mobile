@@ -2,14 +2,18 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { SocieteRequest, SocieteResponse } from "@/types";
-import { createSociete, deleteSocieteById, getSocietes } from "@/lib/api/societe";
+import {
+  createSociete,
+  deleteSocieteById,
+  getSocietes,
+} from "@/lib/api/societe";
 
 const emptyForm: SocieteRequest = {
   nom: "",
   tva: "",
   email: "",
   telephone: "",
-  adresse: ""
+  adresse: "",
 };
 
 export function SocietesPanel() {
@@ -50,7 +54,7 @@ export function SocietesPanel() {
         tva: trimmedTva,
         email: form.email?.trim() || undefined,
         telephone: form.telephone?.trim() || undefined,
-        adresse: form.adresse?.trim() || undefined
+        adresse: form.adresse?.trim() || undefined,
       };
       await createSociete(payload);
       setForm(emptyForm);
@@ -102,7 +106,7 @@ export function SocietesPanel() {
         <input
           id="societe-tva"
           name="tva"
-          autoComplete="tax-id"
+          autoComplete="off"
           type="text"
           value={form.tva}
           onChange={(e) => setForm((f) => ({ ...f, tva: e.target.value }))}
@@ -137,9 +141,7 @@ export function SocietesPanel() {
           autoComplete="street-address"
           type="text"
           value={form.adresse || ""}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, adresse: e.target.value }))
-          }
+          onChange={(e) => setForm((f) => ({ ...f, adresse: e.target.value }))}
           placeholder="Adresse"
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60 sm:col-span-3"
         />
@@ -173,9 +175,7 @@ export function SocietesPanel() {
                 className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
-                  <p className="font-medium text-foreground">
-                    {societe.nom}
-                  </p>
+                  <p className="font-medium text-foreground">{societe.nom}</p>
                   <p className="text-muted">
                     TVA {societe.tva} ·{" "}
                     {societe.telephone || "Téléphone indisponible"}

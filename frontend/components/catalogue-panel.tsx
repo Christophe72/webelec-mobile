@@ -37,7 +37,6 @@ import {
   deleteProduit,
 } from "@/lib/api/catalogue";
 import { getSocietes } from "@/lib/api/societe";
-import { cn } from "@/lib/utils";
 
 const emptyProduit: ProduitCreateDTO = {
   reference: "",

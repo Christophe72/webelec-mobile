@@ -43,7 +43,7 @@ export function ThemeToggle() {
       aria-pressed={isDark}
       aria-label={label}
       disabled={!isReady}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-white/80 text-zinc-800 shadow-sm backdrop-blur transition hover:-translate-y-[1px] hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-100"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-white/80 text-zinc-800 shadow-sm backdrop-blur transition hover:-translate-y-px hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-100"
     >
       {isDark ? <SunIcon /> : <MoonIcon />}
     </button>

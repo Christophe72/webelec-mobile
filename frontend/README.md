@@ -93,11 +93,15 @@ Comportement :
 
 Exemple `.env.example` :
 
-```
+```md
 NEXT_PUBLIC_API_BASE="http://localhost:8080/api" # Dev backend (Spring Boot)
+
 # NEXT_PUBLIC_API_BASE="https://api.webelec.be/api" # Prod backend URL
+
 # Legacy alias (à supprimer dès migration complète) :
+
 # NEXT_PUBLIC_API_URL="http://localhost:8080/api"
+
 OPENAI_API_KEY="sk-xxxx"
 WEBELEC_JWT_SECRET="dev-webelec-secret-change-me-please-0123456789"
 ```
@@ -258,7 +262,7 @@ Toute modification architecturale doit être cohérente avec ce README.dev.md.
 
 ## bdd
 
-<img src="public/diagrams/bdd.svg" alt="Schéma BDD WebElec" width="720" />
+![Schéma BDD WebElec](public/diagrams/bdd.svg)
 
 ```sql
 -- =========================
@@ -491,18 +495,18 @@ CREATE TABLE non_conformites (
 );
 ```
 
-<img src="public/dioagrams/bdd.svg" alt="Schéma BDD WebElec" width="720" />
+![Schéma BDD WebElec](public/dioagrams/bdd.svg)
 
 ## Guide rapide (dev)
 
-```
+```js
 npm install
 npm run dev
 ```
 
 Backend Spring à lancer avant le front. En Docker :
 
-```
+```yml
 docker compose up backend frontend postgres
 ```
 
@@ -513,4 +517,3 @@ docker compose up backend frontend postgres
 - Validations présentes (backend) et appels front alignés
 - Connexion front → backend vérifiée avec `NEXT_PUBLIC_API_BASE`
 - Lint/format/tests exécutés
-

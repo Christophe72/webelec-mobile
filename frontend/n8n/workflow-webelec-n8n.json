@@ -1,0 +1,408 @@
+{
+  "name": "WebElec - Gestion automatique des demandes",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "labelIds": [],
+          "sender": "",
+          "readStatus": "unread",
+          "includeSpamTrash": false
+        },
+        "format": "resolved"
+      },
+      "id": "gmail-trigger",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extraction et nettoyage des données email\nconst items = $input.all();\nconst processedItems = [];\n\nfor (const item of items) {\n  const emailData = item.json;\n  \n  // Extraction du corps de l'email (texte brut ou HTML)\n  let emailBody = '';\n  if (emailData.plainText) {\n    emailBody = emailData.plainText;\n  } else if (emailData.textHtml) {\n    // Nettoyer le HTML basique\n    emailBody = emailData.textHtml.replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim();\n  }\n  \n  // Extraction de l'expéditeur\n  const fromEmail = emailData.from?.email || emailData.from || '';\n  const fromName = emailData.from?.name || '';\n  \n  // Construction de l'objet structuré\n  processedItems.push({\n    json: {\n      messageId: emailData.id || emailData.messageId,\n      threadId: emailData.threadId,\n      receivedDate: emailData.date || new Date().toISOString(),\n      fromEmail: fromEmail,\n      fromName: fromName,\n      subject: emailData.subject || '(Pas de sujet)',\n      body: emailBody,\n      snippet: emailData.snippet || emailBody.substring(0, 200),\n      labelIds: emailData.labelIds || [],\n      // Métadonnées pour le workflow\n      isWebelecRelated: true,\n      processedAt: new Date().toISOString()\n    }\n  });\n}\n\nreturn processedItems;"
+      },
+      "id": "extract-email-data",
+      "name": "Extract Email Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "spam-check",
+              "name": "isSpam",
+              "value": "={{ $json.body.toLowerCase().includes('casino') || $json.body.toLowerCase().includes('viagra') || $json.body.toLowerCase().includes('lottery') || $json.body.toLowerCase().includes('prince') || $json.fromEmail.includes('noreply') }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "spam-detector",
+      "name": "Spam Detector",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.isSpam }}",
+              "value2": false
+            }
+          ]
+        }
+      },
+      "id": "filter-spam",
+      "name": "Filter Spam",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "addLabels",
+        "messageId": "={{ $json.messageId }}",
+        "labelIds": ["SPAM"]
+      },
+      "id": "mark-as-spam",
+      "name": "Mark as Spam",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1050, 450],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "messages": {
+          "values": [
+            {
+              "content": "=Tu es un assistant IA pour WebElec, entreprise d'électricité en Belgique.\n\nAnalyse cet email et retourne UNIQUEMENT un JSON valide (sans markdown, sans ```json):\n\nEMAIL:\n---\nDe: {{ $json.fromEmail }}\nNom: {{ $json.fromName }}\nSujet: {{ $json.subject }}\nContenu:\n{{ $json.body }}\n---\n\nRETOURNE CE JSON:\n{\n  \"urgence\": \"urgent|moyen|faible\",\n  \"score_urgence\": 1-10,\n  \"type\": \"demo\",\n  \"mots_cles_urgence\": [\"mot1\", \"mot2\"],\n  \"client\": {\n    \"nom\": \"nom complet extrait\",\n    \"email\": \"email extrait\",\n    \"telephone\": \"téléphone si mentionné ou null\",\n    \"entreprise\": \"nom entreprise si mentionné ou null\"\n  },\n  \"demande\": {\n    \"type_travaux\": \"description type de travaux ou null\",\n    \"adresse\": \"adresse chantier si mentionné ou null\",\n    \"delai\": \"délai souhaité ou null\",\n    \"description\": \"résumé en 1-2 phrases\"\n  },\n  \"sentiment\": \"positif|neutre|negatif\",\n  \"langue\": \"fr|nl|en\",\n  \"reponse_suggeree\": \"template de réponse personnalisée\"\n}\n\nCRITÈRES D'URGENCE:\n- Mots urgents: panne, court-circuit, danger, incendie, électrocution, urgent, immédiat, SOS = urgent (score 8-10)\n- Demande standard = moyen (score 4-7)\n- Simple info = faible (score 1-3)",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 1000
+        },
+        "jsonOutput": true
+      },
+      "id": "ai-analysis",
+      "name": "AI Analysis (GPT-4o)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [1050, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "2",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parser la réponse JSON de l'IA\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  let aiResponse;\n  \n  try {\n    // Essayer de parser directement\n    const content = item.json.choices?.[0]?.message?.content || item.json.response || item.json.text || '{}';\n    \n    // Nettoyer le markdown si présent\n    const cleaned = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n    \n    aiResponse = JSON.parse(cleaned);\n  } catch (error) {\n    // Fallback en cas d'erreur de parsing\n    aiResponse = {\n      urgence: 'moyen',\n      score_urgence: 5,\n      type: 'demo',\n      mots_cles_urgence: [],\n      client: {\n        nom: item.json.fromName || 'Inconnu',\n        email: item.json.fromEmail || '',\n        telephone: null,\n        entreprise: null\n      },\n      demande: {\n        type_travaux: null,\n        adresse: null,\n        delai: null,\n        description: 'Demande de démonstration'\n      },\n      sentiment: 'neutre',\n      langue: 'fr',\n      reponse_suggeree: 'Réponse standard'\n    };\n  }\n  \n  results.push({\n    json: {\n      ...item.json,\n      ai_analysis: aiResponse,\n      urgence: aiResponse.urgence,\n      score_urgence: aiResponse.score_urgence,\n      type_demande: aiResponse.type,\n      client_nom: aiResponse.client?.nom,\n      client_email: aiResponse.client?.email || item.json.fromEmail,\n      client_telephone: aiResponse.client?.telephone,\n      description_demande: aiResponse.demande?.description\n    }\n  });\n}\n\nreturn results;"
+      },
+      "id": "parse-ai-response",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.urgence }}",
+              "operation": "equals",
+              "value2": "urgent"
+            }
+          ]
+        }
+      },
+      "id": "check-urgency",
+      "name": "Check Urgency",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "me",
+          "mode": "list"
+        },
+        "subject": "=🚨 URGENT - Nouvelle demande WebElec",
+        "emailType": "html",
+        "message": "=<h2 style=\"color: #dc2626;\">⚠️ DEMANDE URGENTE</h2>\n\n<p><strong>Score d'urgence:</strong> {{ $json.score_urgence }}/10</p>\n<p><strong>Mots-clés urgents:</strong> {{ $json.ai_analysis.mots_cles_urgence.join(', ') }}</p>\n\n<hr>\n\n<h3>👤 Client</h3>\n<ul>\n  <li><strong>Nom:</strong> {{ $json.client_nom }}</li>\n  <li><strong>Email:</strong> {{ $json.client_email }}</li>\n  <li><strong>Téléphone:</strong> {{ $json.client_telephone || 'Non communiqué' }}</li>\n  <li><strong>Entreprise:</strong> {{ $json.ai_analysis.client.entreprise || 'Non communiqué' }}</li>\n</ul>\n\n<h3>📋 Demande</h3>\n<p>{{ $json.description_demande }}</p>\n\n<p><strong>Type de travaux:</strong> {{ $json.ai_analysis.demande.type_travaux || 'Non spécifié' }}</p>\n<p><strong>Adresse:</strong> {{ $json.ai_analysis.demande.adresse || 'Non communiqué' }}</p>\n<p><strong>Délai:</strong> {{ $json.ai_analysis.demande.delai || 'Non spécifié' }}</p>\n\n<hr>\n\n<h3>📧 Email original</h3>\n<p><strong>Sujet:</strong> {{ $json.subject }}</p>\n<p><strong>Reçu le:</strong> {{ $json.receivedDate }}</p>\n\n<p><strong>Contenu:</strong></p>\n<blockquote style=\"background: #f3f4f6; padding: 10px; border-left: 4px solid #3b82f6;\">\n{{ $json.body }}\n</blockquote>\n\n<hr>\n\n<p><strong>⚡ Action requise:</strong> Contacter le client rapidement !</p>\n\n<p style=\"color: #6b7280; font-size: 12px;\">Email automatique généré par n8n - WebElec</p>",
+        "options": {}
+      },
+      "id": "send-urgent-notification",
+      "name": "Send Urgent Notification",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1650, 150],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "VOTRE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "WebElec - Demandes Support"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.receivedDate }}",
+            "Heure": "={{ $now.format('HH:mm') }}",
+            "Urgence": "={{ $json.urgence }}",
+            "Score": "={{ $json.score_urgence }}",
+            "Type": "={{ $json.type_demande }}",
+            "Nom": "={{ $json.client_nom }}",
+            "Email": "={{ $json.client_email }}",
+            "Téléphone": "={{ $json.client_telephone || '' }}",
+            "Entreprise": "={{ $json.ai_analysis.client.entreprise || '' }}",
+            "Type travaux": "={{ $json.ai_analysis.demande.type_travaux || '' }}",
+            "Adresse": "={{ $json.ai_analysis.demande.adresse || '' }}",
+            "Délai": "={{ $json.ai_analysis.demande.delai || '' }}",
+            "Description": "={{ $json.description_demande }}",
+            "Sentiment": "={{ $json.ai_analysis.sentiment }}",
+            "Langue": "={{ $json.ai_analysis.langue }}",
+            "Statut": "Nouveau",
+            "Assigné à": "",
+            "Notes": "",
+            "Email ID": "={{ $json.messageId }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "save-to-sheets",
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [1650, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sendTo": "={{ $json.client_email }}",
+        "fromName": "Support WebElec",
+        "subject": "=Re: {{ $json.subject }}",
+        "emailType": "html",
+        "message": "=<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n    .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n    .header { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }\n    .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }\n    .footer { background: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; font-size: 14px; color: #6b7280; }\n    .highlight { background: #dbeafe; padding: 15px; border-left: 4px solid #3b82f6; margin: 20px 0; }\n    .btn { display: inline-block; background: #3b82f6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>WebElec</h1>\n      <p>Solutions électriques professionnelles</p>\n    </div>\n    \n    <div class=\"content\">\n      <p>Bonjour {{ $json.client_nom || 'Madame, Monsieur' }},</p>\n      \n      <p>Nous vous remercions pour votre demande de démonstration de <strong>WebElec</strong>.</p>\n      \n      <div class=\"highlight\">\n        <p><strong>✅ Votre demande a bien été enregistrée</strong></p>\n        <p>Notre équipe vous recontactera dans les <strong>24 heures</strong> pour organiser votre démonstration personnalisée.</p>\n      </div>\n      \n      <p>En attendant, voici ce que WebElec peut vous apporter :</p>\n      <ul>\n        <li>📸 Gestion centralisée de vos chantiers et photos</li>\n        <li>📋 Conformité RGIE automatisée</li>\n        <li>📄 Génération de documents professionnels</li>\n        <li>⚡ Interface moderne et intuitive</li>\n      </ul>\n      \n      <p style=\"text-align: center;\">\n        <a href=\"https://landing-page-webelec-omt5cmq4x-christophe72s-projects.vercel.app/\" class=\"btn\">Découvrir WebElec</a>\n      </p>\n      \n      <p><strong>Besoin d'aide immédiate ?</strong><br>\n      Contactez-nous directement au <a href=\"tel:+32497506536\">+32 497 50 65 36</a></p>\n      \n      <p>À très bientôt,<br>\n      <strong>L'équipe WebElec</strong></p>\n    </div>\n    \n    <div class=\"footer\">\n      <p><strong>WebElec</strong><br>\n      Support : support@webelec.be<br>\n      Tél : +32 497 50 65 36<br>\n      Web : <a href=\"https://landing-page-webelec-omt5cmq4x-christophe72s-projects.vercel.app/\">landing-page-webelec.vercel.app</a></p>\n      \n      <p style=\"font-size: 12px; margin-top: 15px;\">\n      © 2024 WebElec. Tous droits réservés.<br>\n      Email automatique - Ne pas répondre à ce message, nous vous contacterons directement.\n      </p>\n    </div>\n  </div>\n</body>\n</html>",
+        "options": {
+          "replyTo": "support@webelec.be"
+        }
+      },
+      "id": "send-auto-reply",
+      "name": "Send Auto Reply",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1650, 450],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "addLabels",
+        "messageId": "={{ $json.messageId }}",
+        "labelIds": ["Label_WebElec_Traité"]
+      },
+      "id": "mark-as-processed",
+      "name": "Mark as Processed",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1850, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Email Data": {
+      "main": [
+        [
+          {
+            "node": "Spam Detector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spam Detector": {
+      "main": [
+        [
+          {
+            "node": "Filter Spam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Spam": {
+      "main": [
+        [
+          {
+            "node": "AI Analysis (GPT-4o)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark as Spam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Analysis (GPT-4o)": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Check Urgency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Urgency": {
+      "main": [
+        [
+          {
+            "node": "Send Urgent Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send Auto Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Auto Reply": {
+      "main": [
+        [
+          {
+            "node": "Mark as Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-11T00:00:00.000Z",
+  "versionId": "1"
+}

@@ -1,18 +1,24 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/webelec_db
-    username: webelec
-    password: webelec_pwd
     driver-class-name: org.postgresql.Driver
-flyway:
-  enabled: false
+    url: jdbc:postgresql://localhost:5432/webelec?currentSchema=public
+    username: postgres
+    password: postgres
+
   jpa:
     hibernate:
       ddl-auto: update
     properties:
-     hibernate:
-    format_sql: true
-    show-sql: true
+      hibernate:
+        format_sql: true
+        show_sql: true
+        default_schema: public
+
+  flyway:
+    # Flyway est activé en production (migrations). En dev, aucune migration n'est actuellement fournie,
+    # donc on le désactive pour laisser Hibernate créer/mettre à jour le schéma via ddl-auto.
+    enabled: false
+    schemas: public
 
 server:
   port: 8080

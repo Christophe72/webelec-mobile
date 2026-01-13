@@ -6,6 +6,7 @@ type PieceRecord = (typeof mockDb.pieces)[number];
 export function toPieceResponse(
   piece: PieceRecord
 ): PieceJustificativeResponse {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data, ...rest } = piece;
   return rest;
 }
