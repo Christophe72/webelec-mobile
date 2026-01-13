@@ -56,7 +56,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        // endpoints Swagger/OpenAPI retirés
-        return false;
+        String path = request.getRequestURI();
+        // Ne pas filtrer les endpoints publics
+        return path.startsWith("/api/auth/") ||
+               path.startsWith("/actuator/") ||
+               path.startsWith("/swagger-ui/") ||
+               path.startsWith("/v3/api-docs");
     }
 }

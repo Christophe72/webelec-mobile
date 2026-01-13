@@ -8,7 +8,48 @@
 
 ---
 
-## 🔌 Vue d’ensemble
+## 🚀 Démarrage rapide
+
+### Option recommandée : Développement local
+
+**Windows** :
+```bash
+# 1. Démarrer PostgreSQL dans Docker
+start-dev.bat
+
+# 2. Backend (nouveau terminal)
+cd backend
+mvnw spring-boot:run
+
+# 3. Frontend (nouveau terminal)
+cd frontend
+pnpm dev
+```
+
+**Linux/Mac** :
+```bash
+# 1. Démarrer PostgreSQL
+docker-compose up -d postgres pgadmin
+
+# 2. Backend (nouveau terminal)
+cd backend
+./mvnw spring-boot:run
+
+# 3. Frontend (nouveau terminal)
+cd frontend
+pnpm dev
+```
+
+**Accès** :
+- Frontend : http://localhost:3000
+- Backend API : http://localhost:8080
+- PgAdmin : http://localhost:5050
+
+📖 **Guide complet** : Voir [DEMARRAGE_LOCAL.md](./DEMARRAGE_LOCAL.md)
+
+---
+
+## 🔌 Vue d'ensemble
 
 **WebElec SaaS** est une application professionnelle conçue pour les **électriciens**, **PME techniques** et **bureaux d’étude**.
 

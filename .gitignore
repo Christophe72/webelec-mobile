@@ -24,3 +24,19 @@ backend/target/
 frontend/node_modules/
 frontend/.next/
 frontend/out/
+
+# Ignorer les fichiers d'environnement (sécurité)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.build
+frontend/.env.local
+backend/.env
+
+# Ignorer les fichiers Docker temporaires
+.dockerignore
+
+# Ignorer les fichiers temporaires Claude
+tmpclaude-*
