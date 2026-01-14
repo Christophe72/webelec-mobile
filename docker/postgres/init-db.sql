@@ -4,6 +4,7 @@
 \i /docker-entrypoint-initdb.d/migrations/V1__init.sql
 \i /docker-entrypoint-initdb.d/migrations/V2__user_societes.sql
 \i /docker-entrypoint-initdb.d/migrations/V3__user_multi_societe.sql
+\i /docker-entrypoint-initdb.d/migrations/V4__modules_stock.sql
 
 ALTER SCHEMA public OWNER TO postgres;
 

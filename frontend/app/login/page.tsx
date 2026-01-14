@@ -39,11 +39,11 @@ export default function LoginTestPage() {
   }
 
   const quickLinks = [
-    { href: "/societes", title: "Sociétés", description: "CRUD complet via /api/societes" },
-    { href: "/clients", title: "Clients", description: "Contacts liés via /api/clients" },
+    { href: "/societes", title: "Sociétés", description: "CRUD complet via l'API backend" },
+    { href: "/clients", title: "Clients", description: "Contacts liés via l'API backend" },
     { href: "/modules", title: "Modules", description: "Activer les briques fonctionnelles" },
     { href: "/chantiers", title: "Chantiers", description: "Piloter les interventions" },
-    { href: "/catalogue", title: "Catalogue", description: "Tester /api/produits et stock" },
+    { href: "/catalogue", title: "Catalogue", description: "Tester les produits et le stock" },
     { href: "/files-demo", title: "Gestion fichiers", description: "Uploader des pièces jointes" },
     { href: "/rgie/auditeur-pro", title: "Auditeur RGIE", description: "IA conformité via /api/query" },
   ];

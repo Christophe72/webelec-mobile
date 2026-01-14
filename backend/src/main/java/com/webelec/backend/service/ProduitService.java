@@ -3,6 +3,7 @@ package com.webelec.backend.service;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Produit;
 import com.webelec.backend.repository.ProduitRepository;
+import com.webelec.backend.repository.SocieteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +14,11 @@ import java.util.Optional;
 public class ProduitService {
 
     private final ProduitRepository repository;
+    private final SocieteRepository societeRepository;
 
-    public ProduitService(ProduitRepository repository) {
+    public ProduitService(ProduitRepository repository, SocieteRepository societeRepository) {
         this.repository = repository;
+        this.societeRepository = societeRepository;
     }
 
     public List<Produit> findAll() {
@@ -31,6 +34,8 @@ public class ProduitService {
     }
 
     public Produit create(Produit produit) {
+        Objects.requireNonNull(produit, "Produit invalide");
+        produit.setSociete(resolveSociete(produit));
         return repository.save(produit);
     }
 
@@ -43,7 +48,7 @@ public class ProduitService {
         existing.setDescription(produit.getDescription());
         existing.setQuantiteStock(produit.getQuantiteStock());
         existing.setPrixUnitaire(produit.getPrixUnitaire());
-        existing.setSociete(produit.getSociete());
+        existing.setSociete(resolveSociete(produit));
         return repository.save(existing);
     }
 
@@ -52,5 +57,14 @@ public class ProduitService {
             throw new ResourceNotFoundException("Produit non trouvé");
         }
         repository.deleteById(id);
+    }
+
+    private com.webelec.backend.model.Societe resolveSociete(Produit produit) {
+        Long societeId = produit.getSociete() != null ? produit.getSociete().getId() : null;
+        if (societeId == null) {
+            throw new IllegalArgumentException("La société est obligatoire");
+        }
+        return societeRepository.findById(societeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Société non trouvée"));
     }
 }

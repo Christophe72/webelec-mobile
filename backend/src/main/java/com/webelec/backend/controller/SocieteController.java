@@ -7,12 +7,14 @@ import com.webelec.backend.model.Societe;
 import com.webelec.backend.security.AuthenticatedUtilisateur;
 import com.webelec.backend.security.SocieteSecurityService;
 import com.webelec.backend.service.SocieteService;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -21,10 +23,14 @@ public class SocieteController {
 
     private final SocieteService service;
     private final SocieteSecurityService securityService;
+    private final Environment environment;
 
-    public SocieteController(SocieteService service, SocieteSecurityService securityService) {
+    public SocieteController(SocieteService service,
+                             SocieteSecurityService securityService,
+                             Environment environment) {
         this.service = service;
         this.securityService = securityService;
+        this.environment = environment;
     }
 
     /**
@@ -33,6 +39,14 @@ public class SocieteController {
      */
     @GetMapping
     public List<SocieteResponse> getAll(@AuthenticationPrincipal AuthenticatedUtilisateur principal) {
+        if (principal == null) {
+            if (isDevProfile()) {
+                return service.findAll().stream()
+                        .map(SocieteResponse::from)
+                        .toList();
+            }
+            throw new SecurityException("Non authentifié");
+        }
         if (securityService.isAdmin()) {
             // Les admins peuvent voir toutes les sociétés
             return service.findAll().stream()
@@ -45,6 +59,10 @@ public class SocieteController {
                 .filter(s -> s != null)
                 .map(SocieteResponse::from)
                 .toList();
+    }
+
+    private boolean isDevProfile() {
+        return Arrays.asList(environment.getActiveProfiles()).contains("dev");
     }
 
     /**

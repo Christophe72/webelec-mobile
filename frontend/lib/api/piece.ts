@@ -4,7 +4,6 @@ import { getToken } from "@/lib/api/auth-storage";
 const API_URL: string = process.env.NEXT_PUBLIC_API_BASE ?? (() => {
   throw new Error("NEXT_PUBLIC_API_BASE is not defined");
 })();
-const LOCAL_API_BASE = "/api";
 
 function withAuth(init: RequestInit = {}): RequestInit {
   const headers = new Headers(init.headers ?? undefined);
@@ -17,12 +16,14 @@ function withAuth(init: RequestInit = {}): RequestInit {
   return { ...init, headers };
 }
 
-async function fetchJsonFromBase<T>(
-  base: string,
+async function fetchJson<T>(
   endpoint: string,
   init: RequestInit = {}
 ): Promise<T> {
-  const res = await fetch(`${base}${endpoint}`, init);
+  const res = await fetch(
+    `${API_URL}${endpoint}`,
+    withAuth({ cache: "no-store", ...init })
+  );
   if (!res.ok) {
     const message = await res.text().catch(() => res.statusText);
     throw new Error(
@@ -37,51 +38,12 @@ async function fetchJsonFromBase<T>(
   return (await res.json()) as T;
 }
 
-async function fetchJsonWithFallback<T>(
-  endpoint: string,
-  init: RequestInit = {}
-): Promise<T> {
-  try {
-    return await fetchJsonFromBase<T>(
-      API_URL,
-      endpoint,
-      withAuth({ cache: "no-store", ...init })
-    );
-  } catch (err) {
-    console.warn(
-      `[pieces-api] API distante indisponible pour ${endpoint}, fallback local`,
-      err
-    );
-    return fetchJsonFromBase<T>(LOCAL_API_BASE, endpoint, {
-      cache: "no-store",
-      credentials: "include",
-      ...init
-    });
+async function fetchBinary(endpoint: string): Promise<Response> {
+  const res = await fetch(`${API_URL}${endpoint}`, withAuth({ cache: "no-store" }));
+  if (!res.ok) {
+    throw new Error(res.statusText);
   }
-}
-
-async function fetchBinaryWithFallback(
-  endpoint: string
-): Promise<Response> {
-  try {
-    const res = await fetch(
-      `${API_URL}${endpoint}`,
-      withAuth({ cache: "no-store" })
-    );
-    if (!res.ok) {
-      throw new Error(res.statusText);
-    }
-    return res;
-  } catch (err) {
-    console.warn(
-      `[pieces-download] API distante indisponible pour ${endpoint}, fallback local`,
-      err
-    );
-    return fetch(`${LOCAL_API_BASE}${endpoint}`, {
-      cache: "no-store",
-      credentials: "include"
-    });
-  }
+  return res;
 }
 
 function buildFormData(data: PieceUploadDTO): FormData {
@@ -103,43 +65,29 @@ function buildFormData(data: PieceUploadDTO): FormData {
 export async function uploadPiece(
   data: PieceUploadDTO
 ): Promise<PieceJustificativeResponse> {
-  const attempt = async (base: string, init: RequestInit) => {
-    const res = await fetch(`${base}/pieces/upload`, init);
-    if (!res.ok) {
-      const msg = await res.text().catch(() => res.statusText);
-      throw new Error(msg);
-    }
-    return (await res.json()) as PieceJustificativeResponse;
-  };
-
-  try {
-    return await attempt(
-      API_URL,
-      withAuth({
-        method: "POST",
-        body: buildFormData(data),
-        cache: "no-store"
-      })
-    );
-  } catch (err) {
-    console.warn("[uploadPiece] API distante indisponible, fallback local", err);
-    return attempt(LOCAL_API_BASE, {
+  const res = await fetch(
+    `${API_URL}/pieces/upload`,
+    withAuth({
       method: "POST",
       body: buildFormData(data),
-      cache: "no-store",
-      credentials: "include"
-    });
+      cache: "no-store"
+    })
+  );
+  if (!res.ok) {
+    const msg = await res.text().catch(() => res.statusText);
+    throw new Error(msg);
   }
+  return (await res.json()) as PieceJustificativeResponse;
 }
 
 export function getPiece(
   id: number
 ): Promise<PieceJustificativeResponse> {
-  return fetchJsonWithFallback<PieceJustificativeResponse>(`/pieces/${id}`);
+  return fetchJson<PieceJustificativeResponse>(`/pieces/${id}`);
 }
 
 export async function downloadPiece(id: number): Promise<void> {
-  const res = await fetchBinaryWithFallback(`/pieces/${id}/download`);
+  const res = await fetchBinary(`/pieces/${id}/download`);
   if (!res.ok) {
     throw new Error(`Failed to download piece: ${res.statusText}`);
   }
@@ -168,23 +116,23 @@ export async function downloadPiece(id: number): Promise<void> {
 export function getPiecesByIntervention(
   interventionId: number
 ): Promise<PieceJustificativeResponse[]> {
-  return fetchJsonWithFallback(`/pieces/intervention/${interventionId}`);
+  return fetchJson(`/pieces/intervention/${interventionId}`);
 }
 
 export function getPiecesByDevis(
   devisId: number
 ): Promise<PieceJustificativeResponse[]> {
-  return fetchJsonWithFallback(`/pieces/devis/${devisId}`);
+  return fetchJson(`/pieces/devis/${devisId}`);
 }
 
 export function getPiecesByFacture(
   factureId: number
 ): Promise<PieceJustificativeResponse[]> {
-  return fetchJsonWithFallback(`/pieces/facture/${factureId}`);
+  return fetchJson(`/pieces/facture/${factureId}`);
 }
 
 export function deletePiece(id: number): Promise<void> {
-  return fetchJsonWithFallback(`/pieces/${id}`, {
+  return fetchJson(`/pieces/${id}`, {
     method: "DELETE"
   });
 }

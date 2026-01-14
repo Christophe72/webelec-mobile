@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.jsonwebtoken.JwtException;
 import java.io.IOException;
 
 @Component
@@ -43,18 +44,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        String username = jwtService.extractUsername(token);
+        String username;
+        try {
+            username = jwtService.extractUsername(token);
+        } catch (JwtException | IllegalArgumentException ex) {
+            log.warn("[JWT FILTER] Token invalide: {}", ex.getMessage());
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = utilisateurDetailsService.loadUserByUsername(username);
             var utilisateur = ((AuthenticatedUtilisateur) userDetails).getUtilisateur();
-            if (jwtService.isTokenValid(token, utilisateur)) {
-                var authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            try {
+                if (jwtService.isTokenValid(token, utilisateur)) {
+                    var authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            } catch (JwtException | IllegalArgumentException ex) {
+                log.warn("[JWT FILTER] Token invalide lors de la validation: {}", ex.getMessage());
             }
         }
         filterChain.doFilter(request, response);

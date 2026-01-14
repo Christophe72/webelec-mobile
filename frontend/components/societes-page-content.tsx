@@ -6,7 +6,8 @@ export function SocietesPageContent() {
       <div className="mx-auto w-full max-w-5xl">
         <h1 className="text-2xl font-semibold">Test API Sociétés</h1>
         <p className="mt-2 text-sm text-muted">
-          Formulaire de création + liste avec suppression. Utilise les routes `/api/societes`.
+          Formulaire de création + liste avec suppression. Utilise l&apos;API
+          backend.
         </p>
 
         <SocietesPanel />
