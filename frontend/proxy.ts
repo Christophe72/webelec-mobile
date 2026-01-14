@@ -6,8 +6,11 @@ const ClaimsSchema = z.object({
   role: z.string().optional(),
 });
 
-// JWT désactivé hors production
-const AUTH_DISABLED = process.env.NODE_ENV !== "production";
+// JWT désactivé hors production ou via flag explicite
+const AUTH_DISABLED =
+  process.env.WEBELEC_AUTH_DISABLED === "true" ||
+  process.env.NEXT_PUBLIC_API_AUTH_DISABLED === "true" ||
+  process.env.NODE_ENV !== "production";
 
 export async function proxy(req: NextRequest) {
   // ✅ DEV : on laisse tout passer
