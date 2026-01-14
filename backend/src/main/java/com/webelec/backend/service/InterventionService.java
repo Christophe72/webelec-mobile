@@ -5,6 +5,8 @@ import com.webelec.backend.model.Intervention;
 import com.webelec.backend.repository.InterventionRepository;
 import com.webelec.backend.repository.UserSocieteRoleRepository;
 import com.webelec.backend.security.AuthenticatedUtilisateur;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +18,14 @@ public class InterventionService {
 
     private final InterventionRepository repository;
     private final UserSocieteRoleRepository userSocieteRoleRepository;
+    private final boolean allowAnonymous;
 
-    public InterventionService(InterventionRepository repository, UserSocieteRoleRepository userSocieteRoleRepository) {
+    public InterventionService(InterventionRepository repository,
+                               UserSocieteRoleRepository userSocieteRoleRepository,
+                               Environment environment) {
         this.repository = repository;
         this.userSocieteRoleRepository = userSocieteRoleRepository;
+        this.allowAnonymous = environment.acceptsProfiles(Profiles.of("dev"));
     }
 
     public List<Intervention> findAll() {
@@ -29,6 +35,9 @@ public class InterventionService {
     private void checkAppartenanceSociete(Long societeId) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof AuthenticatedUtilisateur utilisateur)) {
+            if (allowAnonymous) {
+                return;
+            }
             throw new SecurityException("Utilisateur non authentifié");
         }
         Long userId = utilisateur.getUtilisateur().getId();
