@@ -24,7 +24,9 @@ export default function LoginTestPage() {
       const res = await login({ email, motDePasse: password });
       setToken(res.accessToken);
       setHasToken(true);
-      setMessage(`Connexion réussie pour ${res.utilisateur.email}, token stocké.`);
+      setMessage(
+        `Connexion réussie pour ${res.utilisateur.email}, token stocké.`
+      );
     } catch (err) {
       setMessage(
         err instanceof Error ? err.message : "Erreur lors de la connexion."
@@ -39,13 +41,46 @@ export default function LoginTestPage() {
   }
 
   const quickLinks = [
-    { href: "/societes", title: "Sociétés", description: "CRUD complet via l'API backend" },
-    { href: "/clients", title: "Clients", description: "Contacts liés via l'API backend" },
-    { href: "/modules", title: "Modules", description: "Activer les briques fonctionnelles" },
-    { href: "/chantiers", title: "Chantiers", description: "Piloter les interventions" },
-    { href: "/catalogue", title: "Catalogue", description: "Tester les produits et le stock" },
-    { href: "/files-demo", title: "Gestion fichiers", description: "Uploader des pièces jointes" },
-    { href: "/rgie/auditeur-pro", title: "Auditeur RGIE", description: "IA conformité via /api/query" },
+    {
+      href: "/dashboard",
+      title: "Dashboard",
+      description: "Vue synthétique des indicateurs clés",
+    },
+    {
+      href: "/societes",
+      title: "Sociétés",
+      description: "CRUD complet via l'API backend",
+    },
+    {
+      href: "/clients",
+      title: "Clients",
+      description: "Contacts liés via l'API backend",
+    },
+    {
+      href: "/modules",
+      title: "Modules",
+      description: "Activer les briques fonctionnelles",
+    },
+    {
+      href: "/chantiers",
+      title: "Chantiers",
+      description: "Piloter les interventions",
+    },
+    {
+      href: "/catalogue",
+      title: "Catalogue",
+      description: "Tester les produits et le stock",
+    },
+    {
+      href: "/files-demo",
+      title: "Gestion fichiers",
+      description: "Uploader des pièces jointes",
+    },
+    {
+      href: "/rgie/auditeur-pro",
+      title: "Auditeur RGIE",
+      description: "IA conformité via /api/query",
+    },
   ];
 
   return (
@@ -77,12 +112,12 @@ export default function LoginTestPage() {
             className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
           />
           <input
-           type="password"
-          name="password"
-          autoComplete="current-password" // ou "new-password" si c'est pour créer un compte
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            name="password"
+            autoComplete="current-password" // ou "new-password" si c'est pour créer un compte
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
           />
           <button
@@ -118,8 +153,12 @@ export default function LoginTestPage() {
               href={link.href}
               className="rounded-xl border border-border px-4 py-3 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm hover:border-primary/50 transition-all"
             >
-              <span className="block text-base font-semibold">{link.title}</span>
-              <span className="text-xs text-muted-foreground">{link.description}</span>
+              <span className="block text-base font-semibold">
+                {link.title}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {link.description}
+              </span>
             </Link>
           ))}
         </div>
