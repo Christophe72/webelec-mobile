@@ -24,7 +24,13 @@ export async function getCalculHistory(filters?: {
   const queryString = params.toString();
   const endpoint = queryString ? `/calculateur/history?${queryString}` : '/calculateur/history';
 
-  return (await api<CalculHistoryDTO[]>(endpoint)) ?? [];
+  try {
+    return (await api<CalculHistoryDTO[]>(endpoint)) ?? [];
+  } catch (error) {
+    // Endpoint parfois indisponible en dev (backend pas à jour).
+    console.warn('Failed to load calculation history from backend:', error);
+    return [];
+  }
 }
 
 /**

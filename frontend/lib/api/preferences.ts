@@ -3,7 +3,11 @@
  */
 
 import { api } from './base';
-import type { CalculateurPreferences, CalculateurPreferencesUpdateDTO } from '@/types/dto/preferences';
+import {
+  DEFAULT_CALCULATEUR_PREFERENCES,
+  type CalculateurPreferences,
+  type CalculateurPreferencesUpdateDTO,
+} from '@/types/dto/preferences';
 
 /**
  * Récupère les préférences de l'utilisateur pour les calculateurs
@@ -24,8 +28,20 @@ export async function getCalculateurPreferences(): Promise<CalculateurPreference
 export async function updateCalculateurPreferences(
   preferences: CalculateurPreferencesUpdateDTO
 ): Promise<CalculateurPreferences> {
-  return api<CalculateurPreferences>('/calculateur/preferences', {
-    method: 'PUT',
-    body: JSON.stringify({ preferences }),
-  });
+  try {
+    return await api<CalculateurPreferences>('/calculateur/preferences', {
+      method: 'PUT',
+      body: JSON.stringify({ preferences }),
+    });
+  } catch (error) {
+    console.warn('Failed to save preferences to backend:', error);
+    return {
+      ...DEFAULT_CALCULATEUR_PREFERENCES,
+      ...preferences,
+      voltageDrop: {
+        ...DEFAULT_CALCULATEUR_PREFERENCES.voltageDrop,
+        ...(preferences.voltageDrop ?? {}),
+      },
+    };
+  }
 }
