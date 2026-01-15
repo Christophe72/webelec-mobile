@@ -14,7 +14,7 @@ RUN corepack enable && corepack prepare pnpm@9 --activate
 
 # Installer les dépendances
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Copier tout le frontend
 COPY . .
@@ -42,7 +42,7 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/package.json .
 COPY --from=build /app/pnpm-lock.yaml* .
 
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --no-frozen-lockfile
 
 EXPOSE 3000
 
