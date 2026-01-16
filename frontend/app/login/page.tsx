@@ -72,6 +72,11 @@ export default function LoginTestPage() {
       description: "Tester les produits et le stock",
     },
     {
+      href: "/calculateur?tab=disjoncteur",
+      title: "Calculatrice disjoncteur",
+      description: "Aide au choix du disjoncteur",
+    },
+    {
       href: "/files-demo",
       title: "Gestion fichiers",
       description: "Uploader des pièces jointes",

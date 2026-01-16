@@ -173,7 +173,7 @@ export const MAX_BREAKER_BY_CIRCUIT: Record<string, Record<number, number>> = {
  *
  * V1 : On utilise uniquement la courbe C (usage général)
  */
-export const COURBE_DEFAULT: 'C' = 'C';
+export const COURBE_DEFAULT = "C" as const;
 
 /**
  * Facteur de sécurité pour la protection câble/disjoncteur
@@ -187,18 +187,20 @@ export const CABLE_PROTECTION_FACTOR = 1.1;
 
 export const MESSAGES = {
   section: {
-    ok: 'Section adaptée. Installation conforme au RGIE.',
-    limite: 'Chute de tension proche de la limite. Acceptable en rénovation.',
-    nonConforme: 'Chute de tension excessive ! Augmentez la section ou réduisez la longueur.',
+    ok: "Section adaptée. Installation conforme au RGIE.",
+    limite: "Chute de tension proche de la limite. Acceptable en rénovation.",
+    nonConforme:
+      "Chute de tension excessive ! Augmentez la section ou réduisez la longueur.",
   },
   disjoncteur: {
-    ok: 'Disjoncteur adapté. Protection correcte du câble.',
-    alerte: 'Le disjoncteur ne protège pas correctement le câble !',
+    ok: "Disjoncteur adapté. Protection correcte du câble.",
+    alerte: "Le disjoncteur ne protège pas correctement le câble !",
   },
   chuteTension: {
-    conforme: 'Chute de tension acceptable selon RGIE.',
-    limite: 'Tolérable en rénovation, correction recommandée en neuf.',
-    nonConforme: 'Chute excessive ! Augmentez la section ou réduisez la longueur.',
+    conforme: "Chute de tension acceptable selon RGIE.",
+    limite: "Tolérable en rénovation, correction recommandée en neuf.",
+    nonConforme:
+      "Chute excessive ! Augmentez la section ou réduisez la longueur.",
   },
 };
 
@@ -207,5 +209,5 @@ export const MESSAGES = {
 // ============================================================================
 
 export const RGIE_DISCLAIMER =
-  'Ces calculs sont fournis à titre indicatif selon le RGIE belge. ' +
-  'Une validation par un électricien agréé est requise pour toute installation électrique.';
+  "Ces calculs sont fournis à titre indicatif selon le RGIE belge. " +
+  "Une validation par un électricien agréé est requise pour toute installation électrique.";

@@ -10,7 +10,11 @@
  * Conforme au RGIE belge (Article 7.6.4)
  */
 
-import type { DisjoncteurInputs, DisjoncteurResult, CalculStatus } from '@/types/dto/calculateur';
+import type {
+  DisjoncteurInputs,
+  DisjoncteurResult,
+  CalculStatus,
+} from "@/types/dto/calculateur";
 import {
   AMPACITY_TABLE,
   STANDARD_BREAKER_RATINGS,
@@ -18,7 +22,7 @@ import {
   CABLE_PROTECTION_FACTOR,
   COURBE_DEFAULT,
   MESSAGES,
-} from './rgie-constants';
+} from "./rgie-constants";
 
 /**
  * Calcule le disjoncteur recommandé
@@ -26,16 +30,18 @@ import {
  * @param inputs - Paramètres du circuit (section, type, installation, courant optionnel)
  * @returns Résultat avec calibre, courbe, statut et alertes
  */
-export function calculateCircuitBreaker(inputs: DisjoncteurInputs): DisjoncteurResult {
-  const { section, typeCircuit, typeInstallation, courant } = inputs;
+export function calculateCircuitBreaker(
+  inputs: DisjoncteurInputs
+): DisjoncteurResult {
+  const { section, typeCircuit, courant } = inputs;
 
   // Validation basique
   if (section <= 0) {
     return {
       calibreRecommande: 0,
       courbe: COURBE_DEFAULT,
-      status: 'non-conforme',
-      message: 'Section invalide',
+      status: "non-conforme",
+      message: "Section invalide",
     };
   }
 
@@ -45,7 +51,7 @@ export function calculateCircuitBreaker(inputs: DisjoncteurInputs): DisjoncteurR
     return {
       calibreRecommande: 0,
       courbe: COURBE_DEFAULT,
-      status: 'non-conforme',
+      status: "non-conforme",
       message: `Section ${section}mm² non reconnue`,
     };
   }
@@ -53,7 +59,7 @@ export function calculateCircuitBreaker(inputs: DisjoncteurInputs): DisjoncteurR
   // Étape 1 : Déterminer le calibre maximum selon le type de circuit
   let maxBreakerRating: number;
 
-  if (typeCircuit === 'dedie' && courant) {
+  if (typeCircuit === "dedie" && courant) {
     // Circuit dédié : calibre basé sur le courant de l'appareil
     // On cherche le calibre standard immédiatement supérieur ou égal au courant
     maxBreakerRating = findNextStandardRating(courant);
@@ -70,7 +76,9 @@ export function calculateCircuitBreaker(inputs: DisjoncteurInputs): DisjoncteurR
 
   // Étape 2 : Protection du câble (RGIE 7.6.4)
   // Le disjoncteur ne doit pas dépasser 110% de l'ampacité du câble
-  const cableProtectionLimit = Math.floor(cableMaxCurrent * CABLE_PROTECTION_FACTOR);
+  const cableProtectionLimit = Math.floor(
+    cableMaxCurrent * CABLE_PROTECTION_FACTOR
+  );
 
   // Étape 3 : Choisir le calibre final
   const recommendedRating = Math.min(maxBreakerRating, cableProtectionLimit);
@@ -140,7 +148,7 @@ function validateBreakerSelection(
   // Vérification 1 : Le disjoncteur protège-t-il le câble ?
   if (breakerRating > cableMaxCurrent * CABLE_PROTECTION_FACTOR) {
     return {
-      status: 'non-conforme',
+      status: "non-conforme",
       message: `Disjoncteur ${breakerRating}A trop élevé pour câble ${section}mm² (max ${cableMaxCurrent}A)`,
       alerte: MESSAGES.disjoncteur.alerte,
     };
@@ -149,9 +157,9 @@ function validateBreakerSelection(
   // Vérification 2 : Le disjoncteur convient-il au courant demandé ?
   if (courant && breakerRating < courant) {
     return {
-      status: 'non-conforme',
+      status: "non-conforme",
       message: `Disjoncteur ${breakerRating}A insuffisant pour courant ${courant}A`,
-      alerte: 'Augmentez la section du câble ou réduisez le courant',
+      alerte: "Augmentez la section du câble ou réduisez le courant",
     };
   }
 
@@ -159,28 +167,32 @@ function validateBreakerSelection(
   const utilisationRatio = breakerRating / cableMaxCurrent;
   if (utilisationRatio > 0.9) {
     return {
-      status: 'limite',
+      status: "limite",
       message: `Disjoncteur ${breakerRating}A | Courbe ${COURBE_DEFAULT} | Câble ${section}mm²`,
-      alerte: `Utilisation proche du maximum du câble (${Math.round(utilisationRatio * 100)}%)`,
+      alerte: `Utilisation proche du maximum du câble (${Math.round(
+        utilisationRatio * 100
+      )}%)`,
     };
   }
 
   // Tout est OK
-  let typeLabel = '';
+  let typeLabel = "";
   switch (typeCircuit) {
-    case 'eclairage':
-      typeLabel = 'éclairage';
+    case "eclairage":
+      typeLabel = "éclairage";
       break;
-    case 'prises':
-      typeLabel = 'prises';
+    case "prises":
+      typeLabel = "prises";
       break;
-    case 'dedie':
-      typeLabel = 'circuit dédié';
+    case "dedie":
+      typeLabel = "circuit dédié";
       break;
   }
 
   return {
-    status: 'ok',
-    message: `Disjoncteur ${breakerRating}A | Courbe ${COURBE_DEFAULT} | ${typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)} ${section}mm². ${MESSAGES.disjoncteur.ok}`,
+    status: "ok",
+    message: `Disjoncteur ${breakerRating}A | Courbe ${COURBE_DEFAULT} | ${
+      typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)
+    } ${section}mm². ${MESSAGES.disjoncteur.ok}`,
   };
 }

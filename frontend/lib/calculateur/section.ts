@@ -10,7 +10,11 @@
  * Conforme au RGIE belge (Articles 4.4.3.2, 5.2.3, Table 52-C1)
  */
 
-import type { SectionInputs, SectionResult, CalculStatus } from '@/types/dto/calculateur';
+import type {
+  SectionInputs,
+  SectionResult,
+  CalculStatus,
+} from "@/types/dto/calculateur";
 import {
   AMPACITY_TABLE,
   RESISTANCE_TABLE,
@@ -18,7 +22,7 @@ import {
   MINIMUM_SECTIONS,
   STANDARD_SECTIONS,
   MESSAGES,
-} from './rgie-constants';
+} from "./rgie-constants";
 
 /**
  * Calcule la section de câble recommandée
@@ -27,14 +31,20 @@ import {
  * @returns Résultat avec section recommandée, statut et message
  */
 export function calculateCableSection(inputs: SectionInputs): SectionResult {
-  const { courant, longueur, tension, typeCircuit, typeInstallation = 'neuf' } = inputs;
+  const {
+    courant,
+    longueur,
+    tension,
+    typeCircuit,
+    typeInstallation = "neuf",
+  } = inputs;
 
   // Validation basique des entrées
   if (courant <= 0 || longueur <= 0) {
     return {
       sectionRecommandee: 0,
-      status: 'non-conforme',
-      message: 'Valeurs invalides : courant et longueur doivent être positifs',
+      status: "non-conforme",
+      message: "Valeurs invalides : courant et longueur doivent être positifs",
       details: {
         chuteCalculee: 0,
         intensiteAdmissible: 0,
@@ -43,7 +53,8 @@ export function calculateCableSection(inputs: SectionInputs): SectionResult {
   }
 
   // Étape 1 : Section minimale selon le type de circuit (RGIE 4.4.3.2)
-  const minSection = typeCircuit === 'dedie' ? 0 : MINIMUM_SECTIONS[typeCircuit];
+  const minSection =
+    typeCircuit === "dedie" ? 0 : MINIMUM_SECTIONS[typeCircuit];
 
   // Étape 2 : Section selon l'intensité (RGIE Table 52-C1)
   let sectionByAmpacity = 0;
@@ -60,7 +71,7 @@ export function calculateCableSection(inputs: SectionInputs): SectionResult {
     const maxSection = STANDARD_SECTIONS[STANDARD_SECTIONS.length - 1];
     return {
       sectionRecommandee: maxSection,
-      status: 'non-conforme',
+      status: "non-conforme",
       message: `Courant trop élevé (${courant}A). Section maximale : ${maxSection}mm² (${AMPACITY_TABLE[maxSection]}A max)`,
       details: {
         chuteCalculee: 0,
@@ -70,7 +81,7 @@ export function calculateCableSection(inputs: SectionInputs): SectionResult {
   }
 
   // Prendre le max entre section min et section par ampacité
-  let candidateSection = Math.max(minSection, sectionByAmpacity);
+  const candidateSection = Math.max(minSection, sectionByAmpacity);
 
   // Étape 3 : Vérification chute de tension (RGIE 5.2.3)
   // On augmente la section si nécessaire pour respecter les limites
@@ -90,16 +101,25 @@ export function calculateCableSection(inputs: SectionInputs): SectionResult {
     }
 
     // Pour rénovation, on accepte jusqu'à la limite
-    if (typeInstallation === 'renovation' && voltageDrop <= limits.limite) {
+    if (typeInstallation === "renovation" && voltageDrop <= limits.limite) {
       finalSection = section;
       break;
     }
   }
 
   // Recalculer la chute finale avec la section choisie
-  const finalVoltageDrop = calculateVoltageDrop(finalSection, longueur, courant, tension);
-  const status = determineStatus(finalVoltageDrop, typeCircuit, typeInstallation);
-  const message = buildMessage(status, finalVoltageDrop, finalSection, typeCircuit);
+  const finalVoltageDrop = calculateVoltageDrop(
+    finalSection,
+    longueur,
+    courant,
+    tension
+  );
+  const status = determineStatus(
+    finalVoltageDrop,
+    typeCircuit,
+    typeInstallation
+  );
+  const message = buildMessage(status, finalVoltageDrop, finalSection);
 
   return {
     sectionRecommandee: finalSection,
@@ -151,10 +171,12 @@ function getVoltageDropLimits(
   typeCircuit: string,
   typeInstallation: string
 ): { ok: number; limite: number } {
-  const isEclairage = typeCircuit === 'eclairage';
+  const isEclairage = typeCircuit === "eclairage";
 
-  if (typeInstallation === 'neuf') {
-    const limit = isEclairage ? VOLTAGE_DROP_LIMITS.neuf.eclairage : VOLTAGE_DROP_LIMITS.neuf.autres;
+  if (typeInstallation === "neuf") {
+    const limit = isEclairage
+      ? VOLTAGE_DROP_LIMITS.neuf.eclairage
+      : VOLTAGE_DROP_LIMITS.neuf.autres;
     return { ok: limit, limite: limit };
   }
 
@@ -175,14 +197,14 @@ function determineStatus(
   const limits = getVoltageDropLimits(typeCircuit, typeInstallation);
 
   if (voltageDrop <= limits.ok) {
-    return 'ok';
+    return "ok";
   }
 
-  if (typeInstallation === 'renovation' && voltageDrop <= limits.limite) {
-    return 'limite';
+  if (typeInstallation === "renovation" && voltageDrop <= limits.limite) {
+    return "limite";
   }
 
-  return 'non-conforme';
+  return "non-conforme";
 }
 
 /**
@@ -191,17 +213,16 @@ function determineStatus(
 function buildMessage(
   status: CalculStatus,
   voltageDrop: number,
-  section: number,
-  typeCircuit: string
+  section: number
 ): string {
   const baseMsg = `Section ${section}mm² | Chute : ${voltageDrop}%`;
 
   switch (status) {
-    case 'ok':
+    case "ok":
       return `${baseMsg}. ${MESSAGES.section.ok}`;
-    case 'limite':
+    case "limite":
       return `${baseMsg}. ${MESSAGES.section.limite}`;
-    case 'non-conforme':
+    case "non-conforme":
       return `${baseMsg}. ${MESSAGES.section.nonConforme}`;
     default:
       return baseMsg;

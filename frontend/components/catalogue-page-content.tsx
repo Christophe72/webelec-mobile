@@ -5,6 +5,7 @@
  * @component
  */
 import CataloguePanel from "@/components/catalogue-panel";
+import CatalogueComposantsList from "@/components/catalogue-composants-list";
 
 export function CataloguePageContent() {
   return (
@@ -16,6 +17,7 @@ export function CataloguePageContent() {
           Gestion des références produits et mouvements de stock mockés.
         </p>
         <CataloguePanel />
+        <CatalogueComposantsList />
       </div>
     </main>
   );

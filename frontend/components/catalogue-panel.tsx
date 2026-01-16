@@ -75,6 +75,15 @@ export function CataloguePanel() {
 
   useEffect(() => {
     void loadData();
+
+    const handler = () => {
+      void loadData();
+    };
+
+    window.addEventListener("catalogue:refresh", handler);
+    return () => {
+      window.removeEventListener("catalogue:refresh", handler);
+    };
   }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
