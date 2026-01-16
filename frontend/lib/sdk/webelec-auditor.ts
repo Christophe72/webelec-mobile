@@ -106,7 +106,7 @@ function humanizeTheme(rule: RgieRule): string {
 function humanizeNature(nature: string): string {
   const n = nature.toLowerCase();
   if (n.includes("interdiction")) {
-    return "C’est interdit par le RGIE";
+    return "Interdiction";
   }
   if (n.includes("obligation")) {
     return "C’est obligatoire selon le RGIE";
@@ -147,14 +147,16 @@ function formatNonConformityDisplay(rule: RgieRule): {
   const articleLine = verbatimExcerpt ? `Texte RGIE : ${verbatimExcerpt}.` : "";
 
   return {
-    domaine: `Non-conformité RGIE — ${theme}`,
-    probleme: (
-      `Ce point ne respecte pas la règle RGIE. ${nature}. ` +
-      `${seuil}Risque principal : ${firstImpact}. ` +
-      `${actionLine}${articleLine}`
-    )
-      .replace(/\s+/g, " ")
-      .trim(),
+    domaine: theme,
+    probleme: [
+      `${nature}.`,
+      seuil ? seuil.trim() : "",
+      `Risque principal : ${firstImpact}.`,
+      actionLine ? actionLine.trim() : "",
+      articleLine ? articleLine.trim() : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
   };
 }
 
