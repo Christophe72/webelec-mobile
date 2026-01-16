@@ -27,6 +27,7 @@ interface RgieRegleApi {
     article: string;
     nature: string;
     seuil: string;
+    verbatim: string;
   };
   tags: string[];
   theme?: string;
@@ -149,8 +150,17 @@ export function RgiePanel() {
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="font-medium text-foreground">
-                  {regle.rgie.article} · {regle.rgie.nature} ·{" "}
-                  <span className="text-muted">seuil {regle.rgie.seuil}</span>
+                  {!regle.rgie.verbatim.includes("synthétique") && regle.rgie.verbatim.length > 20 ? (
+                    <div className="mb-1 text-sm">
+                      {regle.rgie.verbatim.length > 80
+                        ? regle.rgie.verbatim.slice(0, 80) + "..."
+                        : regle.rgie.verbatim}
+                    </div>
+                  ) : null}
+                  <div className="text-xs">
+                    {regle.rgie.article} · {regle.rgie.nature} ·{" "}
+                    <span className="text-muted">seuil {regle.rgie.seuil}</span>
+                  </div>
                 </div>
                 {regle.theme && (
                   <span className="rounded-full bg-(--badge-bg) px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-(--badge-text)">

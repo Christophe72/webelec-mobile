@@ -149,7 +149,18 @@ export default function AuditeurProPage() {
               <ul className="space-y-3 text-sm">
                 {result.nonConformities.map((nc, i) => (
                   <li key={i} className="border p-2 rounded">
-                    <strong>{nc.domaine}</strong> — {nc.probleme}
+                    <div>
+                      <strong className="text-foreground">{nc.domaine}</strong>
+                      <span className="text-muted-foreground"> — {nc.probleme}</span>
+                      {nc.regles[0] && (
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          Gravité {nc.regles[0].gravite.niveau}/5 ({nc.regles[0].gravite.sur_5})
+                          {nc.regles[0].actions.urgentes.length > 0 && (
+                            <> · Action urgente: {nc.regles[0].actions.urgentes[0]}</>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>

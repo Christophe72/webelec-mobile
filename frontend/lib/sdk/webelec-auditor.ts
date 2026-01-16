@@ -31,7 +31,11 @@ function selectDemoRules(
   if (text.includes("salle de bain") || text.includes("sdb")) {
     tags.add("sdb_2025");
   }
-  if (text.includes("ddr") || text.includes("différentiel") || text.includes("differentiel")) {
+  if (
+    text.includes("ddr") ||
+    text.includes("différentiel") ||
+    text.includes("differentiel")
+  ) {
     tags.add("ddr");
   }
   if (text.includes("prise")) {
@@ -43,10 +47,15 @@ function selectDemoRules(
   if (text.includes("terre") || typeof input.mise_terre === "number") {
     tags.add("terre");
   }
+  if (text.includes("circuit") || text.includes("disjoncteur")) {
+    tags.add("protection_circuit");
+  }
 
   let candidates = all.filter((r) =>
     r.tags.some((t) =>
-      Array.from(tags).some((tag) => t.toLowerCase().includes(tag.toLowerCase()))
+      Array.from(tags).some((tag) =>
+        t.toLowerCase().includes(tag.toLowerCase())
+      )
     )
   );
 
@@ -61,6 +70,92 @@ function selectDemoRules(
   });
 
   return candidates.slice(0, 5);
+}
+
+function humanizeTheme(rule: RgieRule): string {
+  const tags = new Set(rule.tags.map((t) => t.toLowerCase()));
+  if (tags.has("ddr")) {
+    return "Protection différentielle (DDR)";
+  }
+  if (tags.has("terre")) {
+    return "Mise à la terre";
+  }
+  if (tags.has("ve")) {
+    return "Borne de recharge VE";
+  }
+  if (tags.has("sdb_2025")) {
+    return "Installation en salle de bain";
+  }
+  if (tags.has("influences_externes")) {
+    return "Environnement de l’installation";
+  }
+  if (tags.has("protection_circuit")) {
+    return "Protection des circuits";
+  }
+
+  const symptom = rule.symptomes[0]?.trim();
+  if (symptom) {
+    return (
+      symptom.replace(/^Symptôme\s*\d+\s*/i, "").trim() ||
+      "Installation électrique"
+    );
+  }
+  return "Installation électrique";
+}
+
+function humanizeNature(nature: string): string {
+  const n = nature.toLowerCase();
+  if (n.includes("interdiction")) {
+    return "C’est interdit par le RGIE";
+  }
+  if (n.includes("obligation")) {
+    return "C’est obligatoire selon le RGIE";
+  }
+  if (n.includes("condition")) {
+    return "Doit respecter une condition du RGIE";
+  }
+  return `Règle RGIE : ${nature}`;
+}
+
+/**
+ * Formats a non-conformity display by leveraging available rich data.
+ * Uses real RGIE verbatim content when available, falls back to symptom-focused format.
+ */
+function formatNonConformityDisplay(rule: RgieRule): {
+  domaine: string;
+  probleme: string;
+} {
+  const firstImpact = rule.gravite.impact[0] || "sécurité";
+  const theme = humanizeTheme(rule);
+  const nature = humanizeNature(rule.rgie.nature);
+  const seuil = rule.rgie.seuil ? `Seuil attendu : ${rule.rgie.seuil}.` : "";
+  const urgentAction = rule.actions?.urgentes?.[0];
+  const correctiveAction = rule.actions?.correctives?.[0];
+  const actionLine = urgentAction
+    ? `Action immédiate : ${urgentAction}.`
+    : correctiveAction
+    ? `À corriger : ${correctiveAction}.`
+    : "";
+  const isVerbatimReal =
+    !rule.rgie.verbatim.includes("synthétique") &&
+    rule.rgie.verbatim.trim().length > 20;
+  const verbatimExcerpt = isVerbatimReal
+    ? rule.rgie.verbatim.length > 90
+      ? rule.rgie.verbatim.slice(0, 90) + "..."
+      : rule.rgie.verbatim
+    : "";
+  const articleLine = verbatimExcerpt ? `Texte RGIE : ${verbatimExcerpt}.` : "";
+
+  return {
+    domaine: `Non-conformité RGIE — ${theme}`,
+    probleme: (
+      `Ce point ne respecte pas la règle RGIE. ${nature}. ` +
+      `${seuil}Risque principal : ${firstImpact}. ` +
+      `${actionLine}${articleLine}`
+    )
+      .replace(/\s+/g, " ")
+      .trim(),
+  };
 }
 
 export class WebElecAuditorPro {
@@ -78,8 +173,7 @@ export class WebElecAuditorPro {
     const demoRules = selectDemoRules(description, input);
 
     const nonConformities: AuditNonConformite[] = demoRules.map((rule) => ({
-      domaine: `Thème ${rule.rgie.article}`,
-      probleme: `Situation potentiellement non conforme à l’article ${rule.rgie.livre}.${rule.rgie.article}`,
+      ...formatNonConformityDisplay(rule),
       regles: [rule],
     }));
 
@@ -100,9 +194,7 @@ export class WebElecAuditorPro {
       `\n- Description analysée : "${description}"` +
       `\n- Articles pertinents : ${
         demoRules.length
-          ? demoRules
-              .map((r) => `${r.rgie.livre}.${r.rgie.article}`)
-              .join(", ")
+          ? demoRules.map((r) => `${r.rgie.livre}.${r.rgie.article}`).join(", ")
           : "aucun article trouvé dans le pack de démo"
       }` +
       `\n- Non-conformités détectées : ${nonConformities.length}` +
