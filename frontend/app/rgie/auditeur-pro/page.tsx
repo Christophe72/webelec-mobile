@@ -64,11 +64,63 @@ async function getEmbedding(text: string) {
   return (await res.json()) as number[];
 }
 
-function buildAiExplanation(rule: RgieRegle): string {
+function buildAiExplanationSteps(rule: RgieRegle): string[] {
   const steps: string[] = [];
+  const tags = new Set(rule.tags.map((tag) => tag.toLowerCase()));
 
   if (rule.actions.urgentes.length > 0) {
     steps.push(`Sécuriser d'abord : ${rule.actions.urgentes[0]}.`);
+  }
+
+  if (tags.has("terre")) {
+    steps.push(
+      "Installer une prise de terre adaptée (piquet, boucle ou fond de fouille) et relier le conducteur de protection au bornier de terre."
+    );
+    steps.push(
+      "Mesurer la résistance de terre avec un telluromètre : méthode 3 piquets, sol humide, et vérifier que la valeur respecte le seuil RGIE."
+    );
+    steps.push(
+      "Vérifier la continuité du conducteur de protection sur les circuits concernés."
+    );
+  }
+
+  if (tags.has("ddr")) {
+    steps.push(
+      "Vérifier que le DDR est bien installé en tête des circuits concernés et correctement câblé (phase/neutre)."
+    );
+    steps.push(
+      "Tester le DDR avec le bouton Test et un appareil de mesure (courant et temps de déclenchement)."
+    );
+    steps.push(
+      "Adapter le calibre du DDR au seuil requis (ex. 30 mA) et à l'usage (salle de bain, prises, etc.)."
+    );
+  }
+
+  if (tags.has("sdb_2025")) {
+    steps.push(
+      "Vérifier les volumes de la salle de bain et utiliser un matériel avec l'indice IP adapté (ex. IPx4)."
+    );
+    steps.push(
+      "Vérifier la position des prises et luminaires par rapport aux volumes réglementés."
+    );
+  }
+
+  if (tags.has("protection_circuit")) {
+    steps.push(
+      "Vérifier le bon dimensionnement des disjoncteurs et la section des conducteurs."
+    );
+    steps.push(
+      "Contrôler la sélectivité et l'absence de surcharge sur le circuit."
+    );
+  }
+
+  if (tags.has("ve")) {
+    steps.push(
+      "Installer un circuit dédié pour la borne et un DDR adapté (type A ou B selon fabricant)."
+    );
+    steps.push(
+      "Vérifier la protection contre les surintensités et la section du câble d'alimentation."
+    );
   }
 
   if (rule.actions.correctives.length > 0) {
@@ -89,9 +141,7 @@ function buildAiExplanation(rule: RgieRegle): string {
     );
   }
 
-  return `Explication IA (vulgarisée) :\n${steps
-    .map((step, index) => `${index + 1}. ${step}`)
-    .join("\n")}`;
+  return steps;
 }
 
 type AuditorState = {
@@ -351,12 +401,22 @@ export default function AuditeurProPage() {
                         ))}
                       </ul>
                     </div>
-                    <div className="rounded-md bg-muted/50 p-3">
-                      <p className="whitespace-pre-line text-xs text-muted-foreground">
-                        {buildAiExplanation(
+                    <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+                      <strong className="text-foreground">
+                        Explication IA (vulgarisée)
+                      </strong>
+                      <ul className="mt-2 space-y-2 text-xs text-muted-foreground">
+                        {buildAiExplanationSteps(
                           result.nonConformities[solutionsIndex].regles[0]
-                        )}
-                      </p>
+                        ).map((step, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/20 text-[11px] font-semibold text-primary">
+                              {idx + 1}
+                            </span>
+                            <span>{step}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 )}
