@@ -197,11 +197,11 @@ export default function AuditeurProPage() {
 
             <div>
               <h3 className="font-bold mb-1">Non-conformités RGIE</h3>
-              <ul className="space-y-3 text-sm">
+              <ul className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
                 {result.nonConformities.map((nc, i) => (
                   <li
                     key={i}
-                    className="rounded-lg border border-red-200 bg-red-50/60 p-4 shadow-sm dark:border-red-900/40 dark:bg-red-950/30"
+                    className="rounded-lg border border-red-200 bg-red-50/60 p-3 shadow-sm dark:border-red-900/40 dark:bg-red-950/30"
                   >
                     <div>
                       <strong className="text-foreground">{nc.domaine}</strong>
@@ -212,13 +212,6 @@ export default function AuditeurProPage() {
                         <div className="mt-3 text-xs text-muted-foreground">
                           Gravité {nc.regles[0].gravite.niveau}/5 (
                           {nc.regles[0].gravite.sur_5})
-                          {nc.regles[0].actions.urgentes.length > 0 && (
-                            <>
-                              {" "}
-                              · Action urgente:{" "}
-                              {nc.regles[0].actions.urgentes[0]}
-                            </>
-                          )}
                         </div>
                       )}
                     </div>
