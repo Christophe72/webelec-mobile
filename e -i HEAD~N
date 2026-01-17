@@ -1,0 +1,39 @@
+[33m7e39653[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/rgie-ingestion[m[33m, [m[1;31morigin/feature/rgie-ingestion[m[33m)[m feat: ajout de la gestion des documents légaux avec des opérations de préparation, de signature et de verrouillage
+[33ma884ff9[m Refactor code structure for improved readability and maintainability
+[33md89331c[m feat(auditeur-pro): améliorer l'explication IA avec des étapes détaillées pour les non-conformités
+[33mbea8346[m feat(auditeur-pro): améliorer l'affichage des non-conformités RGIE avec une mise en page en grille
+[33m6ea706e[m feat(auditeur-pro): améliorer l'affichage des non-conformités et simplifier les messages d'erreur
+[33m8212807[m feat(auditeur-pro): améliorer l'affichage des non-conformités et ajouter des fonctions de formatage
+[33m99c2aef[m feat: ajouter le fichier de configuration launch.json pour le lancement des applications Java
+[33m7dbb46b[m feat: mettre à jour les paramètres de formatage Java et configurer CORS
+[33m03c4fb5[m ajout subtil
+[33m8b6efbf[m feat(dashboard): add various components for enhanced dashboard functionality
+[33m89c3e90[m feat: ajouter la page de tableau de bord avec des indicateurs clés et un suivi des paiements en retard
+[33ma2b3390[m feat: ajouter le fichier de configuration mcp.json pour les serveurs OpenAI
+[33m5ecf0fc[m fix: modifier l'installation des dépendances pour éviter les problèmes de verrouillage
+[33me9f6d90[m feat: ajouter la gestion des erreurs pour l'historique des calculs et les préférences utilisateur
+[33m0935d7c[m feat: add types and interfaces for electric calculator module
+[33m6797e6e[m feat: supprimer le fichier de configuration .env obsolète
+[33m5d8b259[m feat: ajouter un espace pour la configuration de VECTOR_STORE_ID dans le fichier .env
+[33m05a2cc0[m feat: remove mock data and implement backend for modules and stock movements
+[33m70abe6d[m feat: Supprimer les scripts de push sécurisés obsolètes
+[33mf85f976[m Refactor documentation: Remove outdated Docker and backend deployment guides, add comprehensive user guide and environment variable documentation, and enhance local development setup instructions.
+[33md1e21c1[m feat: Mettre à jour la configuration de sécurité et permettre l'accès anonyme en mode développement
+[33m36954f0[m feat: Ajouter la configuration de sécurité pour l'environnement de développement
+[33m6903e05[m feat: Ajouter les migrations de base de données dans la configuration Docker
+[33m7c161b6[m fix: Simplifier la configuration de dépendance et supprimer le healthcheck du service backend
+[33m6ded73b[m feat: Ajouter des arguments de compilation pour supprimer les avertissements de dépréciation et de suppression
+[33m7a50923[m style: Reformater le fichier tsconfig.json pour une meilleure lisibilité
+[33m9941983[m feat: Ajouter le fichier .env.example avec la clé secrète JWT
+[33m56db720[m Feature/rgie ingestion (#34) (#35)
+[33m72c5234[m fix: Réinitialiser la clé secrète JWT dans le fichier .env
+[33mffe60f3[m Feature/rgie ingestion (#34)
+[33m7cb6b8b[m Chore/docker config (#32)
+[33m255f450[m Correction des placeholders pour l'émission et l'expiration dans DevisPanel, ajout de l'apostrophe HTML, et ajout du fichier .env avec la configuration JWT.
+[33m8ce4c98[m fix: Correct HTML entity for apostrophes in placeholders and titles
+[33m9be89f9[m conflit docker jwt
+[33mba198d7[m feat: Add RGIE PDF integration guide and upload script
+[33mbd8defa[m Update stop-dev.bat
+[33m1f3c17a[m feat: Add comprehensive local development setup and Docker configuration
+[33m8d21b6e[m refactor: replace deprecated @MockBean with @MockitoBean in tests
+[33mb7cff6b[m fix: resolve Docker configuration issues from Copilot review
