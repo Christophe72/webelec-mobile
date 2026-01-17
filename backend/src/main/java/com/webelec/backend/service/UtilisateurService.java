@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UtilisateurService {
@@ -91,9 +92,14 @@ public class UtilisateurService {
             throw new IllegalArgumentException("Rôle utilisateur invalide : " + request.getRole());
         }
         // Met à jour ou crée la liaison pour cette société
-        UserSocieteRole link = userSocieteRoleRepository.findById(new com.webelec.backend.model.UserSocieteRoleId(utilisateur.getId(), societe.getId()))
+        UserSocieteRole link = userSocieteRoleRepository.findByUtilisateurId(utilisateur.getId()).stream()
+                .filter(us -> us.getSociete() != null && us.getSociete().getId().equals(societe.getId()))
+                .findFirst()
                 .orElse(new UserSocieteRole(utilisateur, societe, role));
         link.setRole(role);
+        if (link.getId() == null) {
+            link.setId(UUID.randomUUID());
+        }
         userSocieteRoleRepository.save(link);
         return utilisateur;
     }

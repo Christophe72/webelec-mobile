@@ -4,6 +4,7 @@ import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Produit;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.repository.ProduitRepository;
+import com.webelec.backend.repository.SocieteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ class ProduitServiceTest {
 
     @Mock
     private ProduitRepository repository;
+
+    @Mock
+    private SocieteRepository societeRepository;
 
     @InjectMocks
     private ProduitService service;
@@ -91,6 +95,7 @@ class ProduitServiceTest {
     void testCreate() {
         Produit input = buildProduit(null);
         Produit saved = buildProduit(4L);
+        when(societeRepository.findById(input.getSociete().getId())).thenReturn(Optional.of(input.getSociete()));
         when(repository.save(input)).thenReturn(saved);
 
         Produit actual = service.create(input);
@@ -114,6 +119,7 @@ class ProduitServiceTest {
                 .build();
 
         when(repository.findById(id)).thenReturn(Optional.of(existing));
+        when(societeRepository.findById(payload.getSociete().getId())).thenReturn(Optional.of(payload.getSociete()));
         when(repository.save(existing)).thenReturn(existing);
 
         Produit updated = service.update(id, payload);
