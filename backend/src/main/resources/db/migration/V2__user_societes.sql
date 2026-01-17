@@ -3,7 +3,8 @@ CREATE TABLE user_societes (
     societe_id BIGINT NOT NULL,
     role VARCHAR(50) NOT NULL,
     PRIMARY KEY (user_id, societe_id),
-    CONSTRAINT fk_user_soc_user FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_soc_user FOREIGN KEY (user_id) REFERENCES user_societe(id)
+ ON DELETE CASCADE,
     CONSTRAINT fk_user_soc_societe FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
 );
 
