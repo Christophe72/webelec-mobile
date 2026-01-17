@@ -3,7 +3,14 @@
   // Hover to view descriptions of existing attributes.
   "version": "0.2.0",
   "configurations": [
-    
+    {
+      "type": "java",
+      "name": "BackendApplication",
+      "request": "launch",
+      "mainClass": "com.webelec.backend.BackendApplication",
+      "projectName": "backend",
+      "vmArgs": "-Dspring.profiles.active=dev"
+    },
     {
       "type": "java",
       "name": "Current File",
