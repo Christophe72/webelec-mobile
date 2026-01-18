@@ -1,0 +1,4 @@
+numero,dateEmission,dateEcheance,montantHT,montantTVA,montantTTC,statut,clientNom,clientPrenom,clientEmail,clientTelephone,clientAdresse,lignes
+FAC-2025-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc.dupont@email.com,0601020304,"10 rue de Paris, 75001 Paris","Installation électrique|1|500.00|500.00;Tableau électrique|1|500.00|500.00"
+FAC-2025-002,2025-01-16,2025-02-16,2500.00,525.00,3025.00,EN_ATTENTE,Martin,Sophie,sophie.martin@email.com,0602030405,"25 avenue des Champs, 75008 Paris","Borne de recharge|2|800.00|1600.00;Installation|1|400.00|400.00;Câblage|1|500.00|500.00"
+FAC-2025-003,2025-01-17,2025-02-17,800.00,168.00,968.00,PAYEE,Bernard,Jean,jean.bernard@email.com,0603040506,"5 place de la République, 69001 Lyon","Réparation tableau|1|500.00|500.00;Remplacement disjoncteur|3|100.00|300.00"

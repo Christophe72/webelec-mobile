@@ -9,4 +9,5 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     List<Client> findBySocieteId(Long societeId);
     Client findByEmail(String email);
     boolean existsByEmail(String email);
+    Client findByNomAndPrenomAndSocieteId(String nom, String prenom, Long societeId);
 }

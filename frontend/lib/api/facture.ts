@@ -41,3 +41,35 @@ export function payerFacture(id: number | string, data: PaiementDTO): Promise<Pa
     body: JSON.stringify(data)
   });
 }
+
+import { FactureImportResponse } from "@/types";
+import { getToken } from "./auth-storage";
+
+const API_URL = process.env.NEXT_PUBLIC_API_BASE;
+
+export async function importFactures(file: File, societeId: number): Promise<FactureImportResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('societeId', societeId.toString());
+
+  const token = getToken();
+  const headers: HeadersInit = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  
+  // Do NOT set Content-Type - browser will set it with boundary for multipart
+
+  const response = await fetch(`${API_URL}/factures/import`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Import failed' }));
+    throw new Error(errorData.message || 'Import failed');
+  }
+
+  return await response.json();
+}

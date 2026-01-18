@@ -1,13 +1,16 @@
 package com.webelec.backend.controller;
 
+import com.webelec.backend.dto.FactureImportResponse;
 import com.webelec.backend.dto.FactureRequest;
 import com.webelec.backend.dto.FactureResponse;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Facture;
+import com.webelec.backend.service.FactureImportService;
 import com.webelec.backend.service.FactureService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,9 +19,11 @@ import java.util.List;
 public class FactureController {
 
     private final FactureService service;
+    private final FactureImportService importService;
 
-    public FactureController(FactureService service) {
+    public FactureController(FactureService service, FactureImportService importService) {
         this.service = service;
+        this.importService = importService;
     }
 
     @GetMapping
@@ -59,5 +64,20 @@ public class FactureController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<FactureImportResponse> importInvoices(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("societeId") Long societeId) {
+
+        // Validate file size (max 10MB)
+        if (file.getSize() > 10 * 1024 * 1024) {
+            throw new IllegalArgumentException("La taille du fichier ne peut pas dépasser 10MB");
+        }
+
+        FactureImportResponse response = importService.importFromCsv(file, societeId);
+
+        return ResponseEntity.ok(response);
     }
 }

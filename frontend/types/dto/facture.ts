@@ -30,3 +30,20 @@ export interface PaiementDTO {
   mode?: string;
   reference?: string;
 }
+
+export interface ImportRowResult {
+  rowNumber: number;
+  success: boolean;
+  invoiceNumero: string;
+  errors: string[];
+  warnings: string[];
+}
+
+export interface FactureImportResponse {
+  totalRows: number;
+  successCount: number;
+  errorCount: number;
+  results: ImportRowResult[];
+  status: 'COMPLETE_SUCCESS' | 'PARTIAL_SUCCESS' | 'COMPLETE_FAILURE';
+  message: string;
+}
