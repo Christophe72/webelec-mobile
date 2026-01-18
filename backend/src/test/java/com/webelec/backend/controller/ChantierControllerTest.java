@@ -18,7 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.context.annotation.Import;
 
-import static org.mockito.ArgumentMatchers.any;
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -48,9 +48,9 @@ class ChantierControllerTest {
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
         Chantier chantier = new Chantier(1L, "Chantier A", "Adresse A", "Desc", societe, client);
-        Mockito.when(service.create(any(Chantier.class))).thenReturn(chantier);
+        Mockito.when(service.create(anyNonNull(Chantier.class))).thenReturn(chantier);
         mockMvc.perform(post("/api/chantiers")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -62,7 +62,7 @@ class ChantierControllerTest {
     void createChantier_invalidJson_returns400() throws Exception {
         String invalidJson = "{\"nom\":\"\",\"adresse\":\"\",\"description\":\"\"}";
         mockMvc.perform(post("/api/chantiers")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(invalidJson))
                 .andExpect(status().isBadRequest());
     }
@@ -78,9 +78,9 @@ class ChantierControllerTest {
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
         Chantier chantier = new Chantier(2L, "Chantier B", "Adresse B", "Desc2", societe, client);
-        Mockito.when(service.update(Mockito.eq(2L), any(Chantier.class))).thenReturn(chantier);
+        Mockito.when(service.update(Mockito.eq(2L), anyNonNull(Chantier.class))).thenReturn(chantier);
         mockMvc.perform(put("/api/chantiers/2")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(2L))
@@ -102,7 +102,7 @@ class ChantierControllerTest {
         req.setDescription("DescC");
         // SocieteId manquant
         mockMvc.perform(post("/api/chantiers")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
     }
@@ -118,9 +118,9 @@ class ChantierControllerTest {
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
         Chantier chantier = new Chantier(3L, "Chantier D", "Adresse D", "DescD", societe, client);
-        Mockito.when(service.create(any(Chantier.class))).thenReturn(chantier);
+        Mockito.when(service.create(anyNonNull(Chantier.class))).thenReturn(chantier);
         mockMvc.perform(post("/api/chantiers")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.societe.id").value(1L))

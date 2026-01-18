@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,14 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "factures")
+@Table(name = "factures", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"societe_id", "numero"})
+})
 public class Facture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String numero;
 
     @Column(nullable = false)

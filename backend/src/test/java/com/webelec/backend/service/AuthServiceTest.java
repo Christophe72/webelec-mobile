@@ -16,10 +16,11 @@ import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class AuthServiceTest {
@@ -56,7 +57,7 @@ class AuthServiceTest {
         us.setUtilisateur(utilisateur);
         us.setSociete(societe);
         us.setRole(UtilisateurRole.ADMIN);
-        utilisateur.setSocietes(List.of(us));
+        utilisateur.setSocietes(List.of(Objects.requireNonNull(us)));
         when(utilisateurRepository.findByEmail("user@test.fr")).thenReturn(Optional.of(utilisateur));
         when(passwordEncoder.matches("secret", "encoded")).thenReturn(true);
         when(jwtService.generateAccessToken(utilisateur)).thenReturn("access");
@@ -80,18 +81,19 @@ class AuthServiceTest {
         var userSocieteRole = mock(com.webelec.backend.model.UserSocieteRole.class);
         when(userSocieteRole.getSociete()).thenReturn(societe);
         when(userSocieteRole.getRole()).thenReturn(UtilisateurRole.ADMIN);
-        java.util.List<com.webelec.backend.model.UserSocieteRole> societesList = java.util.List.of(userSocieteRole);
+        java.util.List<com.webelec.backend.model.UserSocieteRole> societesList =
+                java.util.List.of(Objects.requireNonNull(userSocieteRole));
         Utilisateur saved = Utilisateur.builder().id(2L).email("new@test.fr").role(UtilisateurRole.ADMIN).societes(societesList).build();
-        when(utilisateurRepository.save(any(Utilisateur.class))).thenReturn(saved);
-        when(jwtService.generateAccessToken(any(Utilisateur.class))).thenReturn("access");
-        when(jwtService.generateRefreshToken(any(Utilisateur.class))).thenReturn("refresh");
+        when(utilisateurRepository.save(anyNonNull(Utilisateur.class))).thenReturn(saved);
+        when(jwtService.generateAccessToken(anyNonNull(Utilisateur.class))).thenReturn("access");
+        when(jwtService.generateRefreshToken(anyNonNull(Utilisateur.class))).thenReturn("refresh");
         // Mock la création de la liaison user_societes
-        when(userSocieteRoleRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userSocieteRoleRepository.save(anyNonNull())).thenAnswer(invocation -> invocation.getArgument(0));
 
         var response = authService.register(request);
 
         assertEquals("access", response.accessToken());
-        verify(utilisateurRepository).save(any(Utilisateur.class));
-        verify(userSocieteRoleRepository).save(any());
+        verify(utilisateurRepository).save(anyNonNull(Utilisateur.class));
+        verify(userSocieteRoleRepository).save(anyNonNull());
     }
 }

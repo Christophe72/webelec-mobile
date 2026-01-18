@@ -7,6 +7,7 @@ import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.LegalDocument;
 import com.webelec.backend.model.LegalDocumentStatus;
 import com.webelec.backend.repository.LegalDocumentRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class LegalDocumentService {
     }
 
     @Transactional
-    public LegalDocument ready(UUID id, LegalDocumentReadyRequest request) {
+    public LegalDocument ready(@NonNull UUID id, LegalDocumentReadyRequest request) {
         LegalDocument document = findOrThrow(id);
         ensureMutable(document);
         if (document.getStatus() != LegalDocumentStatus.DRAFT) {
@@ -38,7 +39,7 @@ public class LegalDocumentService {
     }
 
     @Transactional
-    public LegalDocument sign(UUID id, LegalDocumentSignRequest request) {
+    public LegalDocument sign(@NonNull UUID id, LegalDocumentSignRequest request) {
         LegalDocument document = findOrThrow(id);
         ensureMutable(document);
         if (document.getStatus() != LegalDocumentStatus.READY) {
@@ -58,7 +59,7 @@ public class LegalDocumentService {
     }
 
     @Transactional
-    public LegalDocument lock(UUID id) {
+    public LegalDocument lock(@NonNull UUID id) {
         LegalDocument document = findOrThrow(id);
         if (document.getStatus() != LegalDocumentStatus.SIGNED) {
             throw new ConflictException("Transition invalide : seul un document SIGNED peut être verrouillé");
@@ -69,13 +70,13 @@ public class LegalDocumentService {
     }
 
     @Transactional
-    public LegalDocument revoke(UUID id) {
+    public LegalDocument revoke(@NonNull UUID id) {
         LegalDocument document = findOrThrow(id);
         document.setStatus(LegalDocumentStatus.REVOKED);
         return repository.save(document);
     }
 
-    private LegalDocument findOrThrow(UUID id) {
+    private LegalDocument findOrThrow(@NonNull UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Document non trouvé"));
     }

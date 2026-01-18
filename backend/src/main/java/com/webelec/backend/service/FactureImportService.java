@@ -14,7 +14,6 @@ import com.webelec.backend.model.Societe;
 import com.webelec.backend.repository.ClientRepository;
 import com.webelec.backend.repository.FactureRepository;
 import com.webelec.backend.repository.SocieteRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class FactureImportService {
 
     private final FactureRepository factureRepository;
@@ -38,6 +36,14 @@ public class FactureImportService {
     private final SocieteRepository societeRepository;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+
+    public FactureImportService(FactureRepository factureRepository,
+                                ClientRepository clientRepository,
+                                SocieteRepository societeRepository) {
+        this.factureRepository = factureRepository;
+        this.clientRepository = clientRepository;
+        this.societeRepository = societeRepository;
+    }
 
     @Transactional
     public FactureImportResponse importFromCsv(MultipartFile file, Long societeId) {
@@ -183,7 +189,7 @@ public class FactureImportService {
             result.setInvoiceNumero(row.getNumero());
 
             // Check uniqueness
-            if (factureRepository.findByNumero(row.getNumero()) != null) {
+            if (factureRepository.existsByNumeroAndSocieteId(row.getNumero(), societeId)) {
                 result.addError("Le numéro de facture existe déjà: " + row.getNumero());
             }
         }

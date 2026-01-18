@@ -1,6 +1,6 @@
 export interface UblDTO {
   contenu: string;
-  factureId: string;
+  factureId: number;
 }
 
 export interface PeppolResultDTO {

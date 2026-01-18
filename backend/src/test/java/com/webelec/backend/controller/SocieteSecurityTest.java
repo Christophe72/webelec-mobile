@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -128,8 +128,8 @@ class SocieteSecurityTest {
         // Mock service
         when(societeService.findAll()).thenReturn(List.of(testSociete));
         when(societeService.findById(1L)).thenReturn(Optional.of(testSociete));
-        when(societeService.create(any(Societe.class))).thenReturn(testSociete);
-        when(societeService.update(any(Long.class), any(Societe.class))).thenReturn(testSociete);
+        when(societeService.create(anyNonNull(Societe.class))).thenReturn(testSociete);
+        when(societeService.update(anyNonNull(Long.class), anyNonNull(Societe.class))).thenReturn(testSociete);
     }
 
     @Nested
@@ -162,7 +162,7 @@ class SocieteSecurityTest {
             request.setEmail("test@test.be");
 
             mockMvc.perform(post("/api/societes")
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnauthorized());
         }
@@ -177,7 +177,7 @@ class SocieteSecurityTest {
             request.setEmail("test@test.be");
 
             mockMvc.perform(put("/api/societes/1")
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnauthorized());
         }
@@ -206,7 +206,7 @@ class SocieteSecurityTest {
 
             mockMvc.perform(post("/api/societes")
                             .with(SecurityMockMvcRequestPostProcessors.user(principal))
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isForbidden());
         }
@@ -222,7 +222,7 @@ class SocieteSecurityTest {
 
             mockMvc.perform(post("/api/societes")
                             .with(SecurityMockMvcRequestPostProcessors.user(principal))
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isForbidden());
         }
@@ -238,7 +238,7 @@ class SocieteSecurityTest {
 
             mockMvc.perform(put("/api/societes/1")
                             .with(SecurityMockMvcRequestPostProcessors.user(principal))
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isForbidden());
         }
@@ -289,7 +289,7 @@ class SocieteSecurityTest {
 
             mockMvc.perform(post("/api/societes")
                             .with(SecurityMockMvcRequestPostProcessors.user(principal))
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isForbidden());
         }
@@ -360,7 +360,7 @@ class SocieteSecurityTest {
 
             mockMvc.perform(post("/api/societes")
                             .with(SecurityMockMvcRequestPostProcessors.user(principal))
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
         }
@@ -376,7 +376,7 @@ class SocieteSecurityTest {
 
             mockMvc.perform(put("/api/societes/1")
                             .with(SecurityMockMvcRequestPostProcessors.user(principal))
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
         }
@@ -392,7 +392,7 @@ class SocieteSecurityTest {
 
             mockMvc.perform(put("/api/societes/1")
                             .with(SecurityMockMvcRequestPostProcessors.user(principal))
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
         }

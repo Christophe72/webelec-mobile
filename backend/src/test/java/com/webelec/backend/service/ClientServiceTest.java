@@ -17,13 +17,13 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 import java.util.Optional;
 
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
 
 class ClientServiceTest {
 
@@ -91,12 +91,12 @@ class ClientServiceTest {
     @DisplayName("create sauvegarde le client")
     void testCreate() {
         Client saved = buildClient(9L);
-        when(repository.save(any(Client.class))).thenReturn(saved);
+        when(repository.save(anyNonNull(Client.class))).thenReturn(saved);
 
         Client actual = service.create(request);
 
         assertThat(actual).isEqualTo(saved);
-        verify(repository, times(1)).save(any(Client.class));
+        verify(repository, times(1)).save(anyNonNull(Client.class));
     }
 
     @Test
@@ -165,7 +165,7 @@ class ClientServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> service.delete(55L));
         verify(repository).existsById(55L);
-        verify(repository, times(0)).deleteById(any());
+        verify(repository, times(0)).deleteById(anyNonNull());
     }
 
     private ClientRequest buildRequest() {

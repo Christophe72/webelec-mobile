@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -41,9 +41,9 @@ class ClientControllerTest {
     void createClient_success() throws Exception {
         ClientRequest req = buildRequest();
         Client client = buildClient(1L);
-        Mockito.when(service.create(any(ClientRequest.class))).thenReturn(client);
+        Mockito.when(service.create(anyNonNull(ClientRequest.class))).thenReturn(client);
         mockMvc.perform(post("/api/clients")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -54,7 +54,7 @@ class ClientControllerTest {
     void createClient_invalidJson_returns400() throws Exception {
         String invalidJson = "{\"nom\":\"\",\"email\":\"not-an-email\"}";
         mockMvc.perform(post("/api/clients")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(invalidJson))
                 .andExpect(status().isBadRequest());
     }
@@ -69,9 +69,9 @@ class ClientControllerTest {
         req.setAdresse("Rue neuve 10");
         req.setSocieteId(2L);
         Client client = Client.builder().id(1L).nom("Martin").prenom("Lucie").email("lucie@test.com").telephone("0488/000000").adresse("Rue neuve 10").societe(Societe.builder().id(2L).build()).build();
-        Mockito.when(service.update(Mockito.eq(1L), any(ClientRequest.class))).thenReturn(client);
+        Mockito.when(service.update(Mockito.eq(1L), anyNonNull(ClientRequest.class))).thenReturn(client);
         mockMvc.perform(put("/api/clients/1")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -94,9 +94,9 @@ class ClientControllerTest {
         req.setTelephone("0488/000000");
         req.setAdresse("Rue neuve 10");
         req.setSocieteId(2L);
-        Mockito.when(service.create(any(ClientRequest.class))).thenThrow(new ConflictException("Email déjà utilisé"));
+        Mockito.when(service.create(anyNonNull(ClientRequest.class))).thenThrow(new ConflictException("Email déjà utilisé"));
         mockMvc.perform(post("/api/clients")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Email déjà utilisé"));

@@ -18,9 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -163,7 +163,7 @@ class ProduitServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> service.delete(88L));
         verify(repository).existsById(88L);
-        verify(repository, times(0)).deleteById(any());
+        verify(repository, times(0)).deleteById(anyNonNull());
     }
 
     private Produit buildProduit(Long id) {

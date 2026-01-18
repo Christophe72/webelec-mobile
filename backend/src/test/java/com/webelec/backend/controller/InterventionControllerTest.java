@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 
-import static org.mockito.ArgumentMatchers.any;
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -65,9 +65,9 @@ class InterventionControllerTest {
         intervention.setChantier(chantier);
         intervention.setClient(client);
         intervention.setUtilisateur(utilisateur);
-        Mockito.when(service.create(any(Intervention.class))).thenReturn(intervention);
+        Mockito.when(service.create(anyNonNull(Intervention.class))).thenReturn(intervention);
         mockMvc.perform(post("/api/interventions")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(5L))
@@ -78,7 +78,7 @@ class InterventionControllerTest {
     void createIntervention_invalidJson_returns400() throws Exception {
         String invalidJson = "{\"titre\":\"\",\"description\":\"\"}";
         mockMvc.perform(post("/api/interventions")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(invalidJson))
                 .andExpect(status().isBadRequest());
     }
@@ -98,9 +98,9 @@ class InterventionControllerTest {
         intervention.setTitre("Interv2");
         intervention.setDescription("Desc2");
         intervention.setDateIntervention(LocalDate.of(2025, 12, 3));
-        Mockito.when(service.update(Mockito.eq(6L), any(Intervention.class))).thenReturn(intervention);
+        Mockito.when(service.update(Mockito.eq(6L), anyNonNull(Intervention.class))).thenReturn(intervention);
         mockMvc.perform(put("/api/interventions/6")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(6L))

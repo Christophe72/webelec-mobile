@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -43,9 +43,9 @@ class SocieteControllerTest {
         req.setTva("BE123456789");
         req.setEmail("contact@webelec.com");
         Societe societe = Societe.builder().id(1L).nom("WebElec").tva("BE123456789").email("contact@webelec.com").build();
-        Mockito.when(service.create(any(Societe.class))).thenReturn(societe);
+        Mockito.when(service.create(anyNonNull(Societe.class))).thenReturn(societe);
         mockMvc.perform(post("/api/societes")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -56,7 +56,7 @@ class SocieteControllerTest {
     void createSociete_invalidJson_returns400() throws Exception {
         String invalidJson = "{\"nom\":\"\",\"tva\":\"\",\"email\":\"not-an-email\"}";
         mockMvc.perform(post("/api/societes")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(invalidJson))
                 .andExpect(status().isBadRequest());
     }
@@ -67,9 +67,9 @@ class SocieteControllerTest {
         req.setNom("WebElec");
         req.setTva("BE123456789");
         req.setEmail("contact@webelec.com");
-        Mockito.when(service.create(any(Societe.class))).thenThrow(new IllegalStateException("Email déjà utilisé"));
+        Mockito.when(service.create(anyNonNull(Societe.class))).thenThrow(new IllegalStateException("Email déjà utilisé"));
         mockMvc.perform(post("/api/societes")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Email déjà utilisé"));

@@ -10,6 +10,7 @@ import com.webelec.backend.model.UserSocieteRole;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,7 +40,7 @@ class InterventionResponseTest {
         us.setUtilisateur(utilisateur);
         us.setSociete(societe);
         us.setRole(UtilisateurRole.TECHNICIEN);
-        utilisateur.setSocietes(java.util.List.of(us));
+        utilisateur.setSocietes(java.util.List.of(Objects.requireNonNull(us)));
         Intervention intervention = new Intervention();
         intervention.setId(5L);
         intervention.setTitre("Interv");

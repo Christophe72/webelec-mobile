@@ -20,13 +20,13 @@ export default function FacturesImportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8 text-foreground dark:bg-zinc-950">
       <div className="container mx-auto px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Import de Factures CSV
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Module d'import de factures clients depuis fichiers CSV avec
             validation automatique et création de clients
           </p>
@@ -42,8 +42,10 @@ export default function FacturesImportPage() {
           </button>
 
           {lastImportMessage && (
-            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-800">{lastImportMessage}</p>
+            <div className="mt-4 p-4 rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-700/50 dark:bg-emerald-900/30">
+              <p className="text-emerald-800 dark:text-emerald-100">
+                {lastImportMessage}
+              </p>
             </div>
           )}
         </div>
@@ -58,19 +60,21 @@ export default function FacturesImportPage() {
         />
 
         {/* Documentation */}
-        <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold mb-4">Guide d'utilisation</h2>
+        <div className="rounded-lg border border-zinc-200/70 bg-white/80 p-6 shadow-sm max-w-4xl mx-auto dark:border-zinc-800 dark:bg-zinc-900/60">
+          <h2 className="text-xl font-bold mb-4 text-foreground">
+            Guide d'utilisation
+          </h2>
 
           <div className="space-y-6">
             {/* Format CSV */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-foreground mb-2">
                 Format CSV requis
               </h3>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-muted-foreground mb-3">
                 Le fichier CSV doit contenir les colonnes suivantes (première ligne = headers):
               </p>
-              <div className="bg-gray-50 p-4 rounded border border-gray-200 overflow-x-auto">
+              <div className="rounded border border-zinc-200 bg-zinc-50 p-4 overflow-x-auto dark:border-zinc-800 dark:bg-zinc-900/70">
                 <pre className="text-xs font-mono whitespace-pre">
 {`numero,dateEmission,dateEcheance,montantHT,montantTVA,montantTTC,statut,clientNom,clientPrenom,clientEmail,clientTelephone,clientAdresse,lignes`}
                 </pre>
@@ -79,10 +83,10 @@ export default function FacturesImportPage() {
 
             {/* Exemple */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-foreground mb-2">
                 Exemple de ligne
               </h3>
-              <div className="bg-gray-50 p-4 rounded border border-gray-200 overflow-x-auto">
+              <div className="rounded border border-zinc-200 bg-zinc-50 p-4 overflow-x-auto dark:border-zinc-800 dark:bg-zinc-900/70">
                 <pre className="text-xs font-mono whitespace-pre">
 {`FAC-2025-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc@email.com,0601020304,"10 rue Paris","Item A|1|500|500;Item B|1|500|500"`}
                 </pre>
@@ -91,10 +95,10 @@ export default function FacturesImportPage() {
 
             {/* Colonnes obligatoires */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-foreground mb-2">
                 Colonnes obligatoires
               </h3>
-              <ul className="text-sm space-y-1 list-disc list-inside text-gray-700">
+              <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
                 <li>
                   <strong>numero</strong>: Numéro unique de facture
                 </li>
@@ -122,10 +126,10 @@ export default function FacturesImportPage() {
 
             {/* Colonnes optionnelles */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-foreground mb-2">
                 Colonnes optionnelles
               </h3>
-              <ul className="text-sm space-y-1 list-disc list-inside text-gray-700">
+              <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
                 <li>
                   <strong>clientEmail</strong>: Utilisé pour identifier un client existant
                 </li>
@@ -137,42 +141,42 @@ export default function FacturesImportPage() {
 
             {/* Fonctionnalités */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-foreground mb-2">
                 Fonctionnalités
               </h3>
               <ul className="text-sm space-y-2">
                 <li className="flex items-start">
-                  <span className="text-green-600 mr-2">✓</span>
+                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">✓</span>
                   <div>
                     <strong>Création automatique de clients</strong>
-                    <p className="text-gray-500">
+                    <p className="text-muted-foreground">
                       Si un client n'existe pas, il sera créé automatiquement
                     </p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-600 mr-2">✓</span>
+                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">✓</span>
                   <div>
                     <strong>Validation complète</strong>
-                    <p className="text-gray-500">
+                    <p className="text-muted-foreground">
                       Dates, montants, cohérence HT+TVA=TTC, unicité numéro
                     </p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-600 mr-2">✓</span>
+                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">✓</span>
                   <div>
                     <strong>Import partiel</strong>
-                    <p className="text-gray-500">
+                    <p className="text-muted-foreground">
                       Les lignes valides sont importées, les autres sont rapportées avec détails
                     </p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-600 mr-2">✓</span>
+                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">✓</span>
                   <div>
                     <strong>Rapport d'erreurs</strong>
-                    <p className="text-gray-500">
+                    <p className="text-muted-foreground">
                       Téléchargement d'un fichier texte avec toutes les erreurs
                     </p>
                   </div>
@@ -181,26 +185,26 @@ export default function FacturesImportPage() {
             </div>
 
             {/* Template */}
-            <div className="pt-4 border-t">
-              <h3 className="font-semibold text-gray-900 mb-2">
+            <div className="pt-4 border-t dark:border-zinc-800">
+              <h3 className="font-semibold text-foreground mb-2">
                 Template CSV
               </h3>
-              <p className="text-sm text-gray-600 mb-2">
+              <p className="text-sm text-muted-foreground mb-2">
                 Téléchargez un fichier template pré-formaté pour commencer:
               </p>
               <a
                 href="/factures-import-template.csv"
                 download
-                className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm font-medium"
+                className="inline-flex items-center px-4 py-2 rounded bg-zinc-100 text-zinc-700 hover:bg-zinc-200 text-sm font-medium dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
               >
                 📥 Télécharger le template CSV
               </a>
             </div>
 
             {/* Limites */}
-            <div className="pt-4 border-t">
-              <h3 className="font-semibold text-gray-900 mb-2">Limites</h3>
-              <ul className="text-sm space-y-1 text-gray-700">
+            <div className="pt-4 border-t dark:border-zinc-800">
+              <h3 className="font-semibold text-foreground mb-2">Limites</h3>
+              <ul className="text-sm space-y-1 text-muted-foreground">
                 <li>
                   • Taille max du fichier: <strong>10 MB</strong>
                 </li>
@@ -219,7 +223,7 @@ export default function FacturesImportPage() {
         <div className="max-w-4xl mx-auto mt-6 text-center">
           <a
             href="/app/modules/invoice-import/README.md"
-            className="text-blue-600 hover:text-blue-800 text-sm"
+            className="text-blue-600 hover:text-blue-800 text-sm dark:text-blue-400 dark:hover:text-blue-300"
           >
             Voir la documentation complète du module →
           </a>

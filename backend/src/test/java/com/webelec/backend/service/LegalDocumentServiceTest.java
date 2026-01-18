@@ -1,5 +1,21 @@
 package com.webelec.backend.service;
 
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.webelec.backend.dto.LegalDocumentReadyRequest;
 import com.webelec.backend.dto.LegalDocumentSignRequest;
 import com.webelec.backend.exception.ConflictException;
@@ -7,19 +23,6 @@ import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.LegalDocument;
 import com.webelec.backend.model.LegalDocumentStatus;
 import com.webelec.backend.repository.LegalDocumentRepository;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LegalDocumentServiceTest {
@@ -32,12 +35,12 @@ class LegalDocumentServiceTest {
 
     @Test
     void ready_passes_from_draft() {
-        UUID id = UUID.randomUUID();
-        UUID userSocieteId = UUID.randomUUID();
+        UUID id = randomId();
+        UUID userSocieteId = randomId();
         LegalDocument document = documentWithStatus(id, LegalDocumentStatus.DRAFT);
 
         when(repository.findById(id)).thenReturn(Optional.of(document));
-        when(repository.save(any(LegalDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(anyNonNull(LegalDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         LegalDocumentReadyRequest request = new LegalDocumentReadyRequest();
         request.setUserSocieteId(userSocieteId);
@@ -50,35 +53,35 @@ class LegalDocumentServiceTest {
 
     @Test
     void ready_rejects_non_draft() {
-        UUID id = UUID.randomUUID();
+        UUID id = randomId();
         LegalDocument document = documentWithStatus(id, LegalDocumentStatus.READY);
         when(repository.findById(id)).thenReturn(Optional.of(document));
 
         LegalDocumentReadyRequest request = new LegalDocumentReadyRequest();
-        request.setUserSocieteId(UUID.randomUUID());
+        request.setUserSocieteId(randomId());
 
         assertThrows(ConflictException.class, () -> service.ready(id, request));
     }
 
     @Test
     void ready_rejects_when_signed_or_locked() {
-        UUID id = UUID.randomUUID();
+        UUID id = randomId();
         LegalDocument signed = documentWithStatus(id, LegalDocumentStatus.SIGNED);
         when(repository.findById(id)).thenReturn(Optional.of(signed));
 
         LegalDocumentReadyRequest request = new LegalDocumentReadyRequest();
-        request.setUserSocieteId(UUID.randomUUID());
+        request.setUserSocieteId(randomId());
 
         assertThrows(ConflictException.class, () -> service.ready(id, request));
     }
 
     @Test
     void sign_passes_from_ready_and_sets_signature_fields() {
-        UUID id = UUID.randomUUID();
-        UUID userSocieteId = UUID.randomUUID();
+        UUID id = randomId();
+        UUID userSocieteId = randomId();
         LegalDocument document = documentWithStatus(id, LegalDocumentStatus.READY);
         when(repository.findById(id)).thenReturn(Optional.of(document));
-        when(repository.save(any(LegalDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(anyNonNull(LegalDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         LegalDocumentSignRequest request = new LegalDocumentSignRequest();
         request.setUserSocieteId(userSocieteId);
@@ -104,12 +107,12 @@ class LegalDocumentServiceTest {
 
     @Test
     void sign_rejects_invalid_status() {
-        UUID id = UUID.randomUUID();
+        UUID id = randomId();
         LegalDocument document = documentWithStatus(id, LegalDocumentStatus.DRAFT);
         when(repository.findById(id)).thenReturn(Optional.of(document));
 
         LegalDocumentSignRequest request = new LegalDocumentSignRequest();
-        request.setUserSocieteId(UUID.randomUUID());
+        request.setUserSocieteId(randomId());
         request.setSignerName("John Doe");
 
         assertThrows(ConflictException.class, () -> service.sign(id, request));
@@ -117,10 +120,10 @@ class LegalDocumentServiceTest {
 
     @Test
     void lock_passes_from_signed_and_sets_locked_at() {
-        UUID id = UUID.randomUUID();
+        UUID id = randomId();
         LegalDocument document = documentWithStatus(id, LegalDocumentStatus.SIGNED);
         when(repository.findById(id)).thenReturn(Optional.of(document));
-        when(repository.save(any(LegalDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(anyNonNull(LegalDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         LegalDocument updated = service.lock(id);
 
@@ -130,7 +133,7 @@ class LegalDocumentServiceTest {
 
     @Test
     void lock_rejects_invalid_status() {
-        UUID id = UUID.randomUUID();
+        UUID id = randomId();
         LegalDocument document = documentWithStatus(id, LegalDocumentStatus.READY);
         when(repository.findById(id)).thenReturn(Optional.of(document));
 
@@ -139,10 +142,10 @@ class LegalDocumentServiceTest {
 
     @Test
     void revoke_sets_revoked_status() {
-        UUID id = UUID.randomUUID();
+        UUID id = randomId();
         LegalDocument document = documentWithStatus(id, LegalDocumentStatus.READY);
         when(repository.findById(id)).thenReturn(Optional.of(document));
-        when(repository.save(any(LegalDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(anyNonNull(LegalDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         LegalDocument updated = service.revoke(id);
 
@@ -151,11 +154,11 @@ class LegalDocumentServiceTest {
 
     @Test
     void throws_not_found_when_missing_document() {
-        UUID id = UUID.randomUUID();
+        UUID id = randomId();
         when(repository.findById(id)).thenReturn(Optional.empty());
 
         LegalDocumentReadyRequest request = new LegalDocumentReadyRequest();
-        request.setUserSocieteId(UUID.randomUUID());
+        request.setUserSocieteId(randomId());
 
         assertThrows(ResourceNotFoundException.class, () -> service.ready(id, request));
     }
@@ -168,4 +171,13 @@ class LegalDocumentServiceTest {
         document.setUpdatedAt(Instant.now());
         return document;
     }
+
+    @org.springframework.lang.NonNull
+
+    private java.util.UUID randomId() {
+
+        return java.util.UUID.randomUUID();
+
+    }
+
 }

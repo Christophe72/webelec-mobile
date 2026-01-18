@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.webelec.backend.util.MockitoNonNull.anyNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -122,6 +123,6 @@ class SocieteServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> service.delete(societeId));
 
         verify(repository).existsById(societeId);
-        verify(repository, never()).deleteById(any());
+        verify(repository, never()).deleteById(anyNonNull());
     }
 }

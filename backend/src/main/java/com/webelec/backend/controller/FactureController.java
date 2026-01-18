@@ -3,10 +3,13 @@ package com.webelec.backend.controller;
 import com.webelec.backend.dto.FactureImportResponse;
 import com.webelec.backend.dto.FactureRequest;
 import com.webelec.backend.dto.FactureResponse;
+import com.webelec.backend.dto.PeppolResultDTO;
+import com.webelec.backend.dto.UblDTO;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.Facture;
 import com.webelec.backend.service.FactureImportService;
 import com.webelec.backend.service.FactureService;
+import com.webelec.backend.service.PeppolService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +23,12 @@ public class FactureController {
 
     private final FactureService service;
     private final FactureImportService importService;
+    private final PeppolService peppolService;
 
-    public FactureController(FactureService service, FactureImportService importService) {
+    public FactureController(FactureService service, FactureImportService importService, PeppolService peppolService) {
         this.service = service;
         this.importService = importService;
+        this.peppolService = peppolService;
     }
 
     @GetMapping
@@ -79,5 +84,15 @@ public class FactureController {
         FactureImportResponse response = importService.importFromCsv(file, societeId);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/ubl")
+    public UblDTO getUbl(@PathVariable Long id) {
+        return peppolService.generateUbl(id);
+    }
+
+    @PostMapping("/{id}/peppol")
+    public PeppolResultDTO sendPeppol(@PathVariable Long id) {
+        return peppolService.envoyer(id);
     }
 }
