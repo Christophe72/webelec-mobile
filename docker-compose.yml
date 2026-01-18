@@ -9,8 +9,6 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-      - ./backend/src/main/resources/db/migration:/docker-entrypoint-initdb.d/migrations:ro
     ports:
       - "5432:5432"
     networks:
@@ -39,17 +37,15 @@ services:
       - webelec-net
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./backend
     container_name: webelec-backend
     restart: always
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/webelec?currentSchema=public
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/webelec
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      WEBELEC_JWT_SECRET: ${WEBELEC_JWT_SECRET:-dev-f5e447b965abff7ed55be72b26a0bc68e26efd05ba43937db5c243dd65a4e4bb300c1ed326f4ee90a3d76c8829252fec2e9bc1805aab0aca1850c9952e655f47}
+      WEBELEC_JWT_SECRET: dev-only-secret
     ports:
       - "8080:8080"
     depends_on:
@@ -63,28 +59,21 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_BASE: "http://localhost:8080/api"
-        NEXT_PUBLIC_API_URL: "http://localhost:8080/api"
+        NEXT_PUBLIC_API_BASE: "http://backend:8080/api"
+        NEXT_PUBLIC_API_URL: "http://backend:8080/api"
         NEXT_PUBLIC_API_AUTH_DISABLED: "true"
     container_name: webelec-frontend
     restart: always
     environment:
-      NEXT_PUBLIC_API_BASE: "http://localhost:8080/api"
-      NEXT_PUBLIC_API_URL: "http://localhost:8080/api"
+      NEXT_PUBLIC_API_BASE: "http://backend:8080/api"
+      NEXT_PUBLIC_API_URL: "http://backend:8080/api"
       NEXT_PUBLIC_API_AUTH_DISABLED: "true"
-      WEBELEC_JWT_SECRET: ${WEBELEC_JWT_SECRET:-dev-f5e447b965abff7ed55be72b26a0bc68e26efd05ba43937db5c243dd65a4e4bb300c1ed326f4ee90a3d76c8829252fec2e9bc1805aab0aca1850c9952e655f47}
     ports:
       - "3000:3000"
     depends_on:
       - backend
     networks:
       - webelec-net
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
 volumes:
   postgres_data:
