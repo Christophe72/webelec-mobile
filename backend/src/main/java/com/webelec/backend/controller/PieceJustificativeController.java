@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pieces")
-@CrossOrigin(origins = "*")
 public class PieceJustificativeController {
 
     private final PieceJustificativeService pieceService;

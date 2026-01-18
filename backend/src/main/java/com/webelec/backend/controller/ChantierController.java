@@ -20,7 +20,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/chantiers")
-@CrossOrigin(origins = "*")
 public class ChantierController {
 
     private final ChantierService service;

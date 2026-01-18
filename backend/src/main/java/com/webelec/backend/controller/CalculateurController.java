@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/calculateur")
-@CrossOrigin(origins = "*")
 public class CalculateurController {
 
     private final CalculateurService service;

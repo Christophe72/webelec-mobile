@@ -3,7 +3,6 @@ package com.webelec.backend.controller;
 import com.webelec.backend.dto.SocieteRequest;
 import com.webelec.backend.dto.SocieteResponse;
 import com.webelec.backend.exception.ResourceNotFoundException;
-import com.webelec.backend.model.Societe;
 import com.webelec.backend.security.AuthenticatedUtilisateur;
 import com.webelec.backend.security.SocieteSecurityService;
 import com.webelec.backend.service.SocieteService;
