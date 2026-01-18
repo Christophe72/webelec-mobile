@@ -37,20 +37,39 @@ import {
   deleteProduit,
 } from "@/lib/api/catalogue";
 import { getSocietes } from "@/lib/api/societe";
+import { NumberInput } from "@/components/ui/number-input";
 
-const emptyProduit: ProduitCreateDTO = {
-  reference: "",
+const generateReference = (produits: ProduitDTO[]): string => {
+  const year = new Date().getFullYear();
+  const prefix = `PROD-${year}-`;
+
+  // Find the highest number for this year
+  const thisYearProduits = produits
+    .filter((p) => p.reference.startsWith(prefix))
+    .map((p) => {
+      const match = p.reference.match(/PROD-\d{4}-(\d+)/);
+      return match ? parseInt(match[1], 10) : 0;
+    });
+
+  const maxNumber = thisYearProduits.length > 0 ? Math.max(...thisYearProduits) : 0;
+  const nextNumber = (maxNumber + 1).toString().padStart(4, "0");
+
+  return `${prefix}${nextNumber}`;
+};
+
+const emptyProduit = (produits: ProduitDTO[] = []): ProduitCreateDTO => ({
+  reference: generateReference(produits),
   nom: "",
   description: "",
-  quantiteStock: 0,
-  prixUnitaire: 0,
+  quantiteStock: 10,
+  prixUnitaire: 49.99,
   societeId: 0,
-};
+});
 
 export function CataloguePanel() {
   const [produits, setProduits] = useState<ProduitDTO[]>([]);
   const [societes, setSocietes] = useState<SocieteResponse[]>([]);
-  const [form, setForm] = useState<ProduitCreateDTO>(emptyProduit);
+  const [form, setForm] = useState<ProduitCreateDTO>(emptyProduit([]));
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -104,7 +123,7 @@ export function CataloguePanel() {
       } else {
         await createProduit(form);
       }
-      setForm(emptyProduit);
+      setForm(emptyProduit(produits));
       setEditingId(null);
       await loadData();
     } catch (err) {
@@ -138,7 +157,7 @@ export function CataloguePanel() {
 
   const cancelEdit = () => {
     setEditingId(null);
-    setForm(emptyProduit);
+    setForm(emptyProduit(produits));
   };
 
   return (
@@ -160,65 +179,95 @@ export function CataloguePanel() {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-2">
-        <input
-          type="text"
-          value={form.reference}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, reference: e.target.value }))
-          }
-          placeholder="Référence*"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <input
-          type="text"
-          value={form.nom}
-          onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
-          placeholder="Nom du produit*"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <textarea
-          value={form.description ?? ""}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, description: e.target.value }))
-          }
-          placeholder="Description"
-          rows={2}
-          className="sm:col-span-2 rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <input
-          type="number"
-          value={form.quantiteStock}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, quantiteStock: Number(e.target.value) }))
-          }
-          placeholder="Quantité en stock"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <input
-          type="number"
-          step="0.01"
-          value={form.prixUnitaire}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, prixUnitaire: Number(e.target.value) }))
-          }
-          placeholder="Prix unitaire (€)"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <select
-          value={form.societeId || ""}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
-          }
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        >
-          <option value="">Société*</option>
-          {societes.map((societe) => (
-            <option key={societe.id} value={societe.id}>
-              {societe.nom}
-            </option>
-          ))}
-        </select>
+      <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Référence*
+          </label>
+          <input
+            type="text"
+            value={form.reference}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, reference: e.target.value }))
+            }
+            placeholder="Ex: PROD-2026-0001"
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Nom du produit*
+          </label>
+          <input
+            type="text"
+            value={form.nom}
+            onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
+            placeholder="Ex: Disjoncteur 20A, Câble H07V-K..."
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Description
+          </label>
+          <textarea
+            value={form.description ?? ""}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, description: e.target.value }))
+            }
+            placeholder="Ex: Caractéristiques techniques, spécifications..."
+            rows={2}
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Quantité en stock
+          </label>
+          <NumberInput
+            value={form.quantiteStock}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, quantiteStock: Number(e.target.value) }))
+            }
+            placeholder="10"
+            min={0}
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Prix unitaire (€)
+          </label>
+          <NumberInput
+            step={0.01}
+            value={form.prixUnitaire}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, prixUnitaire: Number(e.target.value) }))
+            }
+            placeholder="49.99"
+            min={0}
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Société*
+          </label>
+          <select
+            value={form.societeId || ""}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
+            }
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          >
+            <option value="">-- Sélectionner une société --</option>
+            {societes.map((societe) => (
+              <option key={societe.id} value={societe.id}>
+                {societe.nom}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="sm:col-span-2 flex justify-end gap-2">
           {editingId && (
             <button

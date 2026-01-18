@@ -18,6 +18,7 @@ import type {
 import { calculateVoltageDrop } from "@/lib/calculateur/chute-tension";
 import { CalculatorResultCard } from "./calculator-result-card";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { AlertCircle } from "lucide-react";
 import { RGIE_DISCLAIMER } from "@/lib/calculateur/rgie-constants";
+import { CABLE_SECTIONS } from "@/lib/calculateur/cable-sections";
 
 interface ChuteTensionCalculatorProps {
   inputs: ChuteTensionInputs;
@@ -86,15 +88,15 @@ export function ChuteTensionCalculator({
           <Label htmlFor="section-chute" className="text-base font-medium">
             Section du câble (mm²)
           </Label>
-          <Input
+          <NumberInput
             id="section-chute"
-            type="number"
-            min="0"
-            step="0.1"
+            min={0}
+            step={0.1}
             value={inputs.section || ""}
             onChange={(e) =>
               onChange("section", parseFloat(e.target.value) || 0)
             }
+            presetValues={[...CABLE_SECTIONS]}
             className="h-12 text-base"
             placeholder="Ex: 2.5"
           />
@@ -105,11 +107,10 @@ export function ChuteTensionCalculator({
           <Label htmlFor="longueur-chute" className="text-base font-medium">
             Longueur (m)
           </Label>
-          <Input
+          <NumberInput
             id="longueur-chute"
-            type="number"
-            min="0"
-            step="0.1"
+            min={0}
+            step={0.1}
             value={inputs.longueur || ""}
             onChange={(e) =>
               onChange("longueur", parseFloat(e.target.value) || 0)
@@ -125,11 +126,10 @@ export function ChuteTensionCalculator({
           <Label htmlFor="courant-chute" className="text-base font-medium">
             Courant (A)
           </Label>
-          <Input
+          <NumberInput
             id="courant-chute"
-            type="number"
-            min="0"
-            step="0.1"
+            min={0}
+            step={0.1}
             value={inputs.courant || ""}
             onChange={(e) =>
               onChange("courant", parseFloat(e.target.value) || 0)

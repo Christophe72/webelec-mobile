@@ -56,12 +56,12 @@ describe("CataloguePanel", () => {
     render(<CataloguePanel />);
 
     expect(
-      await screen.findByText("REF001 — Produit test")
+      await screen.findByText("REF001 — Produit test"),
     ).toBeInTheDocument();
     // Vérifie qu'au moins une occurrence de "Electro SARL" (dans la fiche produit) est présente
     expect(screen.getAllByText("Electro SARL").length).toBeGreaterThan(0);
     expect(
-      screen.getByText((content) => content.includes("Produits chargés : 1"))
+      screen.getByText((content) => content.includes("Produits chargés : 1")),
     ).toBeInTheDocument();
   });
 
@@ -76,7 +76,7 @@ describe("CataloguePanel", () => {
     await user.click(submitButton);
 
     expect(
-      await screen.findByText("Référence et nom sont requis")
+      await screen.findByText("Référence et nom sont requis"),
     ).toBeInTheDocument();
   });
 
@@ -92,14 +92,30 @@ describe("CataloguePanel", () => {
     render(<CataloguePanel />);
     const user = userEvent.setup();
 
-    await user.type(screen.getByPlaceholderText("Référence*"), "REF999");
-    await user.type(
-      screen.getByPlaceholderText("Nom du produit*"),
-      "Produit user"
+    const referenceInput = screen.getByPlaceholderText("Ex: PROD-2026-0001");
+    await user.clear(referenceInput);
+    await user.type(referenceInput, "REF999");
+
+    const nomInput = screen.getByPlaceholderText(
+      "Ex: Disjoncteur 20A, Câble H07V-K...",
     );
-    await user.type(screen.getByPlaceholderText("Description"), "Essai");
-    await user.type(screen.getByPlaceholderText("Quantité en stock"), "8");
-    await user.type(screen.getByPlaceholderText("Prix unitaire (€)"), "45");
+    await user.type(nomInput, "Produit user");
+
+    await user.type(
+      screen.getByPlaceholderText(
+        "Ex: Caractéristiques techniques, spécifications...",
+      ),
+      "Essai",
+    );
+
+    const quantiteInput = screen.getByPlaceholderText("10");
+    await user.clear(quantiteInput);
+    await user.type(quantiteInput, "8");
+
+    const prixInput = screen.getByPlaceholderText("49.99");
+    await user.clear(prixInput);
+    await user.type(prixInput, "45");
+
     await user.selectOptions(screen.getByRole("combobox"), ["1"]);
 
     const submitButton = await screen.findByRole("button", { name: /Créer/i });
@@ -113,7 +129,7 @@ describe("CataloguePanel", () => {
         quantiteStock: 8,
         prixUnitaire: 45,
         societeId: 1,
-      })
+      }),
     );
   });
 
@@ -131,7 +147,7 @@ describe("CataloguePanel", () => {
     await user.click(deleteButton);
 
     await waitFor(() =>
-      expect(mockDeleteProduit).toHaveBeenCalledWith(produit.id)
+      expect(mockDeleteProduit).toHaveBeenCalledWith(produit.id),
     );
     expect(mockGetProduits).toHaveBeenCalledTimes(2);
   });

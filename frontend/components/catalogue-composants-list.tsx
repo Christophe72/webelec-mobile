@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSocietes } from "@/lib/api/societe";
 import { createProduit } from "@/lib/api/catalogue";
 import type { SocieteResponse } from "@/types";
+import { NumberInput } from "@/components/ui/number-input";
 
 type CatalogueItem = {
   label: string;
@@ -625,15 +626,16 @@ export default function CatalogueComposantsList() {
                             >
                               Quantité
                             </label>
-                            <input
+                            <NumberInput
                               id={`quantite-${toSlug(item.label)}`}
-                              type="number"
                               value={item.quantiteStock}
                               onChange={(event) =>
                                 updateMaterialItem(item.label, {
                                   quantiteStock: Number(event.target.value),
                                 })
                               }
+                              min={0}
+                              placeholder="10"
                               className="mt-1 w-full rounded-lg border border-border/60 bg-white/70 px-2 py-1 text-xs text-foreground shadow-inner dark:bg-zinc-900/60"
                             />
                           </div>
@@ -644,16 +646,17 @@ export default function CatalogueComposantsList() {
                             >
                               Prix unitaire (€)
                             </label>
-                            <input
+                            <NumberInput
                               id={`prix-${toSlug(item.label)}`}
-                              type="number"
-                              step="0.01"
+                              step={0.01}
                               value={item.prixUnitaire}
                               onChange={(event) =>
                                 updateMaterialItem(item.label, {
                                   prixUnitaire: Number(event.target.value),
                                 })
                               }
+                              min={0}
+                              placeholder="49.99"
                               className="mt-1 w-full rounded-lg border border-border/60 bg-white/70 px-2 py-1 text-xs text-foreground shadow-inner dark:bg-zinc-900/60"
                             />
                           </div>

@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { NumberInput } from '@/components/ui/number-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Settings, Save } from 'lucide-react';
 
@@ -143,12 +144,11 @@ export function PreferencesModal({
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="pref-warning">Seuil d&apos;avertissement (%)</Label>
-                <Input
+                <NumberInput
                   id="pref-warning"
-                  type="number"
-                  min="0"
-                  max="10"
-                  step="0.1"
+                  min={0}
+                  max={10}
+                  step={0.1}
                   value={preferences.voltageDrop.warningThreshold}
                   onChange={(e) =>
                     setPreferences((prev) => ({
@@ -159,18 +159,18 @@ export function PreferencesModal({
                       },
                     }))
                   }
+                  placeholder="3.0"
                 />
                 <p className="text-sm text-muted-foreground">Défaut: 3%</p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="pref-error">Seuil d&apos;erreur (%)</Label>
-                <Input
+                <NumberInput
                   id="pref-error"
-                  type="number"
-                  min="0"
-                  max="10"
-                  step="0.1"
+                  min={0}
+                  max={10}
+                  step={0.1}
                   value={preferences.voltageDrop.errorThreshold}
                   onChange={(e) =>
                     setPreferences((prev) => ({
@@ -181,6 +181,7 @@ export function PreferencesModal({
                       },
                     }))
                   }
+                  placeholder="5.0"
                 />
                 <p className="text-sm text-muted-foreground">Défaut: 5%</p>
               </div>

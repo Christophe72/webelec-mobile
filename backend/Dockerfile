@@ -10,7 +10,7 @@ COPY pom.xml .
 
 # Télécharger les dépendances Maven (cache)
 RUN mvn -B dependency:go-offline
-
+o
 # Copier le reste du code
 COPY src ./src
 

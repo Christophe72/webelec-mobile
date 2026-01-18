@@ -19,16 +19,41 @@ import {
 import { getSocietes } from "@/lib/api/societe";
 import { getClients } from "@/lib/api/client";
 import { getChantiers } from "@/lib/api/chantier";
+import { NumberInput } from "@/components/ui/number-input";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const emptyDevis = (): DevisCreateDTO => ({
-  numero: "",
+const addDays = (date: Date, days: number): string => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result.toISOString().slice(0, 10);
+};
+
+const generateNumeroDevis = (existingDevis: DevisDTO[]): string => {
+  const year = new Date().getFullYear();
+  const prefix = `DEV-${year}-`;
+
+  // Find the highest number for this year
+  const thisYearDevis = existingDevis
+    .filter((d) => d.numero.startsWith(prefix))
+    .map((d) => {
+      const match = d.numero.match(/DEV-\d{4}-(\d+)/);
+      return match ? parseInt(match[1], 10) : 0;
+    });
+
+  const maxNumber = thisYearDevis.length > 0 ? Math.max(...thisYearDevis) : 0;
+  const nextNumber = (maxNumber + 1).toString().padStart(4, "0");
+
+  return `${prefix}${nextNumber}`;
+};
+
+const emptyDevis = (existingDevis: DevisDTO[] = []): DevisCreateDTO => ({
+  numero: generateNumeroDevis(existingDevis),
   dateEmission: today(),
-  dateExpiration: today(),
-  montantHT: 0,
-  montantTVA: 0,
-  montantTTC: 0,
+  dateExpiration: addDays(new Date(), 30), // 30 days validity
+  montantHT: 1000,
+  montantTVA: 200,
+  montantTTC: 1200,
   statut: "BROUILLON",
   societeId: 0,
   clientId: 0,
@@ -41,7 +66,7 @@ export function DevisPanel() {
   const [societes, setSocietes] = useState<SocieteResponse[]>([]);
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [chantiers, setChantiers] = useState<ChantierDTO[]>([]);
-  const [form, setForm] = useState<DevisCreateDTO>(emptyDevis());
+  const [form, setForm] = useState<DevisCreateDTO>(emptyDevis([]));
   const [lineDesc, setLineDesc] = useState("Prestation forfaitaire");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -110,7 +135,7 @@ export function DevisPanel() {
       } else {
         await createDevis(payload as DevisCreateDTO);
       }
-      setForm(emptyDevis());
+      setForm(emptyDevis(devis));
       setLineDesc("Prestation forfaitaire");
       setEditingId(null);
       await loadData();
@@ -218,134 +243,177 @@ export function DevisPanel() {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-2">
-        <input
-          type="text"
-          value={form.numero}
-          onChange={(e) => setForm((f) => ({ ...f, numero: e.target.value }))}
-          placeholder="Numéro de devis*"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <select
-          value={form.statut}
-          onChange={(e) => setForm((f) => ({ ...f, statut: e.target.value }))}
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        >
-          <option value="BROUILLON">Brouillon</option>
-          <option value="ENVOYE">Envoyé</option>
-          <option value="SIGNE">Signé</option>
-          <option value="PERDU">Perdu</option>
-        </select>
-        <label className="text-xs font-semibold text-muted sm:col-span-2">
-          Dates
-        </label>
-        <label htmlFor="dateEmission" className="sr-only">
-          Date d&apos;émission
-        </label>
-        <input
-          id="dateEmission"
-          name="dateEmission"
-          type="date"
-          value={form.dateEmission}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, dateEmission: e.target.value }))
-          }
-          placeholder="Date d&apos;émission"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <input
-          name="dateExpiration"
-          type="date"
-          value={form.dateExpiration}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, dateExpiration: e.target.value }))
-          }
-          placeholder="Date d&apos;expiration"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <label htmlFor="societeId" className="sr-only">
-          Société*
-        </label>
-        <select
-          id="societeId"
-          value={form.societeId || ""}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
-          }
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        >
-          <option value="">Société*</option>
-          {societes.map((societe) => (
-            <option key={societe.id} value={societe.id}>
-              {societe.nom}
-            </option>
-          ))}
-        </select>
-        <label htmlFor="clientId" className="sr-only">
-          Client*
-        </label>
-        <select
-          id="clientId"
-          value={form.clientId || ""}
-          onChange={(e) => handleClientSelect(e.target.value)}
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        >
-          <option value="">Client*</option>
-          {filteredClients.map((client) => (
-            <option key={client.id} value={client.id}>
-              {client.prenom} {client.nom}
-            </option>
-          ))}
-        </select>
-        <select
-          value={form.chantierId ?? ""}
-          onChange={(e) => handleChantierSelect(e.target.value)}
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        >
-          <option value="">Chantier (optionnel)</option>
-          {filteredChantiers.map((chantier) => (
-            <option key={chantier.id} value={chantier.id}>
-              {chantier.nom}
-            </option>
-          ))}
-        </select>
-        <input
-          type="number"
-          step="0.01"
-          value={form.montantHT}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, montantHT: Number(e.target.value) }))
-          }
-          placeholder="Montant HT"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <input
-          type="number"
-          step="0.01"
-          value={form.montantTVA}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, montantTVA: Number(e.target.value) }))
-          }
-          placeholder="TVA"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <input
-          type="number"
-          step="0.01"
-          value={form.montantTTC}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, montantTTC: Number(e.target.value) }))
-          }
-          placeholder="Montant TTC"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
-        <textarea
-          value={lineDesc}
-          onChange={(e) => setLineDesc(e.target.value)}
-          placeholder="Description rapide de la ligne"
-          rows={2}
-          className="sm:col-span-2 rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-        />
+      <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Numéro de devis*
+          </label>
+          <input
+            type="text"
+            value={form.numero}
+            onChange={(e) => setForm((f) => ({ ...f, numero: e.target.value }))}
+            placeholder="Ex: DEV-2026-0001"
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Statut
+          </label>
+          <select
+            value={form.statut}
+            onChange={(e) => setForm((f) => ({ ...f, statut: e.target.value }))}
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          >
+            <option value="BROUILLON">Brouillon</option>
+            <option value="ENVOYE">Envoyé</option>
+            <option value="SIGNE">Signé</option>
+            <option value="PERDU">Perdu</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="dateEmission" className="mb-1.5 block text-xs font-semibold text-muted">
+            Date d&apos;émission
+          </label>
+          <input
+            id="dateEmission"
+            name="dateEmission"
+            type="date"
+            value={form.dateEmission}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, dateEmission: e.target.value }))
+            }
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div>
+          <label htmlFor="dateExpiration" className="mb-1.5 block text-xs font-semibold text-muted">
+            Date d&apos;expiration
+          </label>
+          <input
+            id="dateExpiration"
+            name="dateExpiration"
+            type="date"
+            value={form.dateExpiration}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, dateExpiration: e.target.value }))
+            }
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div>
+          <label htmlFor="societeId" className="mb-1.5 block text-xs font-semibold text-muted">
+            Société*
+          </label>
+          <select
+            id="societeId"
+            value={form.societeId || ""}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
+            }
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          >
+            <option value="">-- Sélectionner une société --</option>
+            {societes.map((societe) => (
+              <option key={societe.id} value={societe.id}>
+                {societe.nom}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="clientId" className="mb-1.5 block text-xs font-semibold text-muted">
+            Client*
+          </label>
+          <select
+            id="clientId"
+            value={form.clientId || ""}
+            onChange={(e) => handleClientSelect(e.target.value)}
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          >
+            <option value="">-- Sélectionner un client --</option>
+            {filteredClients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.prenom} {client.nom}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="chantierId" className="mb-1.5 block text-xs font-semibold text-muted">
+            Chantier (optionnel)
+          </label>
+          <select
+            id="chantierId"
+            value={form.chantierId ?? ""}
+            onChange={(e) => handleChantierSelect(e.target.value)}
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          >
+            <option value="">-- Aucun chantier --</option>
+            {filteredChantiers.map((chantier) => (
+              <option key={chantier.id} value={chantier.id}>
+                {chantier.nom}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Montant HT (€)
+          </label>
+          <NumberInput
+            step={0.01}
+            min={0}
+            value={form.montantHT}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, montantHT: Number(e.target.value) }))
+            }
+            placeholder="1000.00"
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            TVA (€)
+          </label>
+          <NumberInput
+            step={0.01}
+            min={0}
+            value={form.montantTVA}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, montantTVA: Number(e.target.value) }))
+            }
+            placeholder="200.00"
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Montant TTC (€)
+          </label>
+          <NumberInput
+            step={0.01}
+            min={0}
+            value={form.montantTTC}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, montantTTC: Number(e.target.value) }))
+            }
+            placeholder="1200.00"
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="mb-1.5 block text-xs font-semibold text-muted">
+            Description de la ligne
+          </label>
+          <textarea
+            value={lineDesc}
+            onChange={(e) => setLineDesc(e.target.value)}
+            placeholder="Ex: Prestation forfaitaire, installation électrique..."
+            rows={2}
+            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          />
+        </div>
         <div className="sm:col-span-2 flex justify-end gap-2">
           {editingId && (
             <button

@@ -12,10 +12,12 @@ import type { DisjoncteurInputs, DisjoncteurResult, CircuitType, TypeInstallatio
 import { calculateCircuitBreaker } from '@/lib/calculateur/disjoncteur';
 import { CalculatorResultCard } from './calculator-result-card';
 import { Input } from '@/components/ui/input';
+import { NumberInput } from '@/components/ui/number-input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertCircle } from 'lucide-react';
 import { RGIE_DISCLAIMER } from '@/lib/calculateur/rgie-constants';
+import { CABLE_SECTIONS } from '@/lib/calculateur/cable-sections';
 
 interface DisjoncteurCalculatorProps {
   inputs: DisjoncteurInputs;
@@ -61,13 +63,13 @@ export function DisjoncteurCalculator({ inputs, onChange }: DisjoncteurCalculato
           <Label htmlFor="section" className="text-base font-medium">
             Section du câble (mm²)
           </Label>
-          <Input
+          <NumberInput
             id="section"
-            type="number"
-            min="0"
-            step="0.1"
+            min={0}
+            step={0.1}
             value={inputs.section || ''}
             onChange={(e) => onChange('section', parseFloat(e.target.value) || 0)}
+            presetValues={[...CABLE_SECTIONS]}
             className="h-12 text-base"
             placeholder="Ex: 2.5"
           />
@@ -121,11 +123,10 @@ export function DisjoncteurCalculator({ inputs, onChange }: DisjoncteurCalculato
             <Label htmlFor="courant-dis" className="text-base font-medium">
               Courant de l&#39;appareil (A)
             </Label>
-            <Input
+            <NumberInput
               id="courant-dis"
-              type="number"
-              min="0"
-              step="0.1"
+              min={0}
+              step={0.1}
               value={inputs.courant || ''}
               onChange={(e) => {
                 const val = parseFloat(e.target.value);

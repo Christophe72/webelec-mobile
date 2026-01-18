@@ -42,23 +42,23 @@ function CalculateursPanelContent() {
 
   // État des calculateurs (initialisés avec les préférences)
   const [sectionInputs, setSectionInputs] = useState<SectionInputs>({
-    courant: 0,
-    longueur: 0,
+    courant: 1,
+    longueur: 1,
     tension: preferences.defaultVoltage,
     typeCircuit: preferences.defaultCircuitType,
     typeInstallation: preferences.defaultInstallationType,
   });
 
   const [disjoncteurInputs, setDisjoncteurInputs] = useState<DisjoncteurInputs>({
-    section: 0,
+    section: 1,
     typeCircuit: preferences.defaultCircuitType,
     typeInstallation: 'monophase',
   });
 
   const [chuteTensionInputs, setChuteTensionInputs] = useState<ChuteTensionInputs>({
-    section: 0,
-    longueur: 0,
-    courant: 0,
+    section: 1,
+    longueur: 1,
+    courant: 1,
     tension: preferences.defaultVoltage,
     typeCircuit: preferences.defaultCircuitType,
     typeInstallation: preferences.defaultInstallationType,

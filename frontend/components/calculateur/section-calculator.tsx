@@ -13,6 +13,7 @@ import { calculateCableSection } from '@/lib/calculateur/section';
 import { CalculatorResultCard } from './calculator-result-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { NumberInput } from '@/components/ui/number-input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowRight, AlertCircle } from 'lucide-react';
@@ -66,11 +67,10 @@ export function SectionCalculator({ inputs, onChange, onUseResult }: SectionCalc
           <Label htmlFor="courant" className="text-base font-medium">
             Courant (A)
           </Label>
-          <Input
+          <NumberInput
             id="courant"
-            type="number"
-            min="0"
-            step="0.1"
+            min={0}
+            step={0.1}
             value={inputs.courant || ''}
             onChange={(e) => onChange('courant', parseFloat(e.target.value) || 0)}
             className="h-12 text-base"
@@ -84,11 +84,10 @@ export function SectionCalculator({ inputs, onChange, onUseResult }: SectionCalc
           <Label htmlFor="longueur" className="text-base font-medium">
             Longueur (m)
           </Label>
-          <Input
+          <NumberInput
             id="longueur"
-            type="number"
-            min="0"
-            step="0.1"
+            min={0}
+            step={0.1}
             value={inputs.longueur || ''}
             onChange={(e) => onChange('longueur', parseFloat(e.target.value) || 0)}
             className="h-12 text-base"
