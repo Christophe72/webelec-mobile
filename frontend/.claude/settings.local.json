@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(netstat:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(xargs ls:*)"
     ]
   }
 }
