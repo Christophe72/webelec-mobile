@@ -2,11 +2,11 @@
  * Modal de configuration des préférences utilisateur pour les calculateurs
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import type { CalculateurPreferences } from '@/types/dto/preferences';
-import { DEFAULT_CALCULATEUR_PREFERENCES } from '@/types/dto/preferences';
+import { useState, useEffect } from "react";
+import type { CalculateurPreferences } from "@/types/dto/preferences";
+import { DEFAULT_CALCULATEUR_PREFERENCES } from "@/types/dto/preferences";
 import {
   Dialog,
   DialogContent,
@@ -14,13 +14,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { NumberInput } from '@/components/ui/number-input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Settings, Save } from 'lucide-react';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { NumberInput } from "@/components/ui/number-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Settings, Save } from "lucide-react";
 
 interface PreferencesModalProps {
   open: boolean;
@@ -35,7 +40,8 @@ export function PreferencesModal({
   currentPreferences,
   onSave,
 }: PreferencesModalProps) {
-  const [preferences, setPreferences] = useState<CalculateurPreferences>(currentPreferences);
+  const [preferences, setPreferences] =
+    useState<CalculateurPreferences>(currentPreferences);
   const [saving, setSaving] = useState(false);
 
   // Mettre à jour les préférences locales quand les props changent
@@ -49,8 +55,8 @@ export function PreferencesModal({
       await onSave(preferences);
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to save preferences:', error);
-      alert('Erreur lors de la sauvegarde des préférences');
+      console.error("Failed to save preferences:", error);
+      alert("Erreur lors de la sauvegarde des préférences");
     } finally {
       setSaving(false);
     }
@@ -80,7 +86,10 @@ export function PreferencesModal({
             <Select
               value={preferences.defaultVoltage.toString()}
               onValueChange={(value) =>
-                setPreferences((prev) => ({ ...prev, defaultVoltage: parseInt(value) as 230 | 400 }))
+                setPreferences((prev) => ({
+                  ...prev,
+                  defaultVoltage: parseInt(value) as 230 | 400,
+                }))
               }
             >
               <SelectTrigger id="pref-voltage">
@@ -101,7 +110,7 @@ export function PreferencesModal({
               onValueChange={(value) =>
                 setPreferences((prev) => ({
                   ...prev,
-                  defaultCircuitType: value as 'eclairage' | 'prises' | 'dedie',
+                  defaultCircuitType: value as "eclairage" | "prises" | "dedie",
                 }))
               }
             >
@@ -118,13 +127,15 @@ export function PreferencesModal({
 
           {/* Type d'installation par défaut */}
           <div className="space-y-2">
-            <Label htmlFor="pref-installation">Type d&apos;installation par défaut</Label>
+            <Label htmlFor="pref-installation">
+              Type d&apos;installation par défaut
+            </Label>
             <Select
               value={preferences.defaultInstallationType}
               onValueChange={(value) =>
                 setPreferences((prev) => ({
                   ...prev,
-                  defaultInstallationType: value as 'renovation' | 'neuf',
+                  defaultInstallationType: value as "renovation" | "neuf",
                 }))
               }
             >
@@ -133,7 +144,9 @@ export function PreferencesModal({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="neuf">Neuf (normes strictes)</SelectItem>
-                <SelectItem value="renovation">Rénovation (tolérances)</SelectItem>
+                <SelectItem value="renovation">
+                  Rénovation (tolérances)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -143,7 +156,9 @@ export function PreferencesModal({
             <h4 className="mb-4 font-medium">Seuils de chute de tension</h4>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="pref-warning">Seuil d&apos;avertissement (%)</Label>
+                <Label htmlFor="pref-warning">
+                  Seuil d&apos;avertissement (%)
+                </Label>
                 <NumberInput
                   id="pref-warning"
                   min={0}
@@ -195,7 +210,7 @@ export function PreferencesModal({
           </Button>
           <Button onClick={handleSave} disabled={saving}>
             {saving ? (
-              'Sauvegarde...'
+              "Sauvegarde..."
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />

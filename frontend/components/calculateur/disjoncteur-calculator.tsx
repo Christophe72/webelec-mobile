@@ -5,26 +5,42 @@
  * selon le RGIE belge.
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import type { DisjoncteurInputs, DisjoncteurResult, CircuitType, TypeInstallation } from '@/types/dto/calculateur';
-import { calculateCircuitBreaker } from '@/lib/calculateur/disjoncteur';
-import { CalculatorResultCard } from './calculator-result-card';
-import { Input } from '@/components/ui/input';
-import { NumberInput } from '@/components/ui/number-input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle } from 'lucide-react';
-import { RGIE_DISCLAIMER } from '@/lib/calculateur/rgie-constants';
-import { CABLE_SECTIONS } from '@/lib/calculateur/cable-sections';
+import { useState, useEffect } from "react";
+import type {
+  DisjoncteurInputs,
+  DisjoncteurResult,
+  CircuitType,
+  TypeInstallation,
+} from "@/types/dto/calculateur";
+import { calculateCircuitBreaker } from "@/lib/calculateur/disjoncteur";
+import { CalculatorResultCard } from "./calculator-result-card";
+import { NumberInput } from "@/components/ui/number-input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { AlertCircle } from "lucide-react";
+import { RGIE_DISCLAIMER } from "@/lib/calculateur/rgie-constants";
+import { CABLE_SECTIONS } from "@/lib/calculateur/cable-sections";
 
 interface DisjoncteurCalculatorProps {
   inputs: DisjoncteurInputs;
-  onChange: <K extends keyof DisjoncteurInputs>(field: K, value: DisjoncteurInputs[K]) => void;
+  onChange: <K extends keyof DisjoncteurInputs>(
+    field: K,
+    value: DisjoncteurInputs[K],
+  ) => void;
 }
 
-export function DisjoncteurCalculator({ inputs, onChange }: DisjoncteurCalculatorProps) {
+export function DisjoncteurCalculator({
+  inputs,
+  onChange,
+}: DisjoncteurCalculatorProps) {
   const [result, setResult] = useState<DisjoncteurResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
@@ -36,7 +52,12 @@ export function DisjoncteurCalculator({ inputs, onChange }: DisjoncteurCalculato
       setResult(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputs.section, inputs.typeCircuit, inputs.typeInstallation, inputs.courant]);
+  }, [
+    inputs.section,
+    inputs.typeCircuit,
+    inputs.typeInstallation,
+    inputs.courant,
+  ]);
 
   const handleCalculate = () => {
     setIsCalculating(true);
@@ -67,8 +88,10 @@ export function DisjoncteurCalculator({ inputs, onChange }: DisjoncteurCalculato
             id="section"
             min={0}
             step={0.1}
-            value={inputs.section || ''}
-            onChange={(e) => onChange('section', parseFloat(e.target.value) || 0)}
+            value={inputs.section || ""}
+            onChange={(e) =>
+              onChange("section", parseFloat(e.target.value) || 0)
+            }
             presetValues={[...CABLE_SECTIONS]}
             className="h-12 text-base"
             placeholder="Ex: 2.5"
@@ -85,7 +108,9 @@ export function DisjoncteurCalculator({ inputs, onChange }: DisjoncteurCalculato
           </Label>
           <Select
             value={inputs.typeCircuit}
-            onValueChange={(value) => onChange('typeCircuit', value as CircuitType)}
+            onValueChange={(value) =>
+              onChange("typeCircuit", value as CircuitType)
+            }
           >
             <SelectTrigger id="typeCircuit-dis" className="h-12 text-base">
               <SelectValue />
@@ -100,12 +125,17 @@ export function DisjoncteurCalculator({ inputs, onChange }: DisjoncteurCalculato
 
         {/* Type d'installation */}
         <div className="space-y-2">
-          <Label htmlFor="typeInstallation-dis" className="text-base font-medium">
+          <Label
+            htmlFor="typeInstallation-dis"
+            className="text-base font-medium"
+          >
             Type d&#39;installation
           </Label>
           <Select
             value={inputs.typeInstallation}
-            onValueChange={(value) => onChange('typeInstallation', value as TypeInstallation)}
+            onValueChange={(value) =>
+              onChange("typeInstallation", value as TypeInstallation)
+            }
           >
             <SelectTrigger id="typeInstallation-dis" className="h-12 text-base">
               <SelectValue />
@@ -118,7 +148,7 @@ export function DisjoncteurCalculator({ inputs, onChange }: DisjoncteurCalculato
         </div>
 
         {/* Courant (optionnel, pour circuit dédié) */}
-        {inputs.typeCircuit === 'dedie' && (
+        {inputs.typeCircuit === "dedie" && (
           <div className="space-y-2">
             <Label htmlFor="courant-dis" className="text-base font-medium">
               Courant de l&#39;appareil (A)
@@ -127,10 +157,10 @@ export function DisjoncteurCalculator({ inputs, onChange }: DisjoncteurCalculato
               id="courant-dis"
               min={0}
               step={0.1}
-              value={inputs.courant || ''}
+              value={inputs.courant || ""}
               onChange={(e) => {
                 const val = parseFloat(e.target.value);
-                onChange('courant', isNaN(val) ? 0 : val);
+                onChange("courant", isNaN(val) ? 0 : val);
               }}
               className="h-12 text-base"
               placeholder="Ex: 20"

@@ -39,11 +39,11 @@ export function InvoiceImportDialog({
 
     // Validate file type
     const fileExtension = selectedFile.name.substring(
-      selectedFile.name.lastIndexOf(".")
+      selectedFile.name.lastIndexOf("."),
     );
     if (!config.allowedFileTypes.includes(fileExtension)) {
       setError(
-        `Type de fichier non supporté. Formats acceptés: ${config.allowedFileTypes.join(", ")}`
+        `Type de fichier non supporté. Formats acceptés: ${config.allowedFileTypes.join(", ")}`,
       );
       return;
     }
@@ -51,7 +51,7 @@ export function InvoiceImportDialog({
     // Validate file size
     if (selectedFile.size > config.maxFileSize) {
       setError(
-        `La taille du fichier ne peut pas dépasser ${(config.maxFileSize / (1024 * 1024)).toFixed(0)}MB`
+        `La taille du fichier ne peut pas dépasser ${(config.maxFileSize / (1024 * 1024)).toFixed(0)}MB`,
       );
       return;
     }
@@ -223,15 +223,18 @@ FAC-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc
                   result.status === "COMPLETE_SUCCESS"
                     ? "bg-green-50 border border-green-200"
                     : result.status === "PARTIAL_SUCCESS"
-                    ? "bg-yellow-50 border border-yellow-200"
-                    : "bg-red-50 border border-red-200"
+                      ? "bg-yellow-50 border border-yellow-200"
+                      : "bg-red-50 border border-red-200"
                 }`}
               >
-                <h3 className="font-semibold mb-2">Résultats de l'import</h3>
+                <h3 className="font-semibold mb-2">
+                  Résultats de l&apos;import
+                </h3>
                 <p className="text-sm mb-2">{result.message}</p>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
-                    <span className="font-medium">Total:</span> {result.totalRows}
+                    <span className="font-medium">Total:</span>{" "}
+                    {result.totalRows}
                   </div>
                   <div className="text-green-600">
                     <span className="font-medium">Réussies:</span>{" "}
@@ -311,7 +314,7 @@ FAC-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc
                     onClick={downloadErrorReport}
                     className="px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
                   >
-                    📄 Télécharger rapport d'erreurs
+                    📄 Télécharger rapport d&apos;erreurs
                   </button>
                 )}
                 <button

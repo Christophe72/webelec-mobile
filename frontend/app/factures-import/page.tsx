@@ -8,7 +8,9 @@ import {
 
 export default function FacturesImportPage() {
   const [importOpen, setImportOpen] = useState(false);
-  const [lastImportMessage, setLastImportMessage] = useState<string | null>(null);
+  const [lastImportMessage, setLastImportMessage] = useState<string | null>(
+    null,
+  );
 
   // Créer l'adaptateur HTTP pour les appels réels au backend
   const adapter = new HttpInvoiceImportAdapter();
@@ -27,12 +29,12 @@ export default function FacturesImportPage() {
             Import de Factures CSV
           </h1>
           <p className="text-muted-foreground">
-            Module d'import de factures clients depuis fichiers CSV avec
+            Module d&apos;import de factures clients depuis fichiers CSV avec
             validation automatique et création de clients
           </p>
         </div>
 
-        {/* Bouton d'action */}
+        {/* Bouton d&apos;action */}
         <div className="mb-8">
           <button
             onClick={() => setImportOpen(true)}
@@ -50,7 +52,7 @@ export default function FacturesImportPage() {
           )}
         </div>
 
-        {/* Dialog d'import */}
+        {/* Dialog d&apos;import */}
         <InvoiceImportDialog
           open={importOpen}
           onOpenChange={setImportOpen}
@@ -62,7 +64,7 @@ export default function FacturesImportPage() {
         {/* Documentation */}
         <div className="rounded-lg border border-zinc-200/70 bg-white/80 p-6 shadow-sm max-w-4xl mx-auto dark:border-zinc-800 dark:bg-zinc-900/60">
           <h2 className="text-xl font-bold mb-4 text-foreground">
-            Guide d'utilisation
+            Guide d&apos;utilisation
           </h2>
 
           <div className="space-y-6">
@@ -72,11 +74,12 @@ export default function FacturesImportPage() {
                 Format CSV requis
               </h3>
               <p className="text-sm text-muted-foreground mb-3">
-                Le fichier CSV doit contenir les colonnes suivantes (première ligne = headers):
+                Le fichier CSV doit contenir les colonnes suivantes (première
+                ligne = headers):
               </p>
               <div className="rounded border border-zinc-200 bg-zinc-50 p-4 overflow-x-auto dark:border-zinc-800 dark:bg-zinc-900/70">
                 <pre className="text-xs font-mono whitespace-pre">
-{`numero,dateEmission,dateEcheance,montantHT,montantTVA,montantTTC,statut,clientNom,clientPrenom,clientEmail,clientTelephone,clientAdresse,lignes`}
+                  {`numero,dateEmission,dateEcheance,montantHT,montantTVA,montantTTC,statut,clientNom,clientPrenom,clientEmail,clientTelephone,clientAdresse,lignes`}
                 </pre>
               </div>
             </div>
@@ -88,7 +91,7 @@ export default function FacturesImportPage() {
               </h3>
               <div className="rounded border border-zinc-200 bg-zinc-50 p-4 overflow-x-auto dark:border-zinc-800 dark:bg-zinc-900/70">
                 <pre className="text-xs font-mono whitespace-pre">
-{`FAC-2025-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc@email.com,0601020304,"10 rue Paris","Item A|1|500|500;Item B|1|500|500"`}
+                  {`FAC-2025-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc@email.com,0601020304,"10 rue Paris","Item A|1|500|500;Item B|1|500|500"`}
                 </pre>
               </div>
             </div>
@@ -103,23 +106,27 @@ export default function FacturesImportPage() {
                   <strong>numero</strong>: Numéro unique de facture
                 </li>
                 <li>
-                  <strong>dateEmission</strong> et <strong>dateEcheance</strong>: Format ISO (YYYY-MM-DD)
+                  <strong>dateEmission</strong> et <strong>dateEcheance</strong>
+                  : Format ISO (YYYY-MM-DD)
                 </li>
                 <li>
-                  <strong>montantHT, montantTVA, montantTTC</strong>: Montants avec 2 décimales
+                  <strong>montantHT, montantTVA, montantTTC</strong>: Montants
+                  avec 2 décimales
                 </li>
                 <li>
                   <strong>statut</strong>: EN_ATTENTE, PAYEE, ANNULEE, etc.
                 </li>
                 <li>
-                  <strong>clientNom</strong> et <strong>clientPrenom</strong>: Identité du client
+                  <strong>clientNom</strong> et <strong>clientPrenom</strong>:
+                  Identité du client
                 </li>
                 <li>
                   <strong>lignes</strong>: Format{" "}
                   <code className="bg-gray-200 px-1 rounded">
                     description|quantite|prixUnitaire|total
                   </code>{" "}
-                  séparés par <code className="bg-gray-200 px-1 rounded">;</code>
+                  séparés par{" "}
+                  <code className="bg-gray-200 px-1 rounded">;</code>
                 </li>
               </ul>
             </div>
@@ -131,10 +138,12 @@ export default function FacturesImportPage() {
               </h3>
               <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
                 <li>
-                  <strong>clientEmail</strong>: Utilisé pour identifier un client existant
+                  <strong>clientEmail</strong>: Utilisé pour identifier un
+                  client existant
                 </li>
                 <li>
-                  <strong>clientTelephone</strong> et <strong>clientAdresse</strong>: Informations complémentaires
+                  <strong>clientTelephone</strong> et{" "}
+                  <strong>clientAdresse</strong>: Informations complémentaires
                 </li>
               </ul>
             </div>
@@ -146,16 +155,21 @@ export default function FacturesImportPage() {
               </h3>
               <ul className="text-sm space-y-2">
                 <li className="flex items-start">
-                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">✓</span>
+                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">
+                    ✓
+                  </span>
                   <div>
                     <strong>Création automatique de clients</strong>
                     <p className="text-muted-foreground">
-                      Si un client n'existe pas, il sera créé automatiquement
+                      Si un client n&apos;existe pas, il sera créé
+                      automatiquement
                     </p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">✓</span>
+                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">
+                    ✓
+                  </span>
                   <div>
                     <strong>Validation complète</strong>
                     <p className="text-muted-foreground">
@@ -164,20 +178,26 @@ export default function FacturesImportPage() {
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">✓</span>
+                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">
+                    ✓
+                  </span>
                   <div>
                     <strong>Import partiel</strong>
                     <p className="text-muted-foreground">
-                      Les lignes valides sont importées, les autres sont rapportées avec détails
+                      Les lignes valides sont importées, les autres sont
+                      rapportées avec détails
                     </p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">✓</span>
+                  <span className="text-emerald-600 dark:text-emerald-300 mr-2">
+                    ✓
+                  </span>
                   <div>
-                    <strong>Rapport d'erreurs</strong>
+                    <strong>Rapport d&apos;erreurs</strong>
                     <p className="text-muted-foreground">
-                      Téléchargement d'un fichier texte avec toutes les erreurs
+                      Téléchargement d&apos;un fichier texte avec toutes les
+                      erreurs
                     </p>
                   </div>
                 </li>

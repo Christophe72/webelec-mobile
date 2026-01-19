@@ -25,19 +25,21 @@ export default function PeppolAccountValidationPage() {
         bankWizard: new MockBankWizardAdapter(),
         store: new LocalStorageStoreAdapter(),
         // Politique de confirmation personnalisée
-        manualConfirmationPolicy: ({ issues, country }) => {
+        manualConfirmationPolicy: ({ issues }) => {
           // Demander confirmation si des warnings sont présents
           return issues.some((i) => i.severity === "WARNING");
         },
       }),
-    []
+    [],
   );
   const importAdapter = useMemo(() => new HttpInvoiceImportAdapter(), []);
   const [importOpen, setImportOpen] = useState(false);
   const [factures, setFactures] = useState<FactureDTO[]>([]);
   const [loadingFactures, setLoadingFactures] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [lastImportMessage, setLastImportMessage] = useState<string | null>(null);
+  const [lastImportMessage, setLastImportMessage] = useState<string | null>(
+    null,
+  );
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
   const [sendingId, setSendingId] = useState<number | null>(null);
   const [peppolStates, setPeppolStates] = useState<
@@ -58,7 +60,7 @@ export default function PeppolAccountValidationPage() {
     alert(
       `Compte validé avec succès!\n\nIBAN: ${result.details.iban ?? "N/A"}\nBIC: ${
         result.details.bic ?? "N/A"
-      }\nPays: ${result.details.country ?? "N/A"}`
+      }\nPays: ${result.details.country ?? "N/A"}`,
     );
   };
 
@@ -72,7 +74,7 @@ export default function PeppolAccountValidationPage() {
       setActionError(
         err instanceof Error
           ? err.message
-          : "Erreur lors du chargement des factures"
+          : "Erreur lors du chargement des factures",
       );
     } finally {
       setLoadingFactures(false);
@@ -224,8 +226,8 @@ export default function PeppolAccountValidationPage() {
                   const statusLabel = isSent
                     ? "Envoyee"
                     : isVerified
-                    ? "Verifiee"
-                    : "Non verifiee";
+                      ? "Verifiee"
+                      : "Non verifiee";
                   return (
                     <div
                       key={facture.id}
@@ -283,7 +285,7 @@ export default function PeppolAccountValidationPage() {
         {/* Documentation rapide */}
         <div className="rounded-lg border border-zinc-200/70 bg-white/80 p-6 shadow-sm max-w-2xl mx-auto dark:border-zinc-800 dark:bg-zinc-900/60">
           <h2 className="text-xl font-bold mb-4 text-foreground">
-            Guide d'utilisation
+            Guide d&apos;utilisation
           </h2>
 
           <div className="space-y-4">
@@ -292,7 +294,7 @@ export default function PeppolAccountValidationPage() {
                 Mode IBAN (recommandé)
               </h3>
               <p className="text-sm text-muted-foreground mb-2">
-                Saisissez l'IBAN complet avec ou sans espaces.
+                Saisissez l&apos;IBAN complet avec ou sans espaces.
               </p>
               <div className="rounded border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/70">
                 <p className="text-sm font-mono">
@@ -331,14 +333,16 @@ export default function PeppolAccountValidationPage() {
                     ✓
                   </span>
                   <div>
-                    <p className="font-mono">FR14 2004 1010 0505 0001 3M02 606</p>
-                    <p className="text-muted-foreground">IBAN français valide</p>
+                    <p className="font-mono">
+                      FR14 2004 1010 0505 0001 3M02 606
+                    </p>
+                    <p className="text-muted-foreground">
+                      IBAN français valide
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-red-600 dark:text-red-300 mr-2">
-                    ✗
-                  </span>
+                  <span className="text-red-600 dark:text-red-300 mr-2">✗</span>
                   <div>
                     <p className="font-mono">BE68 1234 5678 9012</p>
                     <p className="text-muted-foreground">
@@ -354,14 +358,16 @@ export default function PeppolAccountValidationPage() {
                 Pays supportés
               </h3>
               <div className="flex flex-wrap gap-2">
-                {["BE", "FR", "DE", "NL", "LU", "IT", "ES", "PT"].map((country) => (
-                  <span
-                    key={country}
-                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium dark:bg-blue-900/40 dark:text-blue-200"
-                  >
-                    {country}
-                  </span>
-                ))}
+                {["BE", "FR", "DE", "NL", "LU", "IT", "ES", "PT"].map(
+                  (country) => (
+                    <span
+                      key={country}
+                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium dark:bg-blue-900/40 dark:text-blue-200"
+                    >
+                      {country}
+                    </span>
+                  ),
+                )}
               </div>
             </div>
 

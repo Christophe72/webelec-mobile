@@ -17,7 +17,6 @@ import type {
 } from "@/types/dto/calculateur";
 import { calculateVoltageDrop } from "@/lib/calculateur/chute-tension";
 import { CalculatorResultCard } from "./calculator-result-card";
-import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import {
@@ -35,7 +34,7 @@ interface ChuteTensionCalculatorProps {
   inputs: ChuteTensionInputs;
   onChange: <K extends keyof ChuteTensionInputs>(
     field: K,
-    value: ChuteTensionInputs[K]
+    value: ChuteTensionInputs[K],
   ) => void;
 }
 

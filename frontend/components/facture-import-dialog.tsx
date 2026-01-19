@@ -27,14 +27,14 @@ export function FactureImportDialog({
     if (!selectedFile) return;
 
     // Validate file type
-    if (!selectedFile.name.endsWith('.csv')) {
-      setError('Seuls les fichiers CSV sont supportés');
+    if (!selectedFile.name.endsWith(".csv")) {
+      setError("Seuls les fichiers CSV sont supportés");
       return;
     }
 
     // Validate file size (10MB)
     if (selectedFile.size > 10 * 1024 * 1024) {
-      setError('La taille du fichier ne peut pas dépasser 10MB');
+      setError("La taille du fichier ne peut pas dépasser 10MB");
       return;
     }
 
@@ -54,14 +54,14 @@ export function FactureImportDialog({
       setResult(response);
 
       // If complete success, call onSuccess and close after delay
-      if (response.status === 'COMPLETE_SUCCESS') {
+      if (response.status === "COMPLETE_SUCCESS") {
         setTimeout(() => {
           onSuccess?.();
           handleClose();
         }, 2000);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'import');
+      setError(err instanceof Error ? err.message : "Erreur lors de l'import");
     } finally {
       setLoading(false);
     }
@@ -79,14 +79,14 @@ export function FactureImportDialog({
 
     const errors = result.results
       .filter((r) => !r.success)
-      .map((r) => `Ligne ${r.rowNumber}: ${r.errors.join(', ')}`)
-      .join('\n');
+      .map((r) => `Ligne ${r.rowNumber}: ${r.errors.join(", ")}`)
+      .join("\n");
 
-    const blob = new Blob([errors], { type: 'text/plain' });
+    const blob = new Blob([errors], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'import-errors.txt';
+    a.download = "import-errors.txt";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -139,7 +139,7 @@ export function FactureImportDialog({
               {file && (
                 <div className="p-3 bg-gray-50 rounded border border-gray-200">
                   <p className="text-sm">
-                    <span className="font-semibold">Fichier sélectionné:</span>{' '}
+                    <span className="font-semibold">Fichier sélectionné:</span>{" "}
                     {file.name}
                   </p>
                   <p className="text-sm text-gray-600">
@@ -167,14 +167,16 @@ export function FactureImportDialog({
                   disabled={!file || loading}
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Import en cours...' : 'Importer'}
+                  {loading ? "Import en cours..." : "Importer"}
                 </button>
               </div>
 
               <div className="mt-6 p-4 bg-gray-50 rounded">
-                <h3 className="font-semibold mb-2 text-sm">Format CSV attendu:</h3>
+                <h3 className="font-semibold mb-2 text-sm">
+                  Format CSV attendu:
+                </h3>
                 <pre className="text-xs overflow-x-auto bg-white p-2 rounded border">
-{`numero,dateEmission,dateEcheance,montantHT,montantTVA,montantTTC,statut,clientNom,clientPrenom,clientEmail,clientTelephone,clientAdresse,lignes
+                  {`numero,dateEmission,dateEcheance,montantHT,montantTVA,montantTTC,statut,clientNom,clientPrenom,clientEmail,clientTelephone,clientAdresse,lignes
 FAC-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc@email.com,0601020304,"10 rue Paris","Item A|2|100|200;Item B|4|200|800"`}
                 </pre>
                 <div className="mt-2">
@@ -192,25 +194,30 @@ FAC-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc
             <div className="space-y-4">
               <div
                 className={`p-4 rounded ${
-                  result.status === 'COMPLETE_SUCCESS'
-                    ? 'bg-green-50 border border-green-200'
-                    : result.status === 'PARTIAL_SUCCESS'
-                    ? 'bg-yellow-50 border border-yellow-200'
-                    : 'bg-red-50 border border-red-200'
+                  result.status === "COMPLETE_SUCCESS"
+                    ? "bg-green-50 border border-green-200"
+                    : result.status === "PARTIAL_SUCCESS"
+                      ? "bg-yellow-50 border border-yellow-200"
+                      : "bg-red-50 border border-red-200"
                 }`}
               >
-                <h3 className="font-semibold mb-2">Résultats de l'import</h3>
+                <h3 className="font-semibold mb-2">
+                  Résultats de l&apos;import
+                </h3>
                 <p className="text-sm mb-2">{result.message}</p>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
-                    <span className="font-medium">Total:</span> {result.totalRows}
+                    <span className="font-medium">Total:</span>{" "}
+                    {result.totalRows}
                   </div>
                   <div className="text-green-600">
-                    <span className="font-medium">Réussies:</span> {result.successCount}
+                    <span className="font-medium">Réussies:</span>{" "}
+                    {result.successCount}
                   </div>
                   {result.errorCount > 0 && (
                     <div className="text-red-600">
-                      <span className="font-medium">Échecs:</span> {result.errorCount}
+                      <span className="font-medium">Échecs:</span>{" "}
+                      {result.errorCount}
                     </div>
                   )}
                 </div>
@@ -260,7 +267,8 @@ FAC-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc
                           ✓ Ligne {r.rowNumber}: {r.invoiceNumero}
                           {r.warnings && r.warnings.length > 0 && (
                             <span className="text-yellow-600 ml-2">
-                              ({r.warnings.length} warning{r.warnings.length > 1 ? 's' : ''})
+                              ({r.warnings.length} warning
+                              {r.warnings.length > 1 ? "s" : ""})
                             </span>
                           )}
                         </p>
@@ -280,7 +288,7 @@ FAC-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc
                     onClick={downloadErrorReport}
                     className="px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
                   >
-                    📄 Télécharger rapport d'erreurs
+                    📄 Télécharger rapport d&apos;erreurs
                   </button>
                 )}
                 <button
