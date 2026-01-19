@@ -12,8 +12,10 @@ on:
   pull_request:
     branches:
       - main
+      - feature/**
     paths:
       - backend/**
+      - .github/workflows/backend-ci.yml
 
   workflow_dispatch:
 

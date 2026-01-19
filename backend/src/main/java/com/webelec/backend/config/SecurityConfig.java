@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
-@Profile("prod")
+@Profile({"prod", "test"})
 @EnableMethodSecurity
 public class SecurityConfig {
 
