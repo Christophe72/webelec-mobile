@@ -82,6 +82,11 @@ export default function LoginTestPage() {
       description: "Uploader des pièces jointes",
     },
     {
+      href: "/ia",
+      title: "IA",
+      description: "Assistant RGIE",
+    },
+    {
       href: "/rgie/auditeur-pro",
       title: "Auditeur RGIE",
       description: "IA conformité via /api/query",

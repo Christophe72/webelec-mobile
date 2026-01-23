@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "../components/theme-provider";
 import ThemeToggle from "@/components/theme-toggle";
 import { Toaster } from "@/components/ui/toaster";
+import GlobalNav from "@/components/global-nav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -43,6 +44,7 @@ export default function RootLayout({
             <div className="fixed right-4 top-4 z-50">
               <ThemeToggle />
             </div>
+            <GlobalNav />
             {children}
             <Toaster />
           </div>
