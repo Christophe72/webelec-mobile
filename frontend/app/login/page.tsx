@@ -94,8 +94,9 @@ export default function LoginTestPage() {
   ];
 
   return (
-    <div className="mx-auto mt-12 max-w-md rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur">
-      <h1 className="text-xl font-semibold mb-4">Test login JWT</h1>
+    <div className="mx-auto mt-4 sm:mt-8 md:mt-12 max-w-md px-4 sm:px-0">
+      <div className="rounded-2xl border border-border bg-card/80 p-4 sm:p-6 shadow-sm backdrop-blur">
+        <h1 className="text-lg sm:text-xl font-semibold mb-4">Test login JWT</h1>
 
       {hasToken === null ? (
         <p>Chargement…</p>
@@ -105,7 +106,7 @@ export default function LoginTestPage() {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm transition-all"
+            className="w-full rounded-lg border border-border px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm transition-all"
           >
             Déconnexion
           </button>
@@ -132,7 +133,7 @@ export default function LoginTestPage() {
           />
           <button
             type="submit"
-            className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-black px-3 py-2 sm:px-4 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black"
           >
             Se connecter
           </button>
@@ -152,7 +153,7 @@ export default function LoginTestPage() {
         </div>
       )}
 
-      <div className="mt-6 space-y-2">
+      <div className="mt-4 sm:mt-6 space-y-2">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Accès rapide
         </p>
@@ -161,9 +162,9 @@ export default function LoginTestPage() {
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-xl border border-border px-4 py-3 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm hover:border-primary/50 transition-all"
+              className="rounded-lg sm:rounded-xl border border-border px-3 py-2 sm:px-4 sm:py-3 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm hover:border-primary/50 transition-all"
             >
-              <span className="block text-base font-semibold">
+              <span className="block text-sm sm:text-base font-semibold">
                 {link.title}
               </span>
               <span className="text-xs text-muted-foreground">
@@ -173,6 +174,7 @@ export default function LoginTestPage() {
           ))}
         </div>
       </div>
+    </div>
     </div>
   );
 }

@@ -174,14 +174,13 @@ class FactureControllerTest {
                 "text/csv",
                 "content".getBytes());
 
-        FactureImportResponse response = FactureImportResponse.builder()
-                .totalRows(1)
-                .successCount(1)
-                .errorCount(0)
-                .results(Collections.emptyList())
-                .status(FactureImportResponse.ImportStatus.COMPLETE_SUCCESS)
-                .message("Import reussi")
-                .build();
+        FactureImportResponse response = new FactureImportResponse();
+        response.setTotalRows(1);
+        response.setSuccessCount(1);
+        response.setErrorCount(0);
+        response.setResults(Collections.emptyList());
+        response.setStatus(FactureImportResponse.ImportStatus.COMPLETE_SUCCESS);
+        response.setMessage("Import reussi");
 
         Mockito.when(importService.importFromCsv(anyNonNull(MultipartFile.class), eq(5L))).thenReturn(response);
 
@@ -206,10 +205,7 @@ class FactureControllerTest {
 
     @Test
     void sendPeppol_returnsResult() throws Exception {
-        PeppolResultDTO result = PeppolResultDTO.builder()
-                .status("SENT")
-                .message("ok")
-                .build();
+        PeppolResultDTO result = new PeppolResultDTO("SENT", "ok");
         Mockito.when(peppolService.envoyer(9L)).thenReturn(result);
 
         mockMvc.perform(post("/api/factures/9/peppol"))

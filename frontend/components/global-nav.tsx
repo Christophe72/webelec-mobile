@@ -17,13 +17,13 @@ const navLinks = [
 export default function GlobalNav() {
   return (
     <div className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
-      <div className="mx-auto w-full max-w-6xl px-4 py-4">
-        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto overflow-y-visible whitespace-nowrap pb-1">
+      <div className="mx-auto w-full max-w-6xl px-2 py-2 sm:px-4 sm:py-3 md:py-4">
+        <div className="no-scrollbar flex items-center gap-1.5 sm:gap-2 overflow-x-auto overflow-y-visible whitespace-nowrap pb-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground transition-all hover:translate-y-px hover:border-primary/50 hover:shadow-sm"
+              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl border border-border px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-foreground transition-all hover:translate-y-px hover:border-primary/50 hover:shadow-sm"
             >
               {link.label}
             </Link>

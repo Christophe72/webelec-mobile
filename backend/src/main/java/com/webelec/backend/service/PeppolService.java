@@ -38,10 +38,7 @@ public class PeppolService {
         Facture facture = loadFacture(factureId);
         validateFactureForPeppol(facture);
 
-        return PeppolResultDTO.builder()
-                .status("SENT")
-                .message("Envoi Peppol simule pour la facture " + facture.getNumero())
-                .build();
+        return new PeppolResultDTO("SENT", "Envoi Peppol simule pour la facture " + facture.getNumero());
     }
 
     private Facture loadFacture(Long factureId) {

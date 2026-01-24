@@ -124,22 +124,21 @@ public class FactureImportService {
                     continue;
                 }
 
-                FactureImportRow row = FactureImportRow.builder()
-                        .rowNumber(rowNumber)
-                        .numero(getColumn(line, 0))
-                        .dateEmission(getColumn(line, 1))
-                        .dateEcheance(getColumn(line, 2))
-                        .montantHT(getColumn(line, 3))
-                        .montantTVA(getColumn(line, 4))
-                        .montantTTC(getColumn(line, 5))
-                        .statut(getColumn(line, 6))
-                        .clientNom(getColumn(line, 7))
-                        .clientPrenom(getColumn(line, 8))
-                        .clientEmail(getColumn(line, 9))
-                        .clientTelephone(getColumn(line, 10))
-                        .clientAdresse(getColumn(line, 11))
-                        .lignes(getColumn(line, 12))
-                        .build();
+                FactureImportRow row = new FactureImportRow();
+                row.setRowNumber(rowNumber);
+                row.setNumero(getColumn(line, 0));
+                row.setDateEmission(getColumn(line, 1));
+                row.setDateEcheance(getColumn(line, 2));
+                row.setMontantHT(getColumn(line, 3));
+                row.setMontantTVA(getColumn(line, 4));
+                row.setMontantTTC(getColumn(line, 5));
+                row.setStatut(getColumn(line, 6));
+                row.setClientNom(getColumn(line, 7));
+                row.setClientPrenom(getColumn(line, 8));
+                row.setClientEmail(getColumn(line, 9));
+                row.setClientTelephone(getColumn(line, 10));
+                row.setClientAdresse(getColumn(line, 11));
+                row.setLignes(getColumn(line, 12));
 
                 rows.add(row);
                 rowNumber++;
@@ -177,10 +176,9 @@ public class FactureImportService {
     }
 
     private ImportRowResult validateAndConvertRow(FactureImportRow row, Long societeId) {
-        ImportRowResult result = ImportRowResult.builder()
-                .rowNumber(row.getRowNumber())
-                .success(true)
-                .build();
+        ImportRowResult result = new ImportRowResult();
+        result.setRowNumber(row.getRowNumber());
+        result.setSuccess(true);
 
         // Validate required fields
         if (isBlank(row.getNumero())) {
@@ -431,15 +429,14 @@ public class FactureImportService {
     }
 
     private FactureImportResponse buildResponse(List<ImportRowResult> results) {
-        int successCount = (int) results.stream().filter(ImportRowResult::isSuccess).count();
+        int successCount = (int) results.stream().filter(r -> r.isSuccess()).count();
         int errorCount = results.size() - successCount;
 
-        FactureImportResponse response = FactureImportResponse.builder()
-                .totalRows(results.size())
-                .successCount(successCount)
-                .errorCount(errorCount)
-                .results(results)
-                .build();
+        FactureImportResponse response = new FactureImportResponse();
+        response.setTotalRows(results.size());
+        response.setSuccessCount(successCount);
+        response.setErrorCount(errorCount);
+        response.setResults(results);
 
         response.calculateStatus();
 
