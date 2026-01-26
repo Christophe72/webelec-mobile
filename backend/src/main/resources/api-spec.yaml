@@ -4,13 +4,13 @@ info:
   version: 1.0.0
   description: |
     API REST du SaaS WebElec pour électriciens belges.
-    
+
     ## Authentification
     Tous les endpoints (sauf `/api/auth/*`) nécessitent un token JWT dans le header :
     ```
     Authorization: Bearer <token>
     ```
-    
+
     ## Codes de réponse
     - `200` : Succès
     - `201` : Créé
@@ -28,6 +28,8 @@ servers:
 tags:
   - name: Auth
     description: Authentification et gestion des tokens
+  - name: Users
+    description: Profil technicien, équipe et habilitations RGIE
   - name: Societes
     description: Gestion des sociétés (multi-tenant)
   - name: Clients
@@ -55,14 +57,14 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Liste des sociétés
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SocieteResponse'
+                  $ref: "#/components/schemas/SocieteResponse"
               example:
                 - id: 1
                   nom: "WebElec SPRL"
@@ -70,15 +72,15 @@ paths:
                   email: "contact@webelec.be"
                   telephone: "+32 2 123 45 67"
                   adresse: "Rue de l'Électricité 42, 1000 Bruxelles"
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
     post:
       summary: Créer une société
       description: |
         Crée une nouvelle société.
-        
+
         **Rôle requis** : `ADMIN` uniquement
-        
+
         **Règles de validation** :
         - `nom` : obligatoire, max 255 caractères
         - `tva` : obligatoire, max 32 caractères
@@ -93,7 +95,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SocieteRequest'
+              $ref: "#/components/schemas/SocieteRequest"
             examples:
               valide:
                 summary: Exemple valide
@@ -114,18 +116,18 @@ paths:
                   nom: ""
                   tva: "BE0123456789"
       responses:
-        '200':
+        "200":
           description: Société créée
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SocieteResponse'
-        '400':
+                $ref: "#/components/schemas/SocieteResponse"
+        "400":
           description: Requête invalide (validation échouée)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: "#/components/schemas/ApiError"
               example:
                 timestamp: "2025-12-27T10:00:00Z"
                 status: 400
@@ -133,11 +135,11 @@ paths:
                 message: "Requête invalide"
                 details:
                   - "nom: Le nom de la société est obligatoire"
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
           description: Conflit (email déjà utilisé)
           content:
             application/json:
@@ -149,7 +151,7 @@ paths:
       summary: Récupérer une société
       description: |
         Récupère les détails d'une société par son ID.
-        
+
         **Rôle requis** : 
         - `ADMIN` : peut voir toutes les sociétés
         - Autres rôles : doit appartenir à la société
@@ -157,59 +159,59 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '200':
+        "200":
           description: Société trouvée
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SocieteResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/SocieteResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       summary: Mettre à jour une société
       description: |
         Met à jour les informations d'une société existante.
-        
+
         **Rôle requis** : `ADMIN` ou `GERANT` de la société
-        
+
         **Règles** : mêmes validations que POST
       tags: [Societes]
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SocieteRequest'
+              $ref: "#/components/schemas/SocieteRequest"
       responses:
-        '200':
+        "200":
           description: Société mise à jour
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SocieteResponse'
-        '400':
+                $ref: "#/components/schemas/SocieteResponse"
+        "400":
           description: Requête invalide
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Conflit (email déjà utilisé par une autre société)
           content:
             application/json:
@@ -219,37 +221,37 @@ paths:
       summary: Supprimer une société
       description: |
         Supprime une société.
-        
+
         **Rôle requis** : `ADMIN` uniquement
-        
+
         **Attention** : cette opération est irréversible.
       tags: [Societes]
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '204':
+        "204":
           description: Société supprimée
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/chantiers:
     get:
       summary: List chantiers
       tags: [Chantiers]
       responses:
-        '200':
+        "200":
           description: List
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ChantierResponse'
+                  $ref: "#/components/schemas/ChantierResponse"
     post:
       summary: Create chantier
       tags: [Chantiers]
@@ -258,72 +260,72 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChantierRequest'
+              $ref: "#/components/schemas/ChantierRequest"
       responses:
-        '200':
+        "200":
           description: Created chantier
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChantierResponse'
+                $ref: "#/components/schemas/ChantierResponse"
   /api/chantiers/{id}:
     get:
       summary: Get chantier
       tags: [Chantiers]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '200':
+        "200":
           description: Found chantier
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChantierResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/ChantierResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       summary: Update chantier
       tags: [Chantiers]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChantierRequest'
+              $ref: "#/components/schemas/ChantierRequest"
       responses:
-        '200':
+        "200":
           description: Updated chantier
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChantierResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/ChantierResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       summary: Delete chantier
       tags: [Chantiers]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '204':
+        "204":
           description: Deleted
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/clients:
     get:
       summary: List clients
       tags: [Clients]
       responses:
-        '200':
+        "200":
           description: List
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ClientResponse'
+                  $ref: "#/components/schemas/ClientResponse"
     post:
       summary: Create client
       tags: [Clients]
@@ -332,72 +334,72 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClientRequest'
+              $ref: "#/components/schemas/ClientRequest"
       responses:
-        '200':
+        "200":
           description: Created client
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientResponse'
+                $ref: "#/components/schemas/ClientResponse"
   /api/clients/{id}:
     get:
       summary: Get client
       tags: [Clients]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '200':
+        "200":
           description: Found client
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/ClientResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       summary: Update client
       tags: [Clients]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClientRequest'
+              $ref: "#/components/schemas/ClientRequest"
       responses:
-        '200':
+        "200":
           description: Updated client
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/ClientResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       summary: Delete client
       tags: [Clients]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '204':
+        "204":
           description: Deleted
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/produits:
     get:
       summary: List produits
       tags: [Produits]
       responses:
-        '200':
+        "200":
           description: List
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProduitResponse'
+                  $ref: "#/components/schemas/ProduitResponse"
     post:
       summary: Create produit
       tags: [Produits]
@@ -406,72 +408,72 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProduitRequest'
+              $ref: "#/components/schemas/ProduitRequest"
       responses:
-        '200':
+        "200":
           description: Created produit
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProduitResponse'
+                $ref: "#/components/schemas/ProduitResponse"
   /api/produits/{id}:
     get:
       summary: Get produit
       tags: [Produits]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '200':
+        "200":
           description: Found produit
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProduitResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/ProduitResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       summary: Update produit
       tags: [Produits]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProduitRequest'
+              $ref: "#/components/schemas/ProduitRequest"
       responses:
-        '200':
+        "200":
           description: Updated produit
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProduitResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/ProduitResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       summary: Delete produit
       tags: [Produits]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '204':
+        "204":
           description: Deleted
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/interventions:
     get:
       summary: List interventions
       tags: [Interventions]
       responses:
-        '200':
+        "200":
           description: List
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InterventionResponse'
+                  $ref: "#/components/schemas/InterventionResponse"
     post:
       summary: Create intervention
       tags: [Interventions]
@@ -480,72 +482,72 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InterventionRequest'
+              $ref: "#/components/schemas/InterventionRequest"
       responses:
-        '200':
+        "200":
           description: Created intervention
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InterventionResponse'
+                $ref: "#/components/schemas/InterventionResponse"
   /api/interventions/{id}:
     get:
       summary: Get intervention
       tags: [Interventions]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '200':
+        "200":
           description: Found intervention
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InterventionResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/InterventionResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       summary: Update intervention
       tags: [Interventions]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InterventionRequest'
+              $ref: "#/components/schemas/InterventionRequest"
       responses:
-        '200':
+        "200":
           description: Updated intervention
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InterventionResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/InterventionResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       summary: Delete intervention
       tags: [Interventions]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '204':
+        "204":
           description: Deleted
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/produits-avances:
     get:
       summary: List advanced products
       tags: [ProduitsAvances]
       responses:
-        '200':
+        "200":
           description: List
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProduitAvanceResponse'
+                  $ref: "#/components/schemas/ProduitAvanceResponse"
     post:
       summary: Create advanced product
       tags: [ProduitsAvances]
@@ -554,72 +556,72 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProduitAvanceRequest'
+              $ref: "#/components/schemas/ProduitAvanceRequest"
       responses:
-        '200':
+        "200":
           description: Created advanced product
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProduitAvanceResponse'
+                $ref: "#/components/schemas/ProduitAvanceResponse"
   /api/produits-avances/{id}:
     get:
       summary: Get advanced product
       tags: [ProduitsAvances]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '200':
+        "200":
           description: Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProduitAvanceResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/ProduitAvanceResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       summary: Update advanced product
       tags: [ProduitsAvances]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProduitAvanceRequest'
+              $ref: "#/components/schemas/ProduitAvanceRequest"
       responses:
-        '200':
+        "200":
           description: Updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProduitAvanceResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/ProduitAvanceResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       summary: Delete advanced product
       tags: [ProduitsAvances]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '204':
+        "204":
           description: Deleted
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/devis:
     get:
       summary: List devis
       tags: [Devis]
       responses:
-        '200':
+        "200":
           description: List
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DevisResponse'
+                  $ref: "#/components/schemas/DevisResponse"
     post:
       summary: Create devis
       tags: [Devis]
@@ -628,72 +630,72 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DevisRequest'
+              $ref: "#/components/schemas/DevisRequest"
       responses:
-        '200':
+        "200":
           description: Created devis
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DevisResponse'
+                $ref: "#/components/schemas/DevisResponse"
   /api/devis/{id}:
     get:
       summary: Get devis
       tags: [Devis]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '200':
+        "200":
           description: Found devis
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DevisResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/DevisResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       summary: Update devis
       tags: [Devis]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DevisRequest'
+              $ref: "#/components/schemas/DevisRequest"
       responses:
-        '200':
+        "200":
           description: Updated devis
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DevisResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/DevisResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       summary: Delete devis
       tags: [Devis]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '204':
+        "204":
           description: Deleted
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/factures:
     get:
       summary: List factures
       tags: [Factures]
       responses:
-        '200':
+        "200":
           description: List
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/FactureResponse'
+                  $ref: "#/components/schemas/FactureResponse"
     post:
       summary: Create facture
       tags: [Factures]
@@ -702,59 +704,109 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FactureRequest'
+              $ref: "#/components/schemas/FactureRequest"
       responses:
-        '200':
+        "200":
           description: Created facture
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FactureResponse'
+                $ref: "#/components/schemas/FactureResponse"
   /api/factures/{id}:
     get:
       summary: Get facture
       tags: [Factures]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '200':
+        "200":
           description: Found facture
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FactureResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/FactureResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       summary: Update facture
       tags: [Factures]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FactureRequest'
+              $ref: "#/components/schemas/FactureRequest"
       responses:
-        '200':
+        "200":
           description: Updated facture
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FactureResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/FactureResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       summary: Delete facture
       tags: [Factures]
       parameters:
-        - $ref: '#/components/parameters/IdParam'
+        - $ref: "#/components/parameters/IdParam"
       responses:
-        '204':
+        "204":
           description: Deleted
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/users/{id}/context:
+    get:
+      summary: Récupérer le contexte utilisateur
+      description: |
+        Retourne un agrégat prêt à afficher pour un technicien belge :
+        - rôle métier déterminé par l'association `user_societes`
+        - habilitations RGIE classées par statut (`VALID`, `TO_RENEW`, `EXPIRED`)
+        - affectation d'équipe active lorsqu'elle existe
+        - agrégat des notifications (non lues + critiques RGIE < 30 jours)
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Contexte utilisateur consolidé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserContextResponse"
+              example:
+                userId: 42
+                fullName: "Alexandre Leroy"
+                email: "alexandre@webelec.be"
+                role: "TECHNICIEN"
+                team:
+                  teamId: 3
+                  teamName: "Equipe RGIE Bruxelles"
+                  assignedAt: "2026-01-05"
+                habilitations:
+                  - id: 11
+                    label: "BA5 courant fort"
+                    certificateNumber: "RGIE-BA5-2024-001"
+                    authorityLevel: "BA5"
+                    validFrom: "2024-02-01"
+                    validUntil: "2026-02-01"
+                    status: "TO_RENEW"
+                  - id: 15
+                    label: "BA4 domestique"
+                    certificateNumber: "RGIE-BA4-2023-099"
+                    authorityLevel: "BA4"
+                    validFrom: "2023-03-15"
+                    validUntil: "2025-03-15"
+                    status: "VALID"
+                notifications:
+                  unreadCount: 4
+                  criticalCount: 1
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
   securitySchemes:
     bearerAuth:
@@ -777,7 +829,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ApiError'
+            $ref: "#/components/schemas/ApiError"
           example:
             timestamp: "2025-12-27T10:00:00Z"
             status: 404
@@ -789,7 +841,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ApiError'
+            $ref: "#/components/schemas/ApiError"
           example:
             timestamp: "2025-12-27T10:00:00Z"
             status: 401
@@ -801,7 +853,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ApiError'
+            $ref: "#/components/schemas/ApiError"
           example:
             timestamp: "2025-12-27T10:00:00Z"
             status: 403
@@ -905,7 +957,7 @@ components:
           format: int64
     ChantierResponse:
       allOf:
-        - $ref: '#/components/schemas/ChantierRequest'
+        - $ref: "#/components/schemas/ChantierRequest"
         - type: object
           properties:
             id:
@@ -931,7 +983,7 @@ components:
           format: int64
     ClientResponse:
       allOf:
-        - $ref: '#/components/schemas/ClientRequest'
+        - $ref: "#/components/schemas/ClientRequest"
         - type: object
           properties:
             id:
@@ -957,7 +1009,7 @@ components:
           format: int64
     ProduitResponse:
       allOf:
-        - $ref: '#/components/schemas/ProduitRequest'
+        - $ref: "#/components/schemas/ProduitRequest"
         - type: object
           properties:
             id:
@@ -985,7 +1037,7 @@ components:
           format: int64
     InterventionResponse:
       allOf:
-        - $ref: '#/components/schemas/InterventionRequest'
+        - $ref: "#/components/schemas/InterventionRequest"
         - type: object
           properties:
             id:
@@ -1014,7 +1066,7 @@ components:
           format: int64
     ProduitAvanceResponse:
       allOf:
-        - $ref: '#/components/schemas/ProduitAvanceRequest'
+        - $ref: "#/components/schemas/ProduitAvanceRequest"
         - type: object
           properties:
             id:
@@ -1022,7 +1074,18 @@ components:
               format: int64
     DevisRequest:
       type: object
-      required: [numero, dateEmission, dateExpiration, montantHT, montantTTC, statut, societeId, clientId, lignes]
+      required:
+        [
+          numero,
+          dateEmission,
+          dateExpiration,
+          montantHT,
+          montantTTC,
+          statut,
+          societeId,
+          clientId,
+          lignes,
+        ]
       properties:
         numero:
           type: string
@@ -1052,7 +1115,7 @@ components:
         lignes:
           type: array
           items:
-            $ref: '#/components/schemas/DevisLigneRequest'
+            $ref: "#/components/schemas/DevisLigneRequest"
     DevisLigneRequest:
       type: object
       required: [description, quantite, prixUnitaire, total]
@@ -1069,7 +1132,7 @@ components:
           format: double
     DevisResponse:
       allOf:
-        - $ref: '#/components/schemas/DevisRequest'
+        - $ref: "#/components/schemas/DevisRequest"
         - type: object
           properties:
             id:
@@ -1077,7 +1140,19 @@ components:
               format: int64
     FactureRequest:
       type: object
-      required: [numero, dateEmission, dateEcheance, montantHT, montantTVA, montantTTC, statut, societeId, clientId, lignes]
+      required:
+        [
+          numero,
+          dateEmission,
+          dateEcheance,
+          montantHT,
+          montantTVA,
+          montantTTC,
+          statut,
+          societeId,
+          clientId,
+          lignes,
+        ]
       properties:
         numero:
           type: string
@@ -1107,7 +1182,7 @@ components:
         lignes:
           type: array
           items:
-            $ref: '#/components/schemas/FactureLigneRequest'
+            $ref: "#/components/schemas/FactureLigneRequest"
     FactureLigneRequest:
       type: object
       required: [description, quantite, prixUnitaire, total]
@@ -1124,9 +1199,84 @@ components:
           format: double
     FactureResponse:
       allOf:
-        - $ref: '#/components/schemas/FactureRequest'
+        - $ref: "#/components/schemas/FactureRequest"
         - type: object
           properties:
             id:
               type: integer
               format: int64
+    RgieHabilitationStatus:
+      type: string
+      description: Statut calculé à partir de la date de validité
+      enum: [VALID, TO_RENEW, EXPIRED]
+    RgieHabilitation:
+      type: object
+      description: Habilitation RGIE détenue par un technicien
+      properties:
+        id:
+          type: integer
+          format: int64
+        label:
+          type: string
+          description: Nom du module ou de la formation RGIE
+        certificateNumber:
+          type: string
+          description: Numéro de certificat (optionnel)
+        authorityLevel:
+          type: string
+          description: Niveau d'habilitation (BA4, BA5, etc.)
+        validFrom:
+          type: string
+          format: date
+        validUntil:
+          type: string
+          format: date
+        status:
+          $ref: "#/components/schemas/RgieHabilitationStatus"
+    UserContextTeam:
+      type: object
+      description: Affectation actuelle à une équipe technique
+      properties:
+        teamId:
+          type: integer
+          format: int64
+        teamName:
+          type: string
+        assignedAt:
+          type: string
+          format: date
+    UserNotificationSummary:
+      type: object
+      description: Agrégat des notifications utilisateur
+      properties:
+        unreadCount:
+          type: integer
+          format: int64
+          description: Nombre de notifications non lues
+        criticalCount:
+          type: integer
+          format: int64
+          description: Nombre d'alertes critiques liées aux expirations RGIE (< 30 jours)
+    UserContextResponse:
+      type: object
+      description: Contexte enrichi d'un technicien RGIE
+      properties:
+        userId:
+          type: integer
+          format: int64
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          description: Rôle métier retourné en clair
+        team:
+          $ref: "#/components/schemas/UserContextTeam"
+        habilitations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RgieHabilitation"
+        notifications:
+          $ref: "#/components/schemas/UserNotificationSummary"

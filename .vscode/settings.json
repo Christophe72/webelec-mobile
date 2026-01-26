@@ -3,6 +3,10 @@
     "/^cd /c/saas/webelec-saas && python - <<'PY'\nfrom pathlib import Path\nfor path in Path\\('frontend/components/calculateur'\\)\\.glob\\('\\*\\.tsx'\\):\n    txt = path\\.read_text\\(encoding='utf-8'\\)\n    if \"Input\" in txt:\n        print\\(path\\)\nPY$/": {
       "approve": true,
       "matchCommandLine": true
+    },
+    "/^cd /c/saas/webelec-saas/backend && \\./mvnw test$/": {
+      "approve": true,
+      "matchCommandLine": true
     }
   }
 }
