@@ -1,9 +1,8 @@
-package com.webelec.backend.navigation.controller;
+package com.webelec.navigation.api;
 
-import com.webelec.backend.navigation.dto.NavigationDTO;
-import com.webelec.backend.navigation.service.NavigationService;
+import com.webelec.navigation.dto.NavigationDTO;
+import com.webelec.navigation.service.NavigationService;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -15,8 +14,8 @@ public class NavigationController {
         this.navigationService = navigationService;
     }
 
-    @GetMapping("/api/users/{userId}/navigation")
-    public NavigationDTO getNavigation(@PathVariable("userId") Long userId) {
-        return navigationService.getNavigation(userId);
+    @GetMapping("/api/navigation")
+    public NavigationDTO getNavigation() {
+        return navigationService.getNavigation();
     }
 }

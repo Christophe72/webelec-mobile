@@ -1,4 +1,4 @@
-package com.webelec.backend.navigation.dto;
+package com.webelec.navigation.dto;
 
 import java.util.List;
 

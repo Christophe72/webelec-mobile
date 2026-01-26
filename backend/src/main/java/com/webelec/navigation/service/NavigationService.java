@@ -1,19 +1,28 @@
-package com.webelec.backend.navigation.service;
+package com.webelec.navigation.service;
 
 import com.webelec.backend.exception.ResourceNotFoundException;
-import com.webelec.backend.navigation.domain.CompanyLicense;
-import com.webelec.backend.navigation.domain.NavigationLicense;
-import com.webelec.backend.navigation.domain.NavigationModule;
-import com.webelec.backend.navigation.domain.NavigationPermission;
-import com.webelec.backend.navigation.domain.NavigationRolePermission;
-import com.webelec.backend.navigation.domain.UserCompanyAssignment;
-import com.webelec.backend.navigation.dto.NavigationDTO;
-import com.webelec.backend.navigation.dto.NavigationItemDTO;
-import com.webelec.backend.navigation.dto.NavigationSectionDTO;
-import com.webelec.backend.navigation.repository.CompanyLicenseRepository;
-import com.webelec.backend.navigation.repository.NavigationModuleRepository;
-import com.webelec.backend.navigation.repository.NavigationRolePermissionRepository;
-import com.webelec.backend.navigation.repository.UserCompanyAssignmentRepository;
+import com.webelec.backend.model.Societe;
+import com.webelec.backend.model.SocieteSelection;
+import com.webelec.backend.model.UserSocieteRole;
+import com.webelec.backend.model.Utilisateur;
+import com.webelec.backend.model.UtilisateurRole;
+import com.webelec.backend.repository.SocieteSelectionRepository;
+import com.webelec.backend.repository.UserSocieteRoleRepository;
+import com.webelec.backend.security.AuthenticatedUtilisateur;
+import com.webelec.navigation.domain.CompanyLicense;
+import com.webelec.navigation.domain.NavigationLicense;
+import com.webelec.navigation.domain.NavigationModule;
+import com.webelec.navigation.domain.NavigationPermission;
+import com.webelec.navigation.domain.NavigationRolePermission;
+import com.webelec.navigation.dto.NavigationDTO;
+import com.webelec.navigation.dto.NavigationItemDTO;
+import com.webelec.navigation.dto.NavigationSectionDTO;
+import com.webelec.navigation.repository.CompanyLicenseRepository;
+import com.webelec.navigation.repository.NavigationModuleRepository;
+import com.webelec.navigation.repository.NavigationRolePermissionRepository;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,44 +43,82 @@ public class NavigationService {
     private final NavigationModuleRepository navigationModuleRepository;
     private final NavigationRolePermissionRepository navigationRolePermissionRepository;
     private final CompanyLicenseRepository companyLicenseRepository;
-    private final UserCompanyAssignmentRepository userCompanyAssignmentRepository;
+    private final SocieteSelectionRepository societeSelectionRepository;
+    private final UserSocieteRoleRepository userSocieteRoleRepository;
 
     public NavigationService(NavigationModuleRepository navigationModuleRepository,
                              NavigationRolePermissionRepository navigationRolePermissionRepository,
                              CompanyLicenseRepository companyLicenseRepository,
-                             UserCompanyAssignmentRepository userCompanyAssignmentRepository) {
+                             SocieteSelectionRepository societeSelectionRepository,
+                             UserSocieteRoleRepository userSocieteRoleRepository) {
         this.navigationModuleRepository = navigationModuleRepository;
         this.navigationRolePermissionRepository = navigationRolePermissionRepository;
         this.companyLicenseRepository = companyLicenseRepository;
-        this.userCompanyAssignmentRepository = userCompanyAssignmentRepository;
+        this.societeSelectionRepository = societeSelectionRepository;
+        this.userSocieteRoleRepository = userSocieteRoleRepository;
     }
 
-    public NavigationDTO getNavigation(Long userId) {
-        UserCompanyAssignment assignment = userCompanyAssignmentRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non rattaché à une société"));
+    public NavigationDTO getNavigation() {
+        Utilisateur utilisateur = requireAuthenticatedUtilisateur();
+        SocieteSelection selection = societeSelectionRepository
+                .findFirstByUtilisateurIdOrderBySelectedAtDesc(utilisateur.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Aucune société active sélectionnée"));
 
-        Set<String> permissionCodes = resolvePermissions(assignment.getRoleCode());
-        Set<String> activeLicenseCodes = resolveActiveLicenses(assignment.getCompanyId());
+        Long companyId = extractCompanyId(selection);
+        UtilisateurRole role = resolveRole(utilisateur.getId(), companyId);
+        Set<String> permissionCodes = resolvePermissions(role);
+        if (permissionCodes.isEmpty()) {
+            return new NavigationDTO(List.of());
+        }
+
+        Set<String> activeLicenseCodes = resolveActiveLicenses(companyId);
         List<NavigationSectionDTO> sections = buildSections(permissionCodes, activeLicenseCodes);
-
-        return new NavigationDTO(
-                assignment.getUserId(),
-                assignment.getCompanyId(),
-                assignment.getRoleCode(),
-                sections
-        );
+        return new NavigationDTO(sections);
     }
 
-    private Set<String> resolvePermissions(String roleCode) {
-        if (roleCode == null || roleCode.isBlank()) {
+    private Utilisateur requireAuthenticatedUtilisateur() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Utilisateur non authentifié");
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof AuthenticatedUtilisateur authenticated) {
+            Utilisateur utilisateur = authenticated.getUtilisateur();
+            if (utilisateur != null && utilisateur.getId() != null) {
+                return utilisateur;
+            }
+        }
+        throw new AccessDeniedException("Utilisateur non authentifié");
+    }
+
+    private Long extractCompanyId(SocieteSelection selection) {
+        Societe societe = selection.getSociete();
+        if (societe == null || societe.getId() == null) {
+            throw new ResourceNotFoundException("Société active introuvable");
+        }
+        return societe.getId();
+    }
+
+    private UtilisateurRole resolveRole(Long userId, Long companyId) {
+        return userSocieteRoleRepository.findByUtilisateurIdAndSocieteId(userId, companyId)
+                .map(UserSocieteRole::getRole)
+                .orElseThrow(() -> new ResourceNotFoundException("Aucun rôle actif pour cette société"));
+    }
+
+    private Set<String> resolvePermissions(UtilisateurRole role) {
+        if (role == null) {
             return Set.of();
         }
-        return navigationRolePermissionRepository.findByRoleCode(roleCode).stream()
+        return navigationRolePermissionRepository.findByRoleCode(role.name()).stream()
                 .map(NavigationRolePermission::getPermission)
                 .filter(Objects::nonNull)
                 .map(NavigationPermission::getCode)
-                .filter(code -> code != null && !code.isBlank())
+                .filter(this::hasText)
                 .collect(Collectors.toSet());
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 
     private Set<String> resolveActiveLicenses(Long companyId) {
@@ -86,7 +133,7 @@ public class NavigationService {
                 .map(CompanyLicense::getLicense)
                 .filter(Objects::nonNull)
                 .map(NavigationLicense::getCode)
-                .filter(code -> code != null && !code.isBlank())
+                .filter(this::hasText)
                 .collect(Collectors.toSet());
     }
 
@@ -100,9 +147,6 @@ public class NavigationService {
     }
 
     private List<NavigationSectionDTO> buildSections(Set<String> permissionCodes, Set<String> activeLicenses) {
-        if (permissionCodes.isEmpty()) {
-            return List.of();
-        }
         List<NavigationModule> modules = navigationModuleRepository.findByActiveTrueOrderByDisplayOrderAsc();
         if (modules.isEmpty()) {
             return List.of();
@@ -130,14 +174,14 @@ public class NavigationService {
                                        Set<String> permissionCodes,
                                        Set<String> activeLicenses) {
         NavigationPermission permission = module.getPermission();
-        if (permission == null || permission.getCode() == null) {
+        if (permission == null || !hasText(permission.getCode())) {
             return false;
         }
         if (!permissionCodes.contains(permission.getCode())) {
             return false;
         }
         NavigationLicense requiredLicense = module.getRequiredLicense();
-        if (requiredLicense == null || requiredLicense.getCode() == null) {
+        if (requiredLicense == null || !hasText(requiredLicense.getCode())) {
             return true;
         }
         return activeLicenses.contains(requiredLicense.getCode());
@@ -148,7 +192,8 @@ public class NavigationService {
                 module.getCode(),
                 module.getLabel(),
                 module.getRoute(),
-                module.getIcon()
+                module.getIcon(),
+                module.isActive()
         );
     }
 

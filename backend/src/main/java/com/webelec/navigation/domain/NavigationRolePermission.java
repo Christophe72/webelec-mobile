@@ -1,4 +1,4 @@
-package com.webelec.backend.navigation.domain;
+package com.webelec.navigation.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

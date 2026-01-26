@@ -1,11 +1,8 @@
-package com.webelec.backend.navigation.dto;
+package com.webelec.navigation.dto;
 
 import java.util.List;
 
 public record NavigationDTO(
-        Long userId,
-        Long companyId,
-        String role,
         List<NavigationSectionDTO> sections
 ) {
     public NavigationDTO {

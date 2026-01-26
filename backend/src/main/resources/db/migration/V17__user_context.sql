@@ -1,21 +1,21 @@
 CREATE TABLE technician_teams (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT IDENTITY(1, 1) PRIMARY KEY,
     code VARCHAR(64) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(512)
 );
 
 CREATE TABLE technician_team_assignments (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT IDENTITY(1, 1) PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES utilisateurs(id) ON DELETE CASCADE,
     team_id BIGINT NOT NULL REFERENCES technician_teams(id) ON DELETE CASCADE,
-    assigned_at DATE NOT NULL DEFAULT CURRENT_DATE,
+    assigned_at DATE NOT NULL DEFAULT CONVERT(date, GETDATE()),
     ended_at DATE,
     CONSTRAINT uq_team_assignment UNIQUE (user_id, team_id, assigned_at)
 );
 
 CREATE TABLE rgie_habilitations (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT IDENTITY(1, 1) PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES utilisateurs(id) ON DELETE CASCADE,
     label VARCHAR(255) NOT NULL,
     certificate_number VARCHAR(100),
@@ -25,13 +25,13 @@ CREATE TABLE rgie_habilitations (
 );
 
 CREATE TABLE user_notifications (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT IDENTITY(1, 1) PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES utilisateurs(id) ON DELETE CASCADE,
     type VARCHAR(50) NOT NULL,
     message VARCHAR(1024),
-    is_read BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
-    read_at TIMESTAMP WITHOUT TIME ZONE
+    is_read BIT NOT NULL DEFAULT 0,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    read_at DATETIME2
 );
 
 CREATE INDEX idx_team_assignments_user_active
@@ -46,4 +46,4 @@ CREATE INDEX idx_user_notifications_user
 
 CREATE INDEX idx_user_notifications_unread
     ON user_notifications (user_id)
-    WHERE is_read = FALSE;
+    WHERE is_read = 0;

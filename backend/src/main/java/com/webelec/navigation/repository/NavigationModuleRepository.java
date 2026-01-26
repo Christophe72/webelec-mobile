@@ -1,6 +1,6 @@
-package com.webelec.backend.navigation.repository;
+package com.webelec.navigation.repository;
 
-import com.webelec.backend.navigation.domain.NavigationModule;
+import com.webelec.navigation.domain.NavigationModule;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 

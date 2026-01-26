@@ -1,6 +1,6 @@
-package com.webelec.backend.navigation.repository;
+package com.webelec.navigation.repository;
 
-import com.webelec.backend.navigation.domain.CompanyLicense;
+import com.webelec.navigation.domain.CompanyLicense;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

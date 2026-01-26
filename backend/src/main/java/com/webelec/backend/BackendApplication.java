@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @EnableConfigurationProperties({SocieteSeedProperties.class, JwtProperties.class})
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.webelec.backend", "com.webelec.navigation"})
 public class BackendApplication {
 
     public static void main(String[] args) {

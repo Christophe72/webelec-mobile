@@ -1,4 +1,4 @@
-package com.webelec.backend.navigation.domain;
+package com.webelec.navigation.domain;
 
 import com.webelec.backend.model.Societe;
 import jakarta.persistence.Column;
