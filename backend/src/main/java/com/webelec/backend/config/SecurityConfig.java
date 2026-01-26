@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -35,6 +36,20 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers
+                    // Protection XSS: empêche l'injection de scripts malveillants
+                    .xssProtection(xss -> xss
+                        .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+                    // Protection Clickjacking: empêche l'application d'être chargée dans une iframe
+                    .frameOptions(frame -> frame.deny())
+                    // Content-Type Options: empêche le navigateur de deviner le type MIME
+                    .contentTypeOptions(contentType -> {})
+                    // HSTS: force HTTPS pendant 1 an
+                    .httpStrictTransportSecurity(hsts -> hsts
+                        .includeSubDomains(true)
+                        .maxAgeInSeconds(31536000)
+                    )
+                )
                 .exceptionHandling(ex -> ex
                     // Retourne 401 au lieu de 403 pour les utilisateurs non authentifiés
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
-@Profile({"dev", "default"})
+@Profile("dev")
 @EnableMethodSecurity
 public class DevSecurityConfig {
 

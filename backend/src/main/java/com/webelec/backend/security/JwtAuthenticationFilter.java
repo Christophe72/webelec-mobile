@@ -50,7 +50,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtService.extractUsername(token);
         } catch (JwtException | IllegalArgumentException ex) {
-            log.warn("[JWT FILTER] Token invalide: {}", ex.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("[JWT FILTER] Token invalide: {}", ex.getMessage());
+            } else {
+                log.warn("[JWT FILTER] Échec d'authentification JWT");
+            }
             filterChain.doFilter(request, response);
             return;
         }
@@ -68,7 +72,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             } catch (JwtException | IllegalArgumentException ex) {
-                log.warn("[JWT FILTER] Token invalide lors de la validation: {}", ex.getMessage());
+                if (log.isDebugEnabled()) {
+                    log.debug("[JWT FILTER] Validation échouée: {}", ex.getMessage());
+                } else {
+                    log.warn("[JWT FILTER] Échec de validation du token");
+                }
             }
         }
         filterChain.doFilter(request, response);

@@ -19,7 +19,7 @@ public class CorsConfig {
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
 
-    @Value("${cors.allowed-origins:*}")
+    @Value("${cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
     private String allowedOrigins;
 
     @Bean

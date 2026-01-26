@@ -41,9 +41,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        # En production: n'exposer que health (pas info ni metrics pour éviter les fuites d'info)
+        include: health
   endpoint:
     health:
+      # Ne pas montrer les détails aux utilisateurs non authentifiés
       show-details: never
 
 logging:
