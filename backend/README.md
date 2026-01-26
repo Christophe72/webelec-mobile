@@ -5,6 +5,7 @@ Backend du SaaS WebElec pour électriciens belges. L'API est écrite en Java 21 
 ---
 
 ## 1. Aperçu rapide
+
 - **Langage** : Java 21
 - **Framework** : Spring Boot 3.5.x (Web, Data JPA, Validation)
 - **Base de données** : PostgreSQL 16 (Docker) + H2 en mémoire pour les tests rapides
@@ -17,6 +18,7 @@ L'application suit la structure standard `controller → service → repository 
 ---
 
 ## 2. Architecture applicative
+
 ```
 src/main/java/com/webelec/backend/
  ├─ controller/   # Endpoints REST (Société, Client, Chantier, Produit, etc.)
@@ -26,11 +28,13 @@ src/main/java/com/webelec/backend/
  ├─ dto/          # DTO exposés aux clients + Bean Validation
  └─ BackendApplication.java
 ```
+
 Les tests sont regroupés dans `src/test/java/com/webelec/backend/` par couche (controllers, services, dto) avec un test d'intégration `DatabaseConnectionTest` basé sur Testcontainers.
 
 ---
 
 ## 3. Prérequis
+
 1. **Java 21** (JDK complet installé et dans le PATH)
 2. **Maven Wrapper** (`mvnw.cmd` sous Windows, `./mvnw` sous Linux/macOS)
 3. **Docker Desktop** (pour PostgreSQL + Testcontainers)
@@ -39,13 +43,14 @@ Les tests sont regroupés dans `src/test/java/com/webelec/backend/` par couche (
 ---
 
 ## 4. Configuration des profils Spring
+
 Les propriétés communes vivent dans `src/main/resources/application.yml`. Les profils spécialisés sont situés dans `application-dev.yml`, `application-prod.yml` et `application-test.yml` (optionnel).
 
-| Profil | Usage | Source principale | Particularités |
-| --- | --- | --- | --- |
-| `dev` | Développement local | `application-dev.yml` | Connexion au PostgreSQL Docker, `ddl-auto=update`, logs SQL actifs |
-| `test` | Tests automatisés | Testcontainers via annotations | PostgreSQL éphémère, pas de config externe requise |
-| `prod` | Déploiement VPS/Cloud | `application-prod.yml` | Credentials fournis via variables d'environnement, `ddl-auto=validate` |
+| Profil | Usage                 | Source principale              | Particularités                                                         |
+| ------ | --------------------- | ------------------------------ | ---------------------------------------------------------------------- |
+| `dev`  | Développement local   | `application-dev.yml`          | Connexion au PostgreSQL Docker, `ddl-auto=update`, logs SQL actifs     |
+| `test` | Tests automatisés     | Testcontainers via annotations | PostgreSQL éphémère, pas de config externe requise                     |
+| `prod` | Déploiement VPS/Cloud | `application-prod.yml`         | Credentials fournis via variables d'environnement, `ddl-auto=validate` |
 
 Variables d'environnement attendues en production : `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`.
 
@@ -54,24 +59,29 @@ Variables d'environnement attendues en production : `DB_HOST`, `DB_PORT`, `DB_NA
 ## 4bis. Authentification et sécurité (décembre 2025)
 
 ### Endpoints publics
+
 - `POST /api/auth/login` — Connexion
-- `POST /api/auth/register` — Inscription  
+- `POST /api/auth/register` — Inscription
 - `POST /api/auth/refresh` — Rafraîchissement du token
 - `GET /api/auth/me` — Profil de l'utilisateur connecté
 
 ### Sécurité des endpoints
+
 Tous les autres endpoints nécessitent un **token JWT** dans le header :
+
 ```
 Authorization: Bearer <token>
 ```
 
 ### Codes de réponse sécurité
-| Code | Signification |
-|------|---------------|
+
+| Code  | Signification                            |
+| ----- | ---------------------------------------- |
 | `401` | Non authentifié (token absent ou expiré) |
-| `403` | Accès refusé (rôle insuffisant) |
+| `403` | Accès refusé (rôle insuffisant)          |
 
 ### Exemple de requête authentifiée
+
 ```bash
 # 1. Login
 curl.exe -X POST http://localhost:8080/api/auth/login ^
@@ -86,34 +96,73 @@ curl.exe -X GET http://localhost:8080/api/societes ^
 ---
 
 ## 5. Lancer l'environnement
+
 ### 5.1 Base de données PostgreSQL (Docker)
+
 Depuis le répertoire contenant le `docker-compose.yml` (ou en utilisant une commande `docker run` équivalente) :
+
 ```bash
 docker compose up -d postgres
 ```
-Paramètres recommandés : base `webelec_db`, utilisateur `webelec`, mot de passe `webelec_pwd`, port `5432`.
+
+Paramètres recommandés : base `webelec`, utilisateur `postgres`, mot de passe `postgres`, port `5432`.
 
 ### 5.2 Démarrer l'API en profil `dev`
+
 Sous Windows :
+
 ```bash
 mvnw.cmd spring-boot:run -Dspring.profiles.active=dev
 ```
+
 Sous Linux/macOS :
+
 ```bash
 ./mvnw spring-boot:run -Dspring.profiles.active=dev
 ```
+
 L'API écoute sur `http://localhost:8080`.
 
+> En profil `dev`, la sécurité est automatiquement contournée : un utilisateur
+> existant est injecté dans le `SecurityContext` pour chaque requête. Par
+> défaut, l'email `admin@webelec.fr` est utilisé, mais vous pouvez le changer
+> via la variable `WEBELEC_DEV_USER_EMAIL` (ou la propriété
+> `webelec.security.dev-user-email`).
+
 ### 5.3 Vérifier la connexion PostgreSQL
+
 ```bash
-psql -h localhost -U webelec -d webelec_db
+psql -h localhost -U postgres -d webelec
 ```
+
 En cas de besoin, ajustez les propriétés `spring.datasource.*` dans `application-dev.yml` pour refléter vos valeurs locales.
+
+### 5.4 Utiliser PostgreSQL installé localement (sans Docker)
+
+Si vous avez PostgreSQL installé directement sur votre machine :
+
+1. Créez une base dédiée (ex. `webelec`).
+2. Exportez les variables avant de lancer `mvnw` (adaptation à vos credentials) :
+   - PowerShell
+     ```powershell
+     $env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/webelec?currentSchema=public"
+     $env:SPRING_DATASOURCE_USERNAME="postgres"
+     $env:SPRING_DATASOURCE_PASSWORD="postgres"
+     ```
+   - bash
+     ```bash
+     export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/webelec?currentSchema=public"
+     export SPRING_DATASOURCE_USERNAME=postgres
+     export SPRING_DATASOURCE_PASSWORD=postgres
+     ```
+3. Lancez ensuite `mvnw spring-boot:run -Dspring-boot.run.profiles=dev` dans ce même terminal. Les valeurs par défaut d'`application-dev.yml` pointent déjà vers `localhost`, mais ces variables vous évitent de modifier les fichiers du projet.
 
 ---
 
 ## 6. Seed et données d'exemple
+
 `DataSeeder` insère des sociétés de démonstration au démarrage seulement si la table est vide. La liste est configurable dans `application.yml` :
+
 ```yaml
 webelec:
   seed:
@@ -124,29 +173,39 @@ webelec:
         telephone: "01 23 45 67 89"
         adresse: "12 rue des Ouvriers, Paris"
 ```
+
 Champs requis : `nom`, `tva`. Les autres champs sont optionnels. Ajoutez autant d'entrées que nécessaire.
 
 ---
 
 ## 7. Tests automatisés
+
 ### 7.1 Tests unitaires et MockMvc
+
 Les tests couvrent :
+
 - DTO (`src/test/java/com/webelec/backend/dto/`) pour garantir les conversions entité ⇄ DTO
 - Services (`src/test/java/com/webelec/backend/service/`)
 - Contrôleurs (`src/test/java/com/webelec/backend/controller/`) via MockMvc (statuts 200/400/404/409/204)
 
 ### 7.2 Testcontainers PostgreSQL
+
 `DatabaseConnectionTest` démarre un conteneur PostgreSQL 16, injecte dynamiquement l'URL JDBC et valide la connexion `DataSource`.
 
 ### 7.3 Commandes utiles
+
 Sous Windows :
+
 ```bash
 mvnw.cmd clean test -Dspring.profiles.active=test
 ```
+
 Sous Linux/macOS :
+
 ```bash
 ./mvnw clean test -Dspring.profiles.active=test
 ```
+
 Après configuration du plugin Surefire avec `spring.profiles.active=test`, l'option `-Dspring.profiles.active=test` devient facultative.
 
 Résultat attendu actuel : 69 tests, BUILD SUCCESS.
@@ -154,19 +213,20 @@ Résultat attendu actuel : 69 tests, BUILD SUCCESS.
 ---
 
 ## 8. Ressources REST disponibles
+
 Chaque ressource expose des DTO validés (@NotBlank, @Email, etc.) et un format d'erreur commun `ApiError`.
 
-| Ressource | Endpoint principal | Fonctions clés |
-| --- | --- | --- |
-| Sociétés | `/api/societes` | CRUD complet + validation TVA, filtre par ID |
-| Utilisateurs | `/api/utilisateurs` | CRUD, filtrage par société, rôles textuels |
-| Clients | `/api/clients` | CRUD, filtre `/societe/{id}` |
-| Chantiers | `/api/chantiers` | Listing, création, filtre par société/chantier |
-| Produits (stock) | `/api/produits` | Gestion du stock, filtres société |
+| Ressource        | Endpoint principal      | Fonctions clés                                    |
+| ---------------- | ----------------------- | ------------------------------------------------- |
+| Sociétés         | `/api/societes`         | CRUD complet + validation TVA, filtre par ID      |
+| Utilisateurs     | `/api/utilisateurs`     | CRUD, filtrage par société, rôles textuels        |
+| Clients          | `/api/clients`          | CRUD, filtre `/societe/{id}`                      |
+| Chantiers        | `/api/chantiers`        | Listing, création, filtre par société/chantier    |
+| Produits (stock) | `/api/produits`         | Gestion du stock, filtres société                 |
 | Produits avancés | `/api/produits-avances` | Catalogue enrichi (prix achat/vente, fournisseur) |
-| Interventions | `/api/interventions` | Filtres `/societe/{id}` et `/chantier/{id}` |
-| Devis | `/api/devis` | Gestion des lignes, filtres société/client |
-| Factures | `/api/factures` | Statuts d'encaissement, filtres société/client |
+| Interventions    | `/api/interventions`    | Filtres `/societe/{id}` et `/chantier/{id}`       |
+| Devis            | `/api/devis`            | Gestion des lignes, filtres société/client        |
+| Factures         | `/api/factures`         | Statuts d'encaissement, filtres société/client    |
 
 Pour des exemples de payloads et le contrat détaillé, consultez `src/main/resources/api-spec.yaml` ou les tests MockMvc correspondants.
 
@@ -180,27 +240,28 @@ Chaque endpoint REST attend un payload JSON conforme au DTO exposé. Les champs 
 
 #### Permissions par rôle
 
-| Endpoint | ADMIN | GERANT | TECHNICIEN | Non auth |
-|----------|:-----:|:------:|:----------:|:--------:|
-| `GET /api/societes` | ✅ (toutes) | ✅ (ses sociétés) | ✅ (ses sociétés) | ❌ 401 |
-| `GET /api/societes/{id}` | ✅ | ✅ (si membre) | ✅ (si membre) | ❌ 401 |
-| `POST /api/societes` | ✅ | ❌ 403 | ❌ 403 | ❌ 401 |
-| `PUT /api/societes/{id}` | ✅ | ✅ (si membre) | ❌ 403 | ❌ 401 |
-| `DELETE /api/societes/{id}` | ✅ | ❌ 403 | ❌ 403 | ❌ 401 |
+| Endpoint                    |    ADMIN    |      GERANT       |    TECHNICIEN     | Non auth |
+| --------------------------- | :---------: | :---------------: | :---------------: | :------: |
+| `GET /api/societes`         | ✅ (toutes) | ✅ (ses sociétés) | ✅ (ses sociétés) |  ❌ 401  |
+| `GET /api/societes/{id}`    |     ✅      |  ✅ (si membre)   |  ✅ (si membre)   |  ❌ 401  |
+| `POST /api/societes`        |     ✅      |      ❌ 403       |      ❌ 403       |  ❌ 401  |
+| `PUT /api/societes/{id}`    |     ✅      |  ✅ (si membre)   |      ❌ 403       |  ❌ 401  |
+| `DELETE /api/societes/{id}` |     ✅      |      ❌ 403       |      ❌ 403       |  ❌ 401  |
 
 #### Champs du payload
 
-| Champ | Type | Obligatoire | Validation | Exemple |
-|-------|------|:-----------:|------------|---------|
-| `nom` | string | ✅ | max 255 car. | `"WebElec SPRL"` |
-| `tva` | string | ✅ | max 32 car. | `"BE0123456789"` |
-| `email` | string | ❌ | format email, unique | `"contact@webelec.be"` |
-| `telephone` | string | ❌ | 6-30 car., format `[0-9+()-./\s]` | `"+32 2 123 45 67"` |
-| `adresse` | string | ❌ | max 512 car. | `"Rue de l'Électricité 42"` |
+| Champ       | Type   | Obligatoire | Validation                        | Exemple                     |
+| ----------- | ------ | :---------: | --------------------------------- | --------------------------- |
+| `nom`       | string |     ✅      | max 255 car.                      | `"WebElec SPRL"`            |
+| `tva`       | string |     ✅      | max 32 car.                       | `"BE0123456789"`            |
+| `email`     | string |     ❌      | format email, unique              | `"contact@webelec.be"`      |
+| `telephone` | string |     ❌      | 6-30 car., format `[0-9+()-./\s]` | `"+32 2 123 45 67"`         |
+| `adresse`   | string |     ❌      | max 512 car.                      | `"Rue de l'Électricité 42"` |
 
 #### Exemples
 
 **✅ Création valide (ADMIN requis)** :
+
 ```bash
 curl.exe -X POST http://localhost:8080/api/societes ^
   -H "Authorization: Bearer <token>" ^
@@ -209,6 +270,7 @@ curl.exe -X POST http://localhost:8080/api/societes ^
 ```
 
 **✅ Exemple minimal** :
+
 ```json
 {
   "nom": "Ma Société",
@@ -217,13 +279,16 @@ curl.exe -X POST http://localhost:8080/api/societes ^
 ```
 
 **❌ Exemple invalide** (nom vide → 400) :
+
 ```json
 {
   "nom": "",
   "tva": "BE0123456789"
 }
 ```
+
 Réponse :
+
 ```json
 {
   "timestamp": "2025-12-27T10:00:00Z",
@@ -235,11 +300,13 @@ Réponse :
 ```
 
 **❌ Email déjà utilisé** → 409 :
+
 ```
 "Email déjà utilisé"
 ```
 
 ### Utilisateurs (`/api/utilisateurs`)
+
 - **POST /api/utilisateurs**
   ```json
   {
@@ -253,6 +320,7 @@ Réponse :
   Champs requis : `nom`, `prenom`, `email`, `societeId`, `role`.
 
 ### Clients (`/api/clients`)
+
 - **POST /api/clients**
   ```json
   {
@@ -266,6 +334,7 @@ Réponse :
   Champs requis : `nom`, `societeId`. Les autres sont optionnels.
 
 ### Chantiers (`/api/chantiers`)
+
 - **POST /api/chantiers**
   ```json
   {
@@ -278,6 +347,7 @@ Réponse :
   Champs requis : `nom`, `societeId`, `clientId`.
 
 ### Produits (`/api/produits`)
+
 - **POST /api/produits**
   ```json
   {
@@ -290,6 +360,7 @@ Réponse :
   Champs requis : `nom`, `societeId`, `quantite`.
 
 ### Authentification (`/api/auth`)
+
 - **POST /api/auth/login**
   ```json
   {
@@ -330,31 +401,34 @@ Toutes les erreurs sont normalisées via `ApiError` :
 
 Mapping des principales erreurs :
 
-| Scénario | Code | Message |
-|----------|------|---------|
-| Validation DTO | 400 | `Requête invalide` + détails sur les champs |
-| Ressource absente | 404 | `Societe non trouvée`, `Client non trouvé`, etc. |
-| Conflit métier (doublon email/numéro) | 409 | Message métier ciblé |
-| Non authentifié | 401 | `Token JWT invalide ou expiré` |
-| Rôle insuffisant | 403 | `Accès refusé : vous n'avez pas les droits nécessaires` |
-| Erreur interne | 500 | `Erreur interne inattendue` |
+| Scénario                              | Code | Message                                                 |
+| ------------------------------------- | ---- | ------------------------------------------------------- |
+| Validation DTO                        | 400  | `Requête invalide` + détails sur les champs             |
+| Ressource absente                     | 404  | `Societe non trouvée`, `Client non trouvé`, etc.        |
+| Conflit métier (doublon email/numéro) | 409  | Message métier ciblé                                    |
+| Non authentifié                       | 401  | `Token JWT invalide ou expiré`                          |
+| Rôle insuffisant                      | 403  | `Accès refusé : vous n'avez pas les droits nécessaires` |
+| Erreur interne                        | 500  | `Erreur interne inattendue`                             |
 
 Le front peut s'appuyer sur ce format pour afficher les messages ou tracer les erreurs.
 
 ---
 
 ## 9. Exemples de requêtes REST (curl, Windows)
+
 ```bash
 curl.exe -X GET http://localhost:8080/api/chantiers
 curl.exe -X POST http://localhost:8080/api/clients ^
   -H "Content-Type: application/json" ^
   -d "{\"nom\":\"Dupont\",\"prenom\":\"Alice\",\"societeId\":1}"
 ```
+
 Adaptez ces commandes à vos besoins (PUT/DELETE) ou utilisez un client comme Insomnia/Postman.
 
 ---
 
 ## 10. Bonnes pratiques appliquées
+
 - Injection par constructeur dans toutes les classes Spring
 - Validation systématique des DTO avec `@Valid`
 - `ResponseEntity<?>` pour les endpoints qui retournent des statuts spécifiques
@@ -365,6 +439,7 @@ Adaptez ces commandes à vos besoins (PUT/DELETE) ou utilisez un client comme In
 ---
 
 ## 11. Roadmap backend
+
 1. **Configuration Maven Surefire** pour activer automatiquement le profil `test`
 2. **Pipeline CI GitHub Actions** : checkout, JDK 21, cache Maven, `mvn test`, `mvn package`
 3. **Spring Security** : authentification JWT, rôles (ADMIN/TECH/USER)
@@ -372,35 +447,43 @@ Adaptez ces commandes à vos besoins (PUT/DELETE) ou utilisez un client comme In
 5. **Endpoints avancés** : IA, RGIE, PDF, IoT (après formalisation des règles métier)
 6. **Observabilité** : activer metrics/health actuateurs et logs structurés
 
-| Issue GitHub | Objectif | Priorité | Labels suggérés |
-| --- | --- | --- | --- |
-| `#01` – CI Pipeline | Créer un workflow GitHub Actions (build, tests, packaging) déclenché sur `main` et PR. | Haute | `ci`, `automation` |
-| `#02` – Spring Security | Ajouter un module JWT avec rôles ADMIN/TECH/USER et guards sur les endpoints sensibles. | Haute | `security`, `enhancement` |
-| `#03` – Flyway Migration | Introduire Flyway, versionner le schéma actuel et documenter la procédure de migration. | Haute | `database`, `migration` |
-| `#04` – Test Profile Auto | Configurer Surefire/Failsafe pour injecter `spring.profiles.active=test` par défaut. | Moyenne | `testing`, `build` |
-| `#05` – Observabilité | Activer Actuator (health, metrics), préparer un dashboard Grafana/Prometheus. | Moyenne | `observability`, `feature` |
-| `#06` – Endpoints avancés | Définir l’étendue (IA, RGIE, PDF, IoT) puis créer des sous-issues spécifiques. | Basse | `product`, `needs-spec` |
+| Issue GitHub              | Objectif                                                                                | Priorité | Labels suggérés            |
+| ------------------------- | --------------------------------------------------------------------------------------- | -------- | -------------------------- |
+| `#01` – CI Pipeline       | Créer un workflow GitHub Actions (build, tests, packaging) déclenché sur `main` et PR.  | Haute    | `ci`, `automation`         |
+| `#02` – Spring Security   | Ajouter un module JWT avec rôles ADMIN/TECH/USER et guards sur les endpoints sensibles. | Haute    | `security`, `enhancement`  |
+| `#03` – Flyway Migration  | Introduire Flyway, versionner le schéma actuel et documenter la procédure de migration. | Haute    | `database`, `migration`    |
+| `#04` – Test Profile Auto | Configurer Surefire/Failsafe pour injecter `spring.profiles.active=test` par défaut.    | Moyenne  | `testing`, `build`         |
+| `#05` – Observabilité     | Activer Actuator (health, metrics), préparer un dashboard Grafana/Prometheus.           | Moyenne  | `observability`, `feature` |
+| `#06` – Endpoints avancés | Définir l’étendue (IA, RGIE, PDF, IoT) puis créer des sous-issues spécifiques.          | Basse    | `product`, `needs-spec`    |
 
 ---
 
 ## 12. Commandes récapitulatives
+
 - Lancer en dev :
+
 ```bash
 mvnw.cmd spring-boot:run -Dspring.profiles.active=dev
 ```
+
 - Lancer tous les tests :
+
 ```bash
 mvnw.cmd clean test -Dspring.profiles.active=test
 ```
+
 - Construire le jar :
+
 ```bash
 mvnw.cmd clean package -DskipTests
 ```
+
 (Remplacez par `./mvnw` sous Linux/macOS.)
 
 ---
 
 ## 13. Références utiles
+
 - `src/main/resources/application-*.yml` : configuration par profil
 - `src/main/resources/api-spec.yaml` : contrat OpenAPI
 - `src/test/java/com/webelec/backend/controller/*ControllerTest.java` : exemples MockMvc
@@ -427,19 +510,22 @@ Le backend est prêt pour un branchement Next.js, l'intégration CI/CD et l'ajou
 ## 14. Intégration CI/CD (GitHub Actions)
 
 Le backend WebElec est doté d’un workflow CI/CD automatisé :
+
 - Build, test (profil `test`) et packaging à chaque push ou PR sur `main`/`develop`.
 - JDK 21, cache Maven, artefact JAR archivé.
 - Profil de test injecté automatiquement via Maven Surefire.
 
 ### Fichier de workflow
+
 `.github/workflows/ci-backend.yml` :
+
 ```yaml
 name: CI Backend WebElec
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 jobs:
   build-test-package:
     runs-on: ubuntu-latest
@@ -449,8 +535,8 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          distribution: "temurin"
+          java-version: "21"
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
@@ -470,7 +556,9 @@ jobs:
 ```
 
 ### Configuration Maven Surefire
+
 Le profil `test` est injecté automatiquement :
+
 ```xml
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
@@ -535,11 +623,13 @@ Documentation officielle : https://flywaydb.org/documentation/
 ## 16. Observabilité (Actuator & logs)
 
 L’observabilité est activée via Spring Boot Actuator :
+
 - Endpoints exposés : `/actuator/health`, `/actuator/info`, `/actuator/metrics`
 - Détails de santé complets (`show-details: always`)
 - Accessible en local sur `http://localhost:8080/actuator/health` etc.
 
 Configuration dans `application.yml` :
+
 ```yaml
 management:
   endpoints:
@@ -552,6 +642,7 @@ management:
 ```
 
 ### Logs structurés
+
 - Niveau par défaut : INFO (root), INFO (Spring Web), WARN (SQL)
 - Format console lisible :
   ```yaml
@@ -573,6 +664,7 @@ La configuration est prête pour une intégration Grafana/Prometheus ou tout out
 ## 17. Formalisation RGIE & IoT avant nouveaux endpoints
 
 Avant de livrer de nouveaux endpoints liés au RGIE ou à l’IoT, réunir et valider les éléments suivants :
+
 1. **Spécifications RGIE officielles** : article, paragraphe, version 2025, seuils/chiffres exacts, cas d’application.
 2. **Modélisation métier** : entités concernées (circuits, protections, capteurs, etc.), relations exactes, règles d’orchestration.
 3. **Flux IoT documentés** : topic MQTT, payload JSON, unités (V, A, °C), fréquence d’échantillonnage, mécanismes d’authentification.
@@ -581,26 +673,29 @@ Avant de livrer de nouveaux endpoints liés au RGIE ou à l’IoT, réunir et va
 
 Sans ces données, appliquer la règle stricte : `Données insuffisantes pour une réponse fiable en mode sécurité backend.` Aucun endpoint ne doit être créé ou exposé.
 
-Pour formaliser une nouvelle demande, utiliser l’issue template `\`.github/ISSUE_TEMPLATE/rgie-iot-spec.yml` (menu *New issue → RFC – Endpoint RGIE/IoT*). Aucune implémentation n’est lancée sans ticket approuvé.
+Pour formaliser une nouvelle demande, utiliser l’issue template `\`.github/ISSUE*TEMPLATE/rgie-iot-spec.yml` (menu \_New issue → RFC – Endpoint RGIE/IoT*). Aucune implémentation n’est lancée sans ticket approuvé.
 
 ---
 
 ## 4ter. Secrets et variables d'environnement (non locaux)
+
 Pour tout environnement autre que votre machine de développement (staging, préprod, production), configurez les variables suivantes **en dehors du dépôt** (GitHub Secrets, variables système, paramètres Docker/Kubernetes). Elles alimentent directement `application-prod.yml` et la configuration JWT.
 
-| Nom | Obligatoire | Portée recommandée | Description |
-| --- | :---: | --- | --- |
-| `SPRING_PROFILES_ACTIVE` | ✅ | Service/runner | Toujours `prod` pour forcer l'usage d'`application-prod.yml`. |
-| `DB_HOST` | ✅ | Secret serveur / GitHub | Hôte PostgreSQL (ex. `db.internal` ou IP privée). |
-| `DB_PORT` | ✅ | Secret serveur / GitHub | Port PostgreSQL (par défaut `5432`). |
-| `DB_NAME` | ✅ | Secret serveur / GitHub | Nom de la base (`webelec_db`, `webelec_stage`, …). |
-| `DB_USER` | ✅ | Secret serveur / GitHub | Utilisateur dédié à l'environnement ciblé. |
-| `DB_PASSWORD` | ✅ | Secret serveur / GitHub | Mot de passe associé, jamais versionné. |
-| `WEBELEC_JWT_SECRET` | ✅ | Secret serveur / GitHub | Secret 256 bits pour signer les tokens (remplace la valeur de dev). |
-| `APP_FILE_UPLOAD_DIR` | ⚠️ | Variable serveur | Si vous stockez les uploads hors du répertoire par défaut `uploads`. |
+| Nom                      | Obligatoire | Portée recommandée      | Description                                                          |
+| ------------------------ | :---------: | ----------------------- | -------------------------------------------------------------------- |
+| `SPRING_PROFILES_ACTIVE` |     ✅      | Service/runner          | Toujours `prod` pour forcer l'usage d'`application-prod.yml`.        |
+| `DB_HOST`                |     ✅      | Secret serveur / GitHub | Hôte PostgreSQL (ex. `db.internal` ou IP privée).                    |
+| `DB_PORT`                |     ✅      | Secret serveur / GitHub | Port PostgreSQL (par défaut `5432`).                                 |
+| `DB_NAME`                |     ✅      | Secret serveur / GitHub | Nom de la base (`webelec_db`, `webelec_stage`, …).                   |
+| `DB_USER`                |     ✅      | Secret serveur / GitHub | Utilisateur dédié à l'environnement ciblé.                           |
+| `DB_PASSWORD`            |     ✅      | Secret serveur / GitHub | Mot de passe associé, jamais versionné.                              |
+| `WEBELEC_JWT_SECRET`     |     ✅      | Secret serveur / GitHub | Secret 256 bits pour signer les tokens (remplace la valeur de dev).  |
+| `APP_FILE_UPLOAD_DIR`    |     ⚠️      | Variable serveur        | Si vous stockez les uploads hors du répertoire par défaut `uploads`. |
 
 ### Exemple : GitHub Actions / Environments
+
 Dans `Settings > Environments > production`, créez les secrets ci-dessus. Le workflow GitHub Actions peut ensuite les injecter :
+
 ```
     env:
       SPRING_PROFILES_ACTIVE: prod
@@ -613,6 +708,7 @@ Dans `Settings > Environments > production`, créez les secrets ci-dessus. Le wo
 ```
 
 ### Exemple : service systemd sur un VPS
+
 ```
 [Service]
 Environment="SPRING_PROFILES_ACTIVE=prod"
@@ -628,6 +724,7 @@ Environment="APP_FILE_UPLOAD_DIR=/var/lib/webelec/uploads"
 > 💡 Remplacez les variables `${…}` par des entrées sécurisées (`/etc/environment`, coffre-fort, export `systemctl set-environment`, etc.).
 
 ### Exemple : Docker Compose (staging)
+
 ```
 services:
   backend:

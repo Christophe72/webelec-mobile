@@ -1,4 +1,5 @@
 const TOKEN_KEY = "jwt_token";
+const REFRESH_TOKEN_KEY = "refresh_token";
 const COOKIE_KEY = "token";
 
 function readCookie(name: string): string | null {
@@ -20,6 +21,11 @@ export function getToken(): string | null {
   return readCookie(COOKIE_KEY);
 }
 
+export function getRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
 export function setToken(token: string): void {
   if (typeof window === "undefined") return;
   // Stocke en localStorage
@@ -28,9 +34,15 @@ export function setToken(token: string): void {
   document.cookie = `${COOKIE_KEY}=${encodeURIComponent(token)}; path=/; SameSite=Strict; max-age=86400`;
 }
 
+export function setRefreshToken(token: string): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(REFRESH_TOKEN_KEY, token);
+}
+
 export function clearToken(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(TOKEN_KEY);
+  window.localStorage.removeItem(REFRESH_TOKEN_KEY);
   // Supprime aussi le cookie
   document.cookie = `${COOKIE_KEY}=; path=/; max-age=0`;
 }

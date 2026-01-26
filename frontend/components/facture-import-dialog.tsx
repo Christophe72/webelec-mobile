@@ -61,7 +61,9 @@ export function FactureImportDialog({
         }, 2000);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur lors de l'import");
+      setError(
+        err instanceof Error ? err.message : "Erreur lors de l\u2019import",
+      );
     } finally {
       setLoading(false);
     }

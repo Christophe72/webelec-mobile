@@ -15,6 +15,7 @@ import {
 } from "@/lib/api/chantier";
 import { getSocietes } from "@/lib/api/societe";
 import { getClients } from "@/lib/api/client";
+import type { ApiError } from "@/lib/api/base";
 
 type ChantierFormState = {
   nom: string;
@@ -45,6 +46,15 @@ export function ChantierPanel() {
   );
   const [editingId, setEditingId] = useState<number | null>(null);
 
+  const handleApiError = useCallback((err: unknown, fallback: string) => {
+    const status = (err as ApiError | null)?.status;
+    if (status === 401) {
+      setError("Vous devez être connecté pour accéder aux données.");
+      return;
+    }
+    setError(err instanceof Error ? err.message : fallback);
+  }, []);
+
   const loadChantiers = useCallback(
     async (societeValue: string = filterSociete) => {
       try {
@@ -55,12 +65,12 @@ export function ChantierPanel() {
         const data = await getChantiers(societeId);
         setChantiers(data ?? []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
+        handleApiError(err, "Erreur inconnue");
       } finally {
         setLoading(false);
       }
     },
-    [filterSociete]
+    [filterSociete, handleApiError]
   );
 
   const loadSocietes = useCallback(async () => {
@@ -68,18 +78,18 @@ export function ChantierPanel() {
       const data = await getSocietes();
       setSocietes(data ?? []);
     } catch (err) {
-      console.error("[ChantierPanel] Impossible de charger les sociétés", err);
+      handleApiError(err, "Impossible de charger les sociétés");
     }
-  }, []);
+  }, [handleApiError]);
 
   const loadClients = useCallback(async () => {
     try {
       const data = await getClients();
       setClients(data ?? []);
     } catch (err) {
-      console.error("[ChantierPanel] Impossible de charger les clients", err);
+      handleApiError(err, "Impossible de charger les clients");
     }
-  }, []);
+  }, [handleApiError]);
 
   useEffect(() => {
     void loadSocietes();
@@ -134,7 +144,7 @@ export function ChantierPanel() {
       setEditingId(null);
       await loadChantiers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      handleApiError(err, "Erreur inconnue");
     } finally {
       setSaving(false);
     }
@@ -146,7 +156,7 @@ export function ChantierPanel() {
       await deleteChantier(id);
       await loadChantiers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      handleApiError(err, "Erreur inconnue");
     }
   };
 

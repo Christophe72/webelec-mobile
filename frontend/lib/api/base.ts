@@ -1,4 +1,5 @@
-import { getToken } from "@/lib/api/auth-storage";
+import { getRefreshToken, getToken, setRefreshToken, setToken } from "@/lib/api/auth-storage";
+import type { AuthResponseDTO } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE;
 
@@ -6,7 +7,7 @@ if (!API_URL) {
   throw new Error("NEXT_PUBLIC_API_BASE is not defined");
 }
 
-interface ApiError extends Error {
+export interface ApiError extends Error {
   status?: number;
   body?: unknown;
   details?: unknown;
@@ -14,7 +15,8 @@ interface ApiError extends Error {
 
 export async function api<T = unknown>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retry: boolean = true
 ): Promise<T> {
   const baseHeaders: HeadersInit = {
     "Content-Type": "application/json",
@@ -32,8 +34,26 @@ export async function api<T = unknown>(
   const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: baseHeaders,
-    cache: "no-store"
+    cache: "no-store",
+    credentials: options.credentials ?? "include"
   });
+
+  if (res.status === 401 && typeof window !== "undefined" && retry) {
+    const refreshedToken = await refreshAccessToken();
+    if (refreshedToken) {
+      return api<T>(
+        endpoint,
+        {
+          ...options,
+          headers: {
+            ...(options.headers || {}),
+            Authorization: `Bearer ${refreshedToken}`
+          }
+        },
+        false
+      );
+    }
+  }
 
   if (!res.ok) {
     const contentType = res.headers.get("content-type") ?? "";
@@ -75,5 +95,35 @@ export async function api<T = unknown>(
   } catch {
     // Si la réponse n'est pas du JSON, on renvoie undefined.
     return undefined as T;
+  }
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+
+  try {
+    const res = await fetch(`${API_URL}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ refreshToken }),
+      cache: "no-store",
+      credentials: "include"
+    });
+
+    if (!res.ok) return null;
+
+    const data = (await res.json()) as AuthResponseDTO;
+    if (!data?.accessToken) return null;
+
+    setToken(data.accessToken);
+    if (data.refreshToken) {
+      setRefreshToken(data.refreshToken);
+    }
+    return data.accessToken;
+  } catch {
+    return null;
   }
 }
