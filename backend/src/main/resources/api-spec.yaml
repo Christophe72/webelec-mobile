@@ -44,6 +44,8 @@ tags:
     description: Gestion des devis
   - name: Factures
     description: Gestion des factures
+  - name: Navigation
+    description: Structure du menu latéral dynamique
 
 paths:
   /api/societes:
@@ -807,6 +809,48 @@ paths:
                   criticalCount: 1
         "404":
           $ref: "#/components/responses/NotFound"
+  /api/users/{id}/navigation:
+    get:
+      summary: Générer la navigation dynamique
+      description: |
+        Retourne le menu latéral dynamique en fonction :
+        - du rôle déterminé via `user_societes`
+        - des permissions associées au rôle
+        - des licences actives de la société
+        - de l'état actif/inactif des modules
+      tags: [Navigation]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Navigation filtrée par rôle et licences actives
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NavigationResponse"
+              example:
+                userId: 42
+                companyId: 7
+                role: "GERANT"
+                sections:
+                  - code: "core"
+                    label: "Pilotage"
+                    items:
+                      - code: "dashboard"
+                        label: "Tableau de bord"
+                        route: "/dashboard"
+                        icon: "lucide:layout-dashboard"
+                  - code: "business"
+                    label: "Gestion commerciale"
+                    items:
+                      - code: "devis"
+                        label: "Devis"
+                        route: "/devis"
+                        icon: "lucide:file-digit"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
   securitySchemes:
     bearerAuth:
@@ -1280,3 +1324,45 @@ components:
             $ref: "#/components/schemas/RgieHabilitation"
         notifications:
           $ref: "#/components/schemas/UserNotificationSummary"
+    NavigationItem:
+      type: object
+      description: Lien individuel affiché dans le menu
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+        route:
+          type: string
+          description: URL App Router côté frontend
+        icon:
+          type: string
+          description: Nom d'icône (Lucide ou équivalent)
+    NavigationSection:
+      type: object
+      description: Groupe logique de liens dans le menu
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/NavigationItem"
+    NavigationResponse:
+      type: object
+      description: Navigation dynamique filtrée côté serveur
+      properties:
+        userId:
+          type: integer
+          format: int64
+        companyId:
+          type: integer
+          format: int64
+        role:
+          type: string
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/NavigationSection"
