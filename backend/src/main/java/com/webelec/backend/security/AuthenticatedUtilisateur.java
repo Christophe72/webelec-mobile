@@ -11,7 +11,8 @@ import java.util.List;
 
 public class AuthenticatedUtilisateur implements UserDetails {
 
-    private final Utilisateur utilisateur;
+    private static final long serialVersionUID = 1L;
+	private final Utilisateur utilisateur;
 
     public AuthenticatedUtilisateur(Utilisateur utilisateur) {
         this.utilisateur = utilisateur;

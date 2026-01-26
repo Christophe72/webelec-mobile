@@ -12,7 +12,6 @@ import com.webelec.backend.repository.UserSocieteRoleRepository;
 import com.webelec.backend.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;

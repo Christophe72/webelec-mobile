@@ -9,7 +9,6 @@ import com.webelec.backend.model.UtilisateurRole;
 import com.webelec.backend.model.UserSocieteRole;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -7,7 +7,6 @@ import com.webelec.backend.model.UserSocieteRole;
 import com.webelec.backend.model.Utilisateur;
 import com.webelec.backend.model.UtilisateurRole;
 import com.webelec.backend.security.AuthenticatedUtilisateur;
-import com.webelec.backend.security.JwtService;
 import com.webelec.backend.service.SocieteService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

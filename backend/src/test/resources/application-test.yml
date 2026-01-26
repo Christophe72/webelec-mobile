@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  h2:
+    console:
+      enabled: false
+
+# Désactiver le seed en test
+webelec:
+  seed:
+    enabled: false
+
+# Configuration JWT pour les tests
+webelec.security.jwt:
+  secret: test-secret-key-for-unit-tests-only-do-not-use-in-production-environment
+  issuer: webelec-test
+  access-token-validity: PT30M
+  refresh-token-validity: P7D
+
+logging:
+  level:
+    root: WARN
+    com.webelec: INFO
+    org.springframework.web: WARN
+    org.hibernate: WARN

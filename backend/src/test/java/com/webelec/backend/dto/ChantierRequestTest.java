@@ -1,7 +1,7 @@
 package com.webelec.backend.dto;
 
 import com.webelec.backend.model.Chantier;
-import com.webelec.backend.model.Societe;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

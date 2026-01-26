@@ -11,11 +11,14 @@ import com.webelec.backend.model.Utilisateur;
 import com.webelec.backend.model.UtilisateurRole;
 import com.webelec.backend.service.InterventionService;
 import com.webelec.backend.security.JwtAuthenticationFilter;
+import com.webelec.backend.security.JwtService;
+import com.webelec.backend.security.UtilisateurDetailsService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -31,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(InterventionController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 class InterventionControllerTest {
     @Autowired
@@ -41,6 +45,12 @@ class InterventionControllerTest {
     private InterventionService service;
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UtilisateurDetailsService utilisateurDetailsService;
 
     @Test
     void createIntervention_success() throws Exception {

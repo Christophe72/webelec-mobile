@@ -3,7 +3,6 @@ package com.webelec.backend.controller;
 import com.webelec.backend.dto.ProduitAvanceRequest;
 import com.webelec.backend.dto.ProduitAvanceResponse;
 import com.webelec.backend.exception.ResourceNotFoundException;
-import com.webelec.backend.model.ProduitAvance;
 import com.webelec.backend.service.ProduitAvanceService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

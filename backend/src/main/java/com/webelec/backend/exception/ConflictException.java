@@ -4,7 +4,8 @@ import java.util.List;
 
 public class ConflictException extends RuntimeException {
 
-    private final List<String> details;
+    private static final long serialVersionUID = 1L;
+	private final List<String> details;
 
     public ConflictException(String message) {
         this(message, List.of());

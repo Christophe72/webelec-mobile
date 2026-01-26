@@ -20,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable(named = "TESTCONTAINERS_ENABLED", matches = "true")
 class ClientRepositoryTest {
 
-    @Container
+    @SuppressWarnings("resource")
+	@Container
     static PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:16")
                     .withDatabaseName("webelec")

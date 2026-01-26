@@ -6,7 +6,6 @@ import com.opencsv.exceptions.CsvValidationException;
 import com.webelec.backend.dto.FactureImportResponse;
 import com.webelec.backend.dto.FactureImportResponse.ImportRowResult;
 import com.webelec.backend.dto.FactureImportRow;
-import com.webelec.backend.exception.ConflictException;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.model.Facture;
 import com.webelec.backend.model.FactureLigne;
