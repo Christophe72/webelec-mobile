@@ -62,3 +62,16 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 # Pour des logs JSON, utiliser un appender dédié (voir doc Spring Boot Logging)
 # Exemple avancé (non activé par défaut) : https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.logging.js
+
+# Configuration Swagger / OpenAPI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    display-request-duration: true
+    filter: true
