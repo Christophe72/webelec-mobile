@@ -1,5 +1,7 @@
 package com.webelec.backend.dto;
 
+import com.webelec.backend.service.context.UserContext;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,13 +15,14 @@ public class UserContextDTO {
     private TeamAssignmentDTO team;
     private List<RgieHabilitationDTO> habilitations = new ArrayList<>();
     private NotificationSummaryDTO notifications;
+    private SocieteSelectionDTO selection;
 
     public UserContextDTO() {
     }
 
     private UserContextDTO(Long userId, String fullName, String email, String role,
                            TeamAssignmentDTO team, List<RgieHabilitationDTO> habilitations,
-                           NotificationSummaryDTO notifications) {
+                           NotificationSummaryDTO notifications, SocieteSelectionDTO selection) {
         this.userId = userId;
         this.fullName = fullName;
         this.email = email;
@@ -27,10 +30,56 @@ public class UserContextDTO {
         this.team = team;
         this.habilitations = habilitations != null ? habilitations : Collections.emptyList();
         this.notifications = notifications;
+        this.selection = selection;
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static UserContextDTO from(UserContext context) {
+        if (context == null) {
+            return null;
+        }
+        List<RgieHabilitationDTO> habilitationDtos = context.habilitations().stream()
+                .map(h -> new RgieHabilitationDTO(
+                        h.id(),
+                        h.label(),
+                        h.certificateNumber(),
+                        h.authorityLevel(),
+                        h.validFrom(),
+                        h.validUntil(),
+                        h.status()
+                ))
+                .toList();
+
+        TeamAssignmentDTO team = null;
+        if (context.team() != null) {
+            team = new TeamAssignmentDTO(
+                    context.team().teamId(),
+                    context.team().teamName(),
+                    context.team().assignedAt()
+            );
+        }
+
+        NotificationSummaryDTO notifications = null;
+        if (context.notifications() != null) {
+            notifications = new NotificationSummaryDTO(
+                    context.notifications().unreadCount(),
+                    context.notifications().criticalCount()
+            );
+        }
+
+        return UserContextDTO.builder()
+                .userId(context.userId())
+                .fullName(context.fullName())
+                .email(context.email())
+                .role(context.role())
+                .team(team)
+                .selection(SocieteSelectionDTO.from(context.selection()))
+                .habilitations(habilitationDtos)
+                .notifications(notifications)
+                .build();
     }
 
     public Long getUserId() {
@@ -89,6 +138,14 @@ public class UserContextDTO {
         this.notifications = notifications;
     }
 
+    public SocieteSelectionDTO getSelection() {
+        return selection;
+    }
+
+    public void setSelection(SocieteSelectionDTO selection) {
+        this.selection = selection;
+    }
+
     public static final class Builder {
         private Long userId;
         private String fullName;
@@ -97,6 +154,7 @@ public class UserContextDTO {
         private TeamAssignmentDTO team;
         private List<RgieHabilitationDTO> habilitations = new ArrayList<>();
         private NotificationSummaryDTO notifications;
+        private SocieteSelectionDTO selection;
 
         private Builder() {
         }
@@ -138,9 +196,14 @@ public class UserContextDTO {
             return this;
         }
 
+        public Builder selection(SocieteSelectionDTO selection) {
+            this.selection = selection;
+            return this;
+        }
+
         public UserContextDTO build() {
             return new UserContextDTO(userId, fullName, email, role, team,
-                    new ArrayList<>(habilitations), notifications);
+                    new ArrayList<>(habilitations), notifications, selection);
         }
     }
 }

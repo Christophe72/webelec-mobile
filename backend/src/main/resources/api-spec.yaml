@@ -785,6 +785,11 @@ paths:
                 fullName: "Alexandre Leroy"
                 email: "alexandre@webelec.be"
                 role: "TECHNICIEN"
+                selection:
+                  societeId: 7
+                  societeName: "Alpha Energies"
+                  role: "TECHNICIEN"
+                  selectedAt: "2026-01-12T22:19:43Z"
                 team:
                   teamId: 3
                   teamName: "Equipe RGIE Bruxelles"
@@ -1301,6 +1306,20 @@ components:
           type: integer
           format: int64
           description: Nombre d'alertes critiques liées aux expirations RGIE (< 30 jours)
+    UserContextSelection:
+      type: object
+      description: Dernière société sélectionnée par l'utilisateur
+      properties:
+        societeId:
+          type: integer
+          format: int64
+        societeName:
+          type: string
+        role:
+          type: string
+        selectedAt:
+          type: string
+          format: date-time
     UserContextResponse:
       type: object
       description: Contexte enrichi d'un technicien RGIE
@@ -1316,6 +1335,8 @@ components:
         role:
           type: string
           description: Rôle métier retourné en clair
+        selection:
+          $ref: "#/components/schemas/UserContextSelection"
         team:
           $ref: "#/components/schemas/UserContextTeam"
         habilitations:
