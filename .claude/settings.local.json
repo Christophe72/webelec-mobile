@@ -17,7 +17,10 @@
       "Bash(docker images:*)",
       "Bash(docker build:*)",
       "Bash(ls:*)",
-      "Bash(pnpm install:*)"
+      "Bash(pnpm install:*)",
+      "Bash(mvn test:*)",
+      "Bash(grep:*)",
+      "Bash(xargs cat:*)"
     ]
   }
 }
