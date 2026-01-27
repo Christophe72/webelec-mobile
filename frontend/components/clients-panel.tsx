@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type {
   ClientDTO,
   ClientCreateDTO,
@@ -14,6 +14,7 @@ import {
   deleteClient,
 } from "@/lib/api/client";
 import { getSocietes } from "@/lib/api/societe";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const emptyClient: ClientCreateDTO = {
   nom: "",
@@ -36,6 +37,13 @@ export function ClientsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<string[]>([]);
   const [filterQuery, setFilterQuery] = useState("");
+  const { status, token } = useAuth();
+
+  const requireToken = useCallback(() => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  }, [status, token]);
 
   const societeById = useMemo(() => {
     const map = new Map<number, SocieteResponse>();
@@ -66,13 +74,18 @@ export function ClientsPanel() {
 
   const hasFilter = Boolean(filterQuery.trim());
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
+    const authToken = requireToken();
+    if (!authToken) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
       const [clientsData, societesData] = await Promise.all([
-        getClients(),
-        getSocietes(),
+        getClients(authToken),
+        getSocietes(authToken),
       ]);
       setClients(clientsData ?? []);
       setSocietes(societesData ?? []);
@@ -81,14 +94,24 @@ export function ClientsPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [requireToken]);
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     void loadData();
-  }, []);
+  }, [loadData, status, token]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setLoading(false);
+      setError("Vous devez être connecté pour accéder aux données.");
+    }
+  }, [status]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const authToken = requireToken();
+    if (!authToken) return;
     setFormErrors([]);
     const trimmedNom = form.nom.trim();
     const trimmedPrenom = form.prenom.trim();
@@ -138,9 +161,9 @@ export function ClientsPanel() {
 
       if (editingId) {
         const updatePayload: ClientUpdateDTO = { ...payload };
-        await updateClient(editingId, updatePayload);
+        await updateClient(authToken, editingId, updatePayload);
       } else {
-        await createClient(payload);
+        await createClient(authToken, payload);
       }
       setForm(emptyClient);
       setEditingId(null);
@@ -165,10 +188,12 @@ export function ClientsPanel() {
   };
 
   const handleDelete = async (id: number) => {
+    const authToken = requireToken();
+    if (!authToken) return;
     try {
       setFormErrors([]);
       setError(null);
-      await deleteClient(id);
+      await deleteClient(authToken, id);
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
@@ -206,6 +231,8 @@ export function ClientsPanel() {
 
       <form onSubmit={handleSubmit} className="grid gap-3 mt-6 sm:grid-cols-2">
         <input
+          id="client-nom"
+          name="nom"
           type="text"
           value={form.nom}
           onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
@@ -213,6 +240,8 @@ export function ClientsPanel() {
           className="px-3 py-2 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
+          id="client-prenom"
+          name="prenom"
           type="text"
           value={form.prenom ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, prenom: e.target.value }))}
@@ -220,6 +249,8 @@ export function ClientsPanel() {
           className="px-3 py-2 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <input
+          id="client-telephone"
+          name="telephone"
           type="tel"
           value={form.telephone ?? ""}
           onChange={(e) =>
@@ -229,6 +260,8 @@ export function ClientsPanel() {
           className="px-3 py-2 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <textarea
+          id="client-adresse"
+          name="adresse"
           value={form.adresse ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, adresse: e.target.value }))}
           placeholder="Adresse"
@@ -297,10 +330,12 @@ export function ClientsPanel() {
 
       <div className="flex flex-col gap-3 mt-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex-1">
-          <label className="text-xs tracking-wide uppercase text-muted">
+          <label htmlFor="clients-search" className="text-xs tracking-wide uppercase text-muted">
             Recherche
           </label>
           <input
+            id="clients-search"
+            name="search"
             type="search"
             value={filterQuery}
             onChange={(event) => setFilterQuery(event.target.value)}

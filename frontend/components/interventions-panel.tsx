@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type {
   InterventionDTO,
   InterventionCreateDTO,
@@ -17,6 +17,7 @@ import {
 import { getSocietes } from "@/lib/api/societe";
 import { getClients } from "@/lib/api/client";
 import { getChantiers } from "@/lib/api/chantier";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -40,17 +41,29 @@ export function InterventionsPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { status, token } = useAuth();
 
-  const loadData = async () => {
+  const requireAuth = useCallback(() => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  }, [status, token]);
+
+  const loadData = useCallback(async () => {
+    const authToken = requireAuth();
+    if (!authToken) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
       const [interventionsData, societesData, clientsData, chantiersData] =
         await Promise.all([
-          getInterventions(),
-          getSocietes(),
-          getClients(),
-          getChantiers(),
+          getInterventions(authToken),
+          getSocietes(authToken),
+          getClients(authToken),
+          getChantiers(authToken),
         ]);
       setInterventions(interventionsData ?? []);
       setSocietes(societesData ?? []);
@@ -61,14 +74,24 @@ export function InterventionsPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [requireAuth]);
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     void loadData();
-  }, []);
+  }, [loadData, status, token]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setLoading(false);
+      setError("Vous devez être connecté pour accéder aux données.");
+    }
+  }, [status]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const authToken = requireAuth();
+    if (!authToken) return;
     if (!form.titre.trim()) {
       setError("Le titre est requis");
       return;
@@ -81,9 +104,9 @@ export function InterventionsPanel() {
       setSaving(true);
       setError(null);
       if (editingId) {
-        await updateIntervention(editingId, form);
+        await updateIntervention(authToken, editingId, form);
       } else {
-        await createIntervention(form);
+        await createIntervention(authToken, form);
       }
       setForm(emptyIntervention());
       setEditingId(null);
@@ -109,9 +132,11 @@ export function InterventionsPanel() {
   };
 
   const handleDelete = async (id: number) => {
+    const authToken = requireAuth();
+    if (!authToken) return;
     try {
       setError(null);
-      await deleteIntervention(id);
+      await deleteIntervention(authToken, id);
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");

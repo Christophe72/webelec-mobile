@@ -1,3 +1,5 @@
+import { bffFetch } from "@/lib/api/bffFetch";
+
 export interface NavigationResponse {
   sections: NavigationSection[];
 }
@@ -16,39 +18,24 @@ export interface NavigationItem {
   active: boolean;
 }
 
-export async function fetchNavigation(): Promise<NavigationResponse> {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE;
-  if (!apiBase) {
-    throw new Error("NEXT_PUBLIC_API_BASE is not defined");
-  }
-
+export async function fetchNavigation(token: string): Promise<NavigationResponse> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
 
   try {
-    const res = await fetch(`${apiBase}/navigation`, {
-      cache: "no-store",
+    return await bffFetch<NavigationResponse>("/api/navigation", token, {
       credentials: "include",
       signal: controller.signal
     });
-
-    if (res.status === 200) {
-      return (await res.json()) as NavigationResponse;
-    }
-
-    if (res.status === 401) {
+  } catch (err) {
+    const status = (err as { status?: number } | null)?.status;
+    if (status === 401) {
       throw new Error("UNAUTHORIZED");
     }
-
-    if (res.status === 403 || res.status === 404) {
+    if (status === 403 || status === 404) {
       return { sections: [] };
     }
-
-    if (!res.ok) {
-      throw new Error("Navigation fetch failed");
-    }
-
-    return (await res.json()) as NavigationResponse;
+    throw err;
   } finally {
     clearTimeout(timeout);
   }

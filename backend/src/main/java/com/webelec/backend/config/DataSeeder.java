@@ -135,7 +135,7 @@ public class DataSeeder {
                 .email("laura.lefevre@elecpro.fr")
                 .motDePasse(passwordEncoder.encode("demo123!"))
                 .build());
-        userSocieteRoleRepository.save(new UserSocieteRole(laura, elecPro, UtilisateurRole.GERANT));
+        userSocieteRoleRepository.save(new UserSocieteRole(laura, elecPro, UtilisateurRole.ARTISAN));
 
         Utilisateur hugo = utilisateurRepository.save(Utilisateur.builder()
                 .nom("Martin")
@@ -143,7 +143,7 @@ public class DataSeeder {
                 .email("hugo.martin@elecpro.fr")
                 .motDePasse(passwordEncoder.encode("demo123!"))
                 .build());
-        userSocieteRoleRepository.save(new UserSocieteRole(hugo, elecPro, UtilisateurRole.TECHNICIEN));
+        userSocieteRoleRepository.save(new UserSocieteRole(hugo, elecPro, UtilisateurRole.TECH));
 
         Utilisateur clara = utilisateurRepository.save(Utilisateur.builder()
                 .nom("Gonzales")
@@ -151,7 +151,7 @@ public class DataSeeder {
                 .email("clara.gonzales@voltservices.fr")
                 .motDePasse(passwordEncoder.encode("demo123!"))
                 .build());
-        userSocieteRoleRepository.save(new UserSocieteRole(clara, voltServices, UtilisateurRole.GERANT));
+        userSocieteRoleRepository.save(new UserSocieteRole(clara, voltServices, UtilisateurRole.ARTISAN));
 
         Utilisateur nabil = utilisateurRepository.save(Utilisateur.builder()
                 .nom("Benali")
@@ -159,7 +159,7 @@ public class DataSeeder {
                 .email("nabil.benali@voltservices.fr")
                 .motDePasse(passwordEncoder.encode("demo123!"))
                 .build());
-        userSocieteRoleRepository.save(new UserSocieteRole(nabil, voltServices, UtilisateurRole.TECHNICIEN));
+        userSocieteRoleRepository.save(new UserSocieteRole(nabil, voltServices, UtilisateurRole.TECH));
 
         Client marcDupont = clientRepository.save(Client.builder()
                 .nom("Dupont")

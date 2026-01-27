@@ -24,6 +24,7 @@ const mockDeleteProduit = deleteProduit as jest.MockedFunction<
   typeof deleteProduit
 >;
 const mockGetSocietes = getSocietes as jest.MockedFunction<typeof getSocietes>;
+const token = "test-token";
 
 const produit: ProduitDTO = {
   id: 1,
@@ -47,6 +48,11 @@ const societe: SocieteResponse = {
 describe("CataloguePanel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    window.localStorage.setItem("access_token", token);
+  });
+
+  afterEach(() => {
+    window.localStorage.removeItem("access_token");
   });
 
   it("affiche les produits récupérés et les sociétés associées", async () => {
@@ -122,7 +128,7 @@ describe("CataloguePanel", () => {
     await user.click(submitButton);
 
     await waitFor(() =>
-      expect(mockCreateProduit).toHaveBeenCalledWith({
+      expect(mockCreateProduit).toHaveBeenCalledWith(token, {
         reference: "REF999",
         nom: "Produit user",
         description: "Essai",
@@ -141,13 +147,22 @@ describe("CataloguePanel", () => {
     render(<CataloguePanel />);
     const user = userEvent.setup();
 
+    // Attendre que le produit soit affiché
+    await screen.findByText("REF001 — Produit test");
+
     const deleteButton = await screen.findByRole("button", {
       name: /Supprimer/i,
     });
     await user.click(deleteButton);
 
+    // Si une confirmation est demandée, valider
+    const confirmButton = screen.queryByRole("button", { name: /Confirmer/i });
+    if (confirmButton) {
+      await user.click(confirmButton);
+    }
+
     await waitFor(() =>
-      expect(mockDeleteProduit).toHaveBeenCalledWith(produit.id),
+      expect(mockDeleteProduit).toHaveBeenCalledWith(token, produit.id),
     );
     expect(mockGetProduits).toHaveBeenCalledTimes(2);
   });

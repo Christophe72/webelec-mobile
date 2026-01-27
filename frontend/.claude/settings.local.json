@@ -4,7 +4,10 @@
       "Bash(npm install:*)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "Read(//c/saas/webelec-saas/backend/src/main/java/com/webelec/backend/config/**)",
+      "Read(//c/saas/webelec-saas/backend/src/main/resources/**)",
+      "Read(//c/saas/webelec-saas/backend/**)"
     ]
   }
 }

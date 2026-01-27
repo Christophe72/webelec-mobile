@@ -63,7 +63,11 @@ public class UtilisateurService {
                 .orElseThrow(() -> new ResourceNotFoundException("Société non trouvée"));
         UtilisateurRole role;
         try {
-            role = UtilisateurRole.valueOf(request.getRole());
+            String normalized = UtilisateurRole.normalizeRole(request.getRole());
+            if (normalized == null) {
+                throw new IllegalArgumentException("Rôle utilisateur invalide : " + request.getRole());
+            }
+            role = UtilisateurRole.valueOf(normalized);
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Rôle utilisateur invalide : " + request.getRole());
         }
@@ -87,7 +91,11 @@ public class UtilisateurService {
                 .orElseThrow(() -> new ResourceNotFoundException("Société non trouvée"));
         UtilisateurRole role;
         try {
-            role = UtilisateurRole.valueOf(request.getRole());
+            String normalized = UtilisateurRole.normalizeRole(request.getRole());
+            if (normalized == null) {
+                throw new IllegalArgumentException("Rôle utilisateur invalide : " + request.getRole());
+            }
+            role = UtilisateurRole.valueOf(normalized);
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Rôle utilisateur invalide : " + request.getRole());
         }

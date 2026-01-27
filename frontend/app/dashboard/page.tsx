@@ -1,100 +1,91 @@
 "use client";
 
-import { RecentActivity } from "@/components/dashboard/RecentActivity";
-import { PrioritiesToday } from "@/components/dashboard/PrioritiesToday";
-import { useState, useEffect } from "react";
-import type { AcknowledgedPriority, DashboardEvent } from "@/types/dashboard";
+import { useEffect, useState } from "react";
+import { fetchDashboardMetrics } from "@/lib/api/dashboard";
+import type { DashboardMetrics } from "@/types/dashboard";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 export default function DashboardPage() {
-  const [events, setEvents] = useState<DashboardEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [acknowledgedPriorities, setAcknowledgedPriorities] = useState<AcknowledgedPriority[]>([]);
+  const { status, token } = useAuth();
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const auth = useAuth();
+  console.log("AUTH DASHBOARD =", auth);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      setIsLoading(true);
+    if (status !== "authenticated" || !token) return;
 
+    let cancelled = false;
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const token = localStorage.getItem("accessToken");
-        console.log("🔑 Token:", token === null ? "NULL" : "présent");
-
-        const response = await fetch("http://localhost:8080/api/user/context", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Erreur API: ${response.status}`);
+        const data = await fetchDashboardMetrics(token);
+        if (data.status === "success") {
+          if (!cancelled) {
+            setMetrics(data.metrics);
+            setError(null);
+          }
+        } else if (!cancelled) {
+          setMetrics(data.metrics ?? null);
+          setError(data.error ?? "Erreur dashboard");
         }
-
-        const data = await response.json();
-        setEvents(Array.isArray(data?.events) ? data.events : []);
-        setAcknowledgedPriorities(Array.isArray(data?.acknowledgedPriorities) ? data.acknowledgedPriorities : []);
       } catch (error) {
-        console.error("Erreur lors du chargement des événements:", error);
-        setEvents([]);
-        setAcknowledgedPriorities([]);
+        if (!cancelled) {
+          setError(error instanceof Error ? error.message : "Erreur dashboard");
+        }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
-    fetchEvents();
-  }, []);
+    fetchData();
 
-  const handleAcknowledge = async (priorityId: string) => {
-    const acknowledgedAt = new Date().toISOString();
-    setAcknowledgedPriorities(prev => [...prev, { priorityId, acknowledgedAt }]);
+    return () => {
+      cancelled = true;
+    };
+  }, [status, token]);
 
-    try {
-      const token = localStorage.getItem("accessToken");
+  if (status !== "authenticated" || !token) {
+    return <div className="p-6">Non connecté (token absent).</div>;
+  }
 
-      const response = await fetch(`http://localhost:8080/api/priorities/${encodeURIComponent(priorityId)}/ack`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  if (loading) {
+    return <div className="p-6">Chargement…</div>;
+  }
 
-      if (!response.ok) {
-        console.error("Erreur lors du marquage de la priorité:", response.status);
-      }
-    } catch (error) {
-      console.error("Erreur lors du marquage de la priorité:", error);
-    }
-  };
+  if (error) {
+    return <div className="p-6">Erreur: {error}</div>;
+  }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Vue d&apos;ensemble de votre activité électrique
-        </p>
-      </div>
+    <div className="p-6 space-y-4">
+      <h1 className="text-xl font-semibold">Dashboard</h1>
 
-      {/* Layout du dashboard */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Priorités du jour - Colonne de gauche */}
-        <div className="lg:col-span-1">
-          <PrioritiesToday
-            events={events}
-            acknowledgedPriorities={acknowledgedPriorities}
-            onAcknowledge={handleAcknowledge}
-          />
+      {!metrics ? (
+        <div>Aucune donnée.</div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-4">
+          <div className="rounded-lg border p-4">
+            <div className="text-sm text-muted-foreground">Chantiers actifs</div>
+            <div className="text-2xl font-bold">{metrics.activeSitesCount}</div>
+          </div>
+          <div className="rounded-lg border p-4">
+            <div className="text-sm text-muted-foreground">Alertes stock</div>
+            <div className="text-2xl font-bold">{metrics.stockAlertsCount}</div>
+          </div>
+          <div className="rounded-lg border p-4">
+            <div className="text-sm text-muted-foreground">Alertes RGIE</div>
+            <div className="text-2xl font-bold">{metrics.rgieAlertsCount}</div>
+          </div>
+          <div className="rounded-lg border p-4">
+            <div className="text-sm text-muted-foreground">Notifications critiques</div>
+            <div className="text-2xl font-bold">{metrics.criticalNotificationsCount}</div>
+          </div>
         </div>
-
-        {/* Activité récente - Colonne centrale/droite */}
-        <div className="md:col-span-1 lg:col-span-2">
-          <RecentActivity events={events} isLoading={isLoading} />
-        </div>
-      </div>
-
-      {/* Autres widgets du dashboard peuvent aller ici */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Exemple : KPIs, graphiques, etc. */}
-      </div>
+      )}
     </div>
   );
 }

@@ -9,33 +9,44 @@ function buildChantierEndpoint(societeId?: number | string): string {
 }
 
 export async function getChantiers(
+  token: string,
   societeId?: number | string
 ): Promise<ChantierDTO[]> {
   const endpoint = buildChantierEndpoint(societeId);
-  return api<ChantierDTO[]>(endpoint);
+  return api<ChantierDTO[]>(token, endpoint);
 }
 
-export function getChantier(id: number | string): Promise<ChantierDTO> {
-  return api(`/chantiers/${id}`);
+export function getChantier(
+  token: string,
+  id: number | string
+): Promise<ChantierDTO> {
+  return api(token, `/chantiers/${id}`);
 }
 
-export function createChantier(data: ChantierCreateDTO): Promise<ChantierDTO> {
-  return api("/chantiers", {
+export function createChantier(
+  token: string,
+  data: ChantierCreateDTO
+): Promise<ChantierDTO> {
+  return api(token, "/chantiers", {
     method: "POST",
     body: JSON.stringify(data)
   });
 }
 
 export function updateChantier(
+  token: string,
   id: number | string,
   data: ChantierUpdateDTO
 ): Promise<ChantierDTO> {
-  return api(`/chantiers/${id}`, {
+  return api(token, `/chantiers/${id}`, {
     method: "PUT",
     body: JSON.stringify(data)
   });
 }
 
-export function deleteChantier(id: number | string): Promise<void> {
-  return api(`/chantiers/${id}`, { method: "DELETE" });
+export function deleteChantier(
+  token: string,
+  id: number | string
+): Promise<void> {
+  return api(token, `/chantiers/${id}`, { method: "DELETE" });
 }

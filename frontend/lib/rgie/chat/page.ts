@@ -14,10 +14,11 @@ export interface ChatMessage {
 }
 
 export async function analyseEffet(
+  token: string,
   input: string,
   setMessages: Dispatch<SetStateAction<ChatMessage[]>>
 ) {
-  const embedding = await getEmbedding(input);
+  const embedding = await getEmbedding(token, input);
   const res = await explainEngine.explain(input, embedding);
 
   setMessages((prev) => [

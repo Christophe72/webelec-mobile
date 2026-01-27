@@ -22,7 +22,7 @@ public record UserContext(
 
     public String role() {
         return selection != null && selection.role() != null
-                ? selection.role().name()
+                ? selection.role().canonicalName()
                 : null;
     }
 

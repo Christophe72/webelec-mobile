@@ -20,34 +20,49 @@ function filterDevis(
   });
 }
 
-export async function getDevis(filters?: {
+export async function getDevis(
+  token: string,
+  filters?: {
   societeId?: number | string;
   clientId?: number | string;
 }): Promise<DevisDTO[]> {
-  const data = await api<DevisDTO[]>("/devis");
+  const data = await api<DevisDTO[]>(token, "/devis");
   return filterDevis(data, filters);
 }
 
-export function getDevisById(id: number | string): Promise<DevisDTO> {
-  return api(`/devis/${id}`);
+export function getDevisById(
+  token: string,
+  id: number | string
+): Promise<DevisDTO> {
+  return api(token, `/devis/${id}`);
 }
 
 export const getUnDevis = getDevisById;
 
-export function createDevis(data: DevisCreateDTO): Promise<DevisDTO> {
-  return api("/devis", {
+export function createDevis(
+  token: string,
+  data: DevisCreateDTO
+): Promise<DevisDTO> {
+  return api(token, "/devis", {
     method: "POST",
     body: JSON.stringify(data)
   });
 }
 
-export function updateDevis(id: number | string, data: DevisUpdateDTO): Promise<DevisDTO> {
-  return api(`/devis/${id}`, {
+export function updateDevis(
+  token: string,
+  id: number | string,
+  data: DevisUpdateDTO
+): Promise<DevisDTO> {
+  return api(token, `/devis/${id}`, {
     method: "PUT",
     body: JSON.stringify(data)
   });
 }
 
-export function deleteDevis(id: number | string): Promise<void> {
-  return api(`/devis/${id}`, { method: "DELETE" });
+export function deleteDevis(
+  token: string,
+  id: number | string
+): Promise<void> {
+  return api(token, `/devis/${id}`, { method: "DELETE" });
 }

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSocietes } from "@/lib/api/societe";
 import { createProduit } from "@/lib/api/catalogue";
+import { useAuth } from "@/lib/hooks/useAuth";
 import type { SocieteResponse } from "@/types";
 import { NumberInput } from "@/components/ui/number-input";
 
@@ -237,19 +238,29 @@ export default function CatalogueComposantsList() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { status, token } = useAuth();
+
+  const requireAuth = useCallback(() => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  }, [status, token]);
 
   useEffect(() => {
     const loadSocietes = async () => {
       try {
-        const data = await getSocietes();
+        const authToken = requireAuth();
+        if (!authToken) return;
+        const data = await getSocietes(authToken);
         setSocietes(data ?? []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erreur inconnue");
       }
     };
 
+    if (status !== "authenticated" || !token) return;
     void loadSocietes();
-  }, []);
+  }, [requireAuth, status, token]);
 
   const activeCategory =
     CATEGORIES.find((category) => category.id === activeCategoryId) ??
@@ -341,6 +352,8 @@ export default function CatalogueComposantsList() {
   const handleSaveMaterial = async () => {
     setError(null);
     setSuccess(null);
+    const authToken = requireAuth();
+    if (!authToken) return;
     const validationError = validateMaterialItems();
     if (validationError) {
       setError(validationError);
@@ -351,7 +364,7 @@ export default function CatalogueComposantsList() {
       setSaving(true);
       await Promise.all(
         materialItems.map((item) =>
-          createProduit({
+          createProduit(authToken, {
             reference: item.reference,
             nom: item.label,
             description: undefined,

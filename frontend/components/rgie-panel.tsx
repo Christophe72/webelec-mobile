@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { bffFetch } from "@/lib/api/bffFetch";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 type RgieThemeOption =
   | "all"
@@ -58,9 +60,18 @@ export function RgiePanel() {
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { status, token } = useAuth();
+
+  const requireAuth = () => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  };
 
   async function load() {
     try {
+      const authToken = requireAuth();
+      if (!authToken) return;
       setLoading(true);
       setError(null);
 
@@ -69,11 +80,7 @@ export function RgiePanel() {
           ? ""
           : `?${new URLSearchParams({ theme }).toString()}`;
 
-      const res = await fetch(`/api/rgie${params}`);
-      if (!res.ok) {
-        throw new Error(`Erreur HTTP ${res.status}`);
-      }
-      const json = (await res.json()) as RgieResponse;
+      const json = await bffFetch<RgieResponse>(`/api/rgie${params}`, authToken);
       setData(json.items ?? []);
       setTotal(json.count ?? json.items?.length ?? 0);
     } catch (err) {
@@ -84,9 +91,10 @@ export function RgiePanel() {
   }
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme]);
+  }, [theme, status, token]);
 
   return (
     <section className="mx-auto mt-8 w-full max-w-5xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">

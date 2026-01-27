@@ -21,6 +21,13 @@ public class AuthenticatedUtilisateur implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         UtilisateurRole role = utilisateur.getRole();
+        if (role == null && utilisateur.getSocietes() != null && !utilisateur.getSocietes().isEmpty()) {
+            role = utilisateur.getSocietes().stream()
+                    .map(link -> link != null ? link.getRole() : null)
+                    .filter(r -> r != null)
+                    .findFirst()
+                    .orElse(null);
+        }
         if (role == null) {
             return List.of();
         }

@@ -39,6 +39,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { bffFetch } from "@/lib/api/bffFetch";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { WebElecAuditorPro } from "@/lib/sdk/webelec-auditor";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -54,14 +56,12 @@ import type { InstallationInput } from "@/lib/rgie/audit.schema";
 import type { RgieRegle } from "@/types";
 
 // Embedding API
-async function getEmbedding(text: string) {
-  const res = await fetch("/api/embedding", {
+async function getEmbedding(token: string, text: string) {
+  return bffFetch<number[]>("/api/embedding", token, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),
   });
-  if (!res.ok) throw new Error(`Embedding error: ${await res.text()}`);
-  return (await res.json()) as number[];
 }
 
 function buildAiExplanationSteps(rule: RgieRegle): string[] {
@@ -162,15 +162,20 @@ export default function AuditeurProPage() {
   const [error, setError] = useState<string | null>(null);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [solutionsIndex, setSolutionsIndex] = useState<number | null>(null);
+  const { status, token } = useAuth();
 
   const auditor = useMemo(() => new WebElecAuditorPro(), []);
 
   const runAudit = async () => {
     if (!state.description.trim()) return;
+    if (status !== "authenticated" || !token) {
+      setError("Vous devez être connecté pour lancer l'audit.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const embedding = await getEmbedding(state.description);
+      const embedding = await getEmbedding(token, state.description);
       const res = await auditor.run(
         state.description,
         embedding,

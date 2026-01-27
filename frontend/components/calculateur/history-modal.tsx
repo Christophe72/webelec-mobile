@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { CalculHistoryDTO, CalculatorType } from '@/types/dto/calculateur';
 import { getCalculHistory, deleteCalculHistory } from '@/lib/api/calculateur';
 import {
@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { History, Trash2, Download, Filter } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 interface HistoryModalProps {
   open: boolean;
@@ -30,25 +31,29 @@ export function HistoryModal({ open, onOpenChange, onLoadCalculation }: HistoryM
   const [history, setHistory] = useState<CalculHistoryDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [filterType, setFilterType] = useState<CalculatorType | 'all'>('all');
+  const { status, token } = useAuth();
 
-  // Charger l'historique au montage
-  useEffect(() => {
-    if (open) {
-      loadHistory();
-    }
-  }, [open]);
-
-  const loadHistory = async () => {
+  const loadHistory = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getCalculHistory();
+      if (status !== 'authenticated' || !token) return;
+      const data = await getCalculHistory(token);
       setHistory(data);
     } catch (error) {
       console.error('Failed to load history:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [status, token]);
+
+  // Charger l'historique au montage
+  useEffect(() => {
+    if (open) {
+      if (status === 'authenticated' && token) {
+        loadHistory();
+      }
+    }
+  }, [open, status, token, loadHistory]);
 
   const handleDelete = async (id: number) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce calcul ?')) {
@@ -56,7 +61,8 @@ export function HistoryModal({ open, onOpenChange, onLoadCalculation }: HistoryM
     }
 
     try {
-      await deleteCalculHistory(id);
+      if (status !== 'authenticated' || !token) return;
+      await deleteCalculHistory(token, id);
       setHistory((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error('Failed to delete calculation:', error);

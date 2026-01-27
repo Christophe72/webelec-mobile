@@ -1,14 +1,9 @@
-export async function getEmbedding(text: string): Promise<number[]> {
-  const res = await fetch("/api/embedding", {
+import { bffFetch } from "@/lib/api/bffFetch";
+
+export async function getEmbedding(token: string, text: string): Promise<number[]> {
+  return bffFetch<number[]>("/api/embedding", token, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),
   });
-
-  if (!res.ok) {
-    throw new Error(`Embedding error: ${await res.text()}`);
-  }
-
-  return (await res.json()) as number[];
 }
-

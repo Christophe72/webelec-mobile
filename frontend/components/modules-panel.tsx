@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import {
   ModuleCreateDTO,
   ModuleDTO,
@@ -12,6 +12,7 @@ import {
   getModules,
   updateModule
 } from "@/lib/api/module";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const emptyForm: ModuleCreateDTO = {
   nom: "",
@@ -28,26 +29,48 @@ export function ModulesPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { status, token } = useAuth();
 
-  const load = async () => {
+  const requireAuth = useCallback(() => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  }, [status, token]);
+
+  const load = useCallback(async () => {
+    const authToken = requireAuth();
+    if (!authToken) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
-      const data = await getModules();
+      const data = await getModules(authToken);
       setModules(data ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
     } finally {
       setLoading(false);
     }
-  };
+  }, [requireAuth]);
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     void load();
-  }, []);
+  }, [load, status, token]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setLoading(false);
+      setError("Vous devez être connecté pour accéder aux données.");
+    }
+  }, [status]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const authToken = requireAuth();
+    if (!authToken) return;
     if (!form.nom.trim()) {
       setError("Le nom du module est requis");
       return;
@@ -58,9 +81,9 @@ export function ModulesPanel() {
       setError(null);
       if (editingId) {
         const payload: ModuleUpdateDTO = { ...form };
-        await updateModule(editingId, payload);
+        await updateModule(authToken, editingId, payload);
       } else {
-        await createModule(form);
+        await createModule(authToken, form);
       }
       setForm(emptyForm);
       setEditingId(null);
@@ -73,9 +96,11 @@ export function ModulesPanel() {
   };
 
   const handleDelete = async (id: number) => {
+    const authToken = requireAuth();
+    if (!authToken) return;
     try {
       setError(null);
-      await deleteModule(id);
+      await deleteModule(authToken, id);
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
@@ -99,9 +124,11 @@ export function ModulesPanel() {
   };
 
   const toggleActif = async (module: ModuleDTO) => {
+    const authToken = requireAuth();
+    if (!authToken) return;
     try {
       setError(null);
-      await updateModule(module.id, { actif: !module.actif });
+      await updateModule(authToken, module.id, { actif: !module.actif });
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");

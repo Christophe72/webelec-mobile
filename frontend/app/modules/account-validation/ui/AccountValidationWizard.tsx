@@ -86,12 +86,14 @@ export function AccountValidationWizard(props: AccountValidationWizardProps) {
 
         {/* Mode Selection */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <p className="block text-sm font-medium text-gray-700 mb-2">
             Mode de saisie
-          </label>
+          </p>
           <div className="flex gap-4">
             <label className="flex items-center">
               <input
+                id="mode-iban"
+                name="mode"
                 type="radio"
                 checked={mode === "IBAN"}
                 onChange={() => setMode("IBAN")}
@@ -102,6 +104,8 @@ export function AccountValidationWizard(props: AccountValidationWizardProps) {
             </label>
             <label className="flex items-center">
               <input
+                id="mode-bban"
+                name="mode"
                 type="radio"
                 checked={mode === "BBAN"}
                 onChange={() => setMode("BBAN")}
@@ -116,10 +120,12 @@ export function AccountValidationWizard(props: AccountValidationWizardProps) {
         {/* IBAN Mode */}
         {mode === "IBAN" && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="iban" className="block text-sm font-medium text-gray-700 mb-2">
               IBAN
             </label>
             <input
+              id="iban"
+              name="iban"
               type="text"
               value={iban}
               onChange={(e) => setIban(e.target.value.toUpperCase())}
@@ -134,10 +140,12 @@ export function AccountValidationWizard(props: AccountValidationWizardProps) {
         {mode === "BBAN" && (
           <>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="countryHint" className="block text-sm font-medium text-gray-700 mb-2">
                 Pays (code ISO 2 lettres)
               </label>
               <input
+                id="countryHint"
+                name="countryHint"
                 type="text"
                 value={countryHint}
                 onChange={(e) => setCountryHint(e.target.value.toUpperCase())}
@@ -148,10 +156,12 @@ export function AccountValidationWizard(props: AccountValidationWizardProps) {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="bban" className="block text-sm font-medium text-gray-700 mb-2">
                 BBAN
               </label>
               <input
+                id="bban"
+                name="bban"
                 type="text"
                 value={bban}
                 onChange={(e) => setBban(e.target.value)}
@@ -165,10 +175,12 @@ export function AccountValidationWizard(props: AccountValidationWizardProps) {
 
         {/* BIC Field */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="bic" className="block text-sm font-medium text-gray-700 mb-2">
             BIC / SWIFT (optionnel selon pays)
           </label>
           <input
+            id="bic"
+            name="bic"
             type="text"
             value={bic}
             onChange={(e) => setBic(e.target.value.toUpperCase())}

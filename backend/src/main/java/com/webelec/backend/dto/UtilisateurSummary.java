@@ -42,10 +42,10 @@ public class UtilisateurSummary {
                 societeNom = us.getSociete().getNom();
             }
             if (us.getRole() != null) {
-                role = us.getRole().name();
+                role = us.getRole().canonicalName();
             }
         } else if (entity.getRole() != null) {
-            role = entity.getRole().name();
+            role = entity.getRole().canonicalName();
         }
         return new UtilisateurSummary(entity.getId(), entity.getNom(), entity.getPrenom(), societeId, societeNom, role);
     }
@@ -61,7 +61,7 @@ public class UtilisateurSummary {
                 utilisateur != null ? utilisateur.getPrenom() : null,
                 link.getSociete() != null ? link.getSociete().getId() : null,
                 link.getSociete() != null ? link.getSociete().getNom() : null,
-                link.getRole() != null ? link.getRole().name() : null
+                link.getRole() != null ? link.getRole().canonicalName() : null
         );
     }
 

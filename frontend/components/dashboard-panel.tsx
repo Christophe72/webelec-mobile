@@ -21,6 +21,7 @@ import { getFactures } from "@/lib/api/facture";
 import { getClients } from "@/lib/api/client";
 import { getProduits } from "@/lib/api/catalogue";
 import type { ClientDTO, FactureDTO, ProduitDTO } from "@/types";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const parseDate = (value?: string | null) => {
   if (!value) return null;
@@ -50,18 +51,21 @@ export default function DashboardPanel() {
   const [viewMode, setViewMode] = useState<"tableaux" | "graphiques">(
     "tableaux"
   );
+  const { status, token } = useAuth();
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     let isActive = true;
 
     const loadData = async () => {
+      if (status !== "authenticated" || !token) return;
       try {
         setLoading(true);
         setError(null);
         const [facturesData, clientsData, produitsData] = await Promise.all([
-          getFactures(),
-          getClients(),
-          getProduits(),
+          getFactures(token),
+          getClients(token),
+          getProduits(token),
         ]);
         if (!isActive) return;
         setFactures(facturesData ?? []);
@@ -81,7 +85,14 @@ export default function DashboardPanel() {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [status, token]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setLoading(false);
+      setError("Vous devez être connecté pour accéder aux données.");
+    }
+  }, [status]);
 
   const currency = useMemo(
     () =>

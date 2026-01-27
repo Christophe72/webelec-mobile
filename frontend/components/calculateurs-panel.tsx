@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense, useCallback } from 'react';
+import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type {
   CalculatorType,
@@ -27,6 +27,7 @@ import { HistoryModal } from './calculateur/history-modal';
 import { Button } from './ui/button';
 import { Cable, Zap, TrendingDown, Settings, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 function CalculateursPanelContent() {
   const router = useRouter();
@@ -35,23 +36,36 @@ function CalculateursPanelContent() {
 
   const [activeTab, setActiveTab] = useState<CalculatorType>(tabFromUrl);
 
+  const initialPreferences = useMemo(() => {
+    if (typeof window === 'undefined') return DEFAULT_CALCULATEUR_PREFERENCES;
+    const cachedPrefs = localStorage.getItem('calculateur-preferences');
+    if (!cachedPrefs) return DEFAULT_CALCULATEUR_PREFERENCES;
+    try {
+      return JSON.parse(cachedPrefs) as CalculateurPreferences;
+    } catch (error) {
+      console.error('Failed to parse cached preferences:', error);
+      return DEFAULT_CALCULATEUR_PREFERENCES;
+    }
+  }, []);
+
   // Préférences utilisateur
-  const [preferences, setPreferences] = useState<CalculateurPreferences>(DEFAULT_CALCULATEUR_PREFERENCES);
+  const [preferences, setPreferences] = useState<CalculateurPreferences>(initialPreferences);
   const [preferencesModalOpen, setPreferencesModalOpen] = useState(false);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const { status, token } = useAuth();
 
   // État des calculateurs (initialisés avec les préférences)
   const [sectionInputs, setSectionInputs] = useState<SectionInputs>({
     courant: 1,
     longueur: 1,
-    tension: preferences.defaultVoltage,
-    typeCircuit: preferences.defaultCircuitType,
-    typeInstallation: preferences.defaultInstallationType,
+    tension: initialPreferences.defaultVoltage,
+    typeCircuit: initialPreferences.defaultCircuitType,
+    typeInstallation: initialPreferences.defaultInstallationType,
   });
 
   const [disjoncteurInputs, setDisjoncteurInputs] = useState<DisjoncteurInputs>({
     section: 1,
-    typeCircuit: preferences.defaultCircuitType,
+    typeCircuit: initialPreferences.defaultCircuitType,
     typeInstallation: 'monophase',
   });
 
@@ -59,9 +73,9 @@ function CalculateursPanelContent() {
     section: 1,
     longueur: 1,
     courant: 1,
-    tension: preferences.defaultVoltage,
-    typeCircuit: preferences.defaultCircuitType,
-    typeInstallation: preferences.defaultInstallationType,
+    tension: initialPreferences.defaultVoltage,
+    typeCircuit: initialPreferences.defaultCircuitType,
+    typeInstallation: initialPreferences.defaultInstallationType,
   });
 
   const applyPreferencesToInputs = useCallback((prefs: CalculateurPreferences) => {
@@ -84,21 +98,9 @@ function CalculateursPanelContent() {
   }, []);
 
   const loadPreferences = useCallback(async () => {
-    // 1. Charger depuis localStorage (instantané)
-    const cachedPrefs = localStorage.getItem('calculateur-preferences');
-    if (cachedPrefs) {
-      try {
-        const prefs = JSON.parse(cachedPrefs) as CalculateurPreferences;
-        setPreferences(prefs);
-        applyPreferencesToInputs(prefs);
-      } catch (error) {
-        console.error('Failed to parse cached preferences:', error);
-      }
-    }
-
-    // 2. Charger depuis le backend (background)
     try {
-      const backendPrefs = await getCalculateurPreferences();
+      if (status !== 'authenticated' || !token) return;
+      const backendPrefs = await getCalculateurPreferences(token);
       if (backendPrefs) {
         setPreferences(backendPrefs);
         applyPreferencesToInputs(backendPrefs);
@@ -107,13 +109,15 @@ function CalculateursPanelContent() {
     } catch (error) {
       console.error('Failed to load preferences from backend:', error);
     }
-  }, [applyPreferencesToInputs]);
+  }, [applyPreferencesToInputs, status, token]);
 
   // Charger les préférences au montage
   useEffect(() => {
-    void loadPreferences();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (status !== 'authenticated' || !token) return;
+    queueMicrotask(() => {
+      void loadPreferences();
+    });
+  }, [loadPreferences, status, token]);
 
   const handleSavePreferences = async (newPrefs: CalculateurPreferences) => {
     // Sauvegarder dans localStorage
@@ -122,7 +126,9 @@ function CalculateursPanelContent() {
 
     // Sauvegarder dans le backend
     try {
-      await updateCalculateurPreferences(newPrefs);
+      if (status === 'authenticated' && token) {
+        await updateCalculateurPreferences(token, newPrefs);
+      }
     } catch (error) {
       console.error('Failed to save preferences to backend:', error);
       // On continue quand même, localStorage est sauvegardé

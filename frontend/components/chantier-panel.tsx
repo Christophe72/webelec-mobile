@@ -16,6 +16,7 @@ import {
 import { getSocietes } from "@/lib/api/societe";
 import { getClients } from "@/lib/api/client";
 import type { ApiError } from "@/lib/api/base";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 type ChantierFormState = {
   nom: string;
@@ -45,6 +46,7 @@ export function ChantierPanel() {
     buildEmptyForm("all")
   );
   const [editingId, setEditingId] = useState<number | null>(null);
+  const { status, token } = useAuth();
 
   const handleApiError = useCallback((err: unknown, fallback: string) => {
     const status = (err as ApiError | null)?.status;
@@ -55,14 +57,25 @@ export function ChantierPanel() {
     setError(err instanceof Error ? err.message : fallback);
   }, []);
 
+  const requireToken = useCallback(() => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  }, [status, token]);
+
   const loadChantiers = useCallback(
     async (societeValue: string = filterSociete) => {
+      const authToken = requireToken();
+      if (!authToken) {
+        setLoading(false);
+        return;
+      }
       try {
         setLoading(true);
         setError(null);
         const societeId =
           societeValue === "all" ? undefined : Number(societeValue);
-        const data = await getChantiers(societeId);
+        const data = await getChantiers(authToken, societeId);
         setChantiers(data ?? []);
       } catch (err) {
         handleApiError(err, "Erreur inconnue");
@@ -70,35 +83,48 @@ export function ChantierPanel() {
         setLoading(false);
       }
     },
-    [filterSociete, handleApiError]
+    [filterSociete, handleApiError, requireToken]
   );
 
   const loadSocietes = useCallback(async () => {
+    const authToken = requireToken();
+    if (!authToken) return;
     try {
-      const data = await getSocietes();
+      const data = await getSocietes(authToken);
       setSocietes(data ?? []);
     } catch (err) {
       handleApiError(err, "Impossible de charger les sociétés");
     }
-  }, [handleApiError]);
+  }, [handleApiError, requireToken]);
 
   const loadClients = useCallback(async () => {
+    const authToken = requireToken();
+    if (!authToken) return;
     try {
-      const data = await getClients();
+      const data = await getClients(authToken);
       setClients(data ?? []);
     } catch (err) {
       handleApiError(err, "Impossible de charger les clients");
     }
-  }, [handleApiError]);
+  }, [handleApiError, requireToken]);
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     void loadSocietes();
     void loadClients();
-  }, [loadSocietes, loadClients]);
+  }, [status, token, loadSocietes, loadClients]);
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     void loadChantiers(filterSociete);
-  }, [filterSociete, loadChantiers]);
+  }, [status, token, filterSociete, loadChantiers]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setLoading(false);
+      setError("Vous devez être connecté pour accéder aux données.");
+    }
+  }, [status]);
 
   const filteredClients = useMemo(() => {
     if (!form.societeId) {
@@ -112,6 +138,8 @@ export function ChantierPanel() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const authToken = requireToken();
+    if (!authToken) return;
     if (!form.nom.trim()) {
       setError("Le nom du chantier est requis");
       return;
@@ -136,9 +164,9 @@ export function ChantierPanel() {
         clientId: Number(form.clientId),
       };
       if (editingId) {
-        await updateChantier(editingId, payload);
+        await updateChantier(authToken, editingId, payload);
       } else {
-        await createChantier(payload);
+        await createChantier(authToken, payload);
       }
       setForm(buildEmptyForm(filterSociete));
       setEditingId(null);
@@ -151,9 +179,11 @@ export function ChantierPanel() {
   };
 
   const handleDelete = async (id: number) => {
+    const authToken = requireToken();
+    if (!authToken) return;
     try {
       setError(null);
-      await deleteChantier(id);
+      await deleteChantier(authToken, id);
       await loadChantiers();
     } catch (err) {
       handleApiError(err, "Erreur inconnue");
@@ -202,6 +232,7 @@ export function ChantierPanel() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <select
             title="Filtrer par société"
+            name="filterSociete"
             value={filterSociete}
             onChange={(e) => setFilterSociete(e.target.value)}
             className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
@@ -226,6 +257,8 @@ export function ChantierPanel() {
 
       <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-2">
         <input
+          id="chantier-nom"
+          name="nom"
           type="text"
           value={form.nom}
           onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
@@ -234,6 +267,8 @@ export function ChantierPanel() {
         />
         <select
           title="Société du chantier"
+          id="chantier-societe"
+          name="societeId"
           value={form.societeId}
           onChange={(e) => {
             const newSocieteId = e.target.value;
@@ -266,6 +301,8 @@ export function ChantierPanel() {
         </select>
         <select
           title="Client du chantier"
+          id="chantier-client"
+          name="clientId"
           value={form.clientId}
           onChange={(e) => {
             const newClientId = e.target.value;
@@ -292,6 +329,8 @@ export function ChantierPanel() {
           ))}
         </select>
         <input
+          id="chantier-adresse"
+          name="adresse"
           type="text"
           value={form.adresse || ""}
           onChange={(e) => setForm((f) => ({ ...f, adresse: e.target.value }))}
@@ -299,6 +338,8 @@ export function ChantierPanel() {
           className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60 sm:col-span-2"
         />
         <textarea
+          id="chantier-description"
+          name="description"
           value={form.description || ""}
           onChange={(e) =>
             setForm((f) => ({ ...f, description: e.target.value }))

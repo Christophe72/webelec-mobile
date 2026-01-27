@@ -1,12 +1,13 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { SocieteRequest, SocieteResponse } from "@/types";
 import {
   createSociete,
   deleteSocieteById,
   getSocietes,
 } from "@/lib/api/societe";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const emptyForm: SocieteRequest = {
   nom: "",
@@ -21,26 +22,48 @@ export function SocietesPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<SocieteRequest>(emptyForm);
+  const { status, token } = useAuth();
 
-  async function load() {
+  const requireAuth = useCallback(() => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  }, [status, token]);
+
+  const load = useCallback(async () => {
+    const authToken = requireAuth();
+    if (!authToken) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
-      const data = await getSocietes();
+      const data = await getSocietes(authToken);
       setSocietes(data ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
     } finally {
       setLoading(false);
     }
-  }
+  }, [requireAuth]);
 
   useEffect(() => {
-    load();
-  }, []);
+    if (status !== "authenticated" || !token) return;
+    void load();
+  }, [load, status, token]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setLoading(false);
+      setError("Vous devez être connecté pour accéder aux données.");
+    }
+  }, [status]);
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    const authToken = requireAuth();
+    if (!authToken) return;
     const trimmedNom = form.nom.trim();
     const trimmedTva = form.tva.trim();
     if (!trimmedNom || !trimmedTva) {
@@ -56,7 +79,7 @@ export function SocietesPanel() {
         telephone: form.telephone?.trim() || undefined,
         adresse: form.adresse?.trim() || undefined,
       };
-      await createSociete(payload);
+      await createSociete(authToken, payload);
       setForm(emptyForm);
       await load();
     } catch (err) {
@@ -65,9 +88,11 @@ export function SocietesPanel() {
   };
 
   const onDelete = async (id: number) => {
+    const authToken = requireAuth();
+    if (!authToken) return;
     try {
       setError(null);
-      await deleteSocieteById(id.toString());
+      await deleteSocieteById(authToken, id.toString());
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");

@@ -19,32 +19,47 @@ function buildInterventionEndpoint(filters?: {
 }
 
 
-export async function getInterventions(filters?: {
+export async function getInterventions(
+  token: string,
+  filters?: {
   societeId?: number | string;
   chantierId?: number | string;
 }): Promise<InterventionDTO[]> {
   const endpoint = buildInterventionEndpoint(filters);
-  return api<InterventionDTO[]>(endpoint);
+  return api<InterventionDTO[]>(token, endpoint);
 }
 
-export function getIntervention(id: number | string): Promise<InterventionDTO> {
-  return api(`/interventions/${id}`);
+export function getIntervention(
+  token: string,
+  id: number | string
+): Promise<InterventionDTO> {
+  return api(token, `/interventions/${id}`);
 }
 
-export function createIntervention(data: InterventionCreateDTO): Promise<InterventionDTO> {
-  return api("/interventions", {
+export function createIntervention(
+  token: string,
+  data: InterventionCreateDTO
+): Promise<InterventionDTO> {
+  return api(token, "/interventions", {
     method: "POST",
     body: JSON.stringify(data)
   });
 }
 
-export function updateIntervention(id: number | string, data: InterventionUpdateDTO): Promise<InterventionDTO> {
-  return api(`/interventions/${id}`, {
+export function updateIntervention(
+  token: string,
+  id: number | string,
+  data: InterventionUpdateDTO
+): Promise<InterventionDTO> {
+  return api(token, `/interventions/${id}`, {
     method: "PUT",
     body: JSON.stringify(data)
   });
 }
 
-export function deleteIntervention(id: number | string): Promise<void> {
-  return api(`/interventions/${id}`, { method: "DELETE" });
+export function deleteIntervention(
+  token: string,
+  id: number | string
+): Promise<void> {
+  return api(token, `/interventions/${id}`, { method: "DELETE" });
 }

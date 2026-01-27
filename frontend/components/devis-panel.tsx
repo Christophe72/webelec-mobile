@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type {
   DevisDTO,
   DevisCreateDTO,
@@ -20,6 +20,7 @@ import { getSocietes } from "@/lib/api/societe";
 import { getClients } from "@/lib/api/client";
 import { getChantiers } from "@/lib/api/chantier";
 import { NumberInput } from "@/components/ui/number-input";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -72,17 +73,29 @@ export function DevisPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { status, token } = useAuth();
 
-  const loadData = async () => {
+  const requireToken = useCallback(() => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  }, [status, token]);
+
+  const loadData = useCallback(async () => {
+    const authToken = requireToken();
+    if (!authToken) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
       const [devisData, societesData, clientsData, chantiersData] =
         await Promise.all([
-          getDevis(),
-          getSocietes(),
-          getClients(),
-          getChantiers(),
+          getDevis(authToken),
+          getSocietes(authToken),
+          getClients(authToken),
+          getChantiers(authToken),
         ]);
       setDevis(devisData ?? []);
       setSocietes(societesData ?? []);
@@ -93,14 +106,24 @@ export function DevisPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [requireToken]);
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     void loadData();
-  }, []);
+  }, [loadData, status, token]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setLoading(false);
+      setError("Vous devez être connecté pour accéder aux données.");
+    }
+  }, [status]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const authToken = requireToken();
+    if (!authToken) return;
     if (!form.numero.trim()) {
       setError("Le numéro de devis est requis.");
       return;
@@ -131,9 +154,9 @@ export function DevisPanel() {
       setSaving(true);
       setError(null);
       if (editingId) {
-        await updateDevis(editingId, payload);
+        await updateDevis(authToken, editingId, payload);
       } else {
-        await createDevis(payload as DevisCreateDTO);
+        await createDevis(authToken, payload as DevisCreateDTO);
       }
       setForm(emptyDevis(devis));
       setLineDesc("Prestation forfaitaire");
@@ -165,9 +188,11 @@ export function DevisPanel() {
   };
 
   const handleDelete = async (id: number) => {
+    const authToken = requireToken();
+    if (!authToken) return;
     try {
       setError(null);
-      await deleteDevis(id);
+      await deleteDevis(authToken, id);
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
@@ -245,10 +270,12 @@ export function DevisPanel() {
 
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="devis-numero" className="mb-1.5 block text-xs font-semibold text-muted">
             Numéro de devis*
           </label>
           <input
+            id="devis-numero"
+            name="numero"
             type="text"
             value={form.numero}
             onChange={(e) => setForm((f) => ({ ...f, numero: e.target.value }))}
@@ -257,10 +284,12 @@ export function DevisPanel() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="devis-statut" className="mb-1.5 block text-xs font-semibold text-muted">
             Statut
           </label>
           <select
+            id="devis-statut"
+            name="statut"
             value={form.statut}
             onChange={(e) => setForm((f) => ({ ...f, statut: e.target.value }))}
             className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
@@ -307,6 +336,7 @@ export function DevisPanel() {
           </label>
           <select
             id="societeId"
+            name="societeId"
             value={form.societeId || ""}
             onChange={(e) =>
               setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
@@ -327,6 +357,7 @@ export function DevisPanel() {
           </label>
           <select
             id="clientId"
+            name="clientId"
             value={form.clientId || ""}
             onChange={(e) => handleClientSelect(e.target.value)}
             className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
@@ -345,6 +376,7 @@ export function DevisPanel() {
           </label>
           <select
             id="chantierId"
+            name="chantierId"
             value={form.chantierId ?? ""}
             onChange={(e) => handleChantierSelect(e.target.value)}
             className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
@@ -358,10 +390,12 @@ export function DevisPanel() {
           </select>
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="devis-montant-ht" className="mb-1.5 block text-xs font-semibold text-muted">
             Montant HT (€)
           </label>
           <NumberInput
+            id="devis-montant-ht"
+            name="montantHT"
             step={0.01}
             min={0}
             value={form.montantHT}
@@ -373,10 +407,12 @@ export function DevisPanel() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="devis-montant-tva" className="mb-1.5 block text-xs font-semibold text-muted">
             TVA (€)
           </label>
           <NumberInput
+            id="devis-montant-tva"
+            name="montantTVA"
             step={0.01}
             min={0}
             value={form.montantTVA}
@@ -388,10 +424,12 @@ export function DevisPanel() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="devis-montant-ttc" className="mb-1.5 block text-xs font-semibold text-muted">
             Montant TTC (€)
           </label>
           <NumberInput
+            id="devis-montant-ttc"
+            name="montantTTC"
             step={0.01}
             min={0}
             value={form.montantTTC}
@@ -403,10 +441,12 @@ export function DevisPanel() {
           />
         </div>
         <div className="sm:col-span-2">
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="devis-line-desc" className="mb-1.5 block text-xs font-semibold text-muted">
             Description de la ligne
           </label>
           <textarea
+            id="devis-line-desc"
+            name="lineDescription"
             value={lineDesc}
             onChange={(e) => setLineDesc(e.target.value)}
             placeholder="Ex: Prestation forfaitaire, installation électrique..."

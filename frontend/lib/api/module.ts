@@ -1,31 +1,41 @@
 import { api } from "./base";
 import { ModuleDTO, ModuleCreateDTO, ModuleUpdateDTO } from "@/types";
 
-export async function getModules(): Promise<ModuleDTO[]> {
-  return (await api<ModuleDTO[]>("/modules")) ?? [];
+export async function getModules(token: string): Promise<ModuleDTO[]> {
+  return (await api<ModuleDTO[]>(token, "/modules")) ?? [];
 }
 
-export function getModule(id: number | string): Promise<ModuleDTO> {
-  return api(`/modules/${id}`);
+export function getModule(
+  token: string,
+  id: number | string
+): Promise<ModuleDTO> {
+  return api(token, `/modules/${id}`);
 }
 
-export function createModule(data: ModuleCreateDTO): Promise<ModuleDTO> {
-  return api("/modules", {
+export function createModule(
+  token: string,
+  data: ModuleCreateDTO
+): Promise<ModuleDTO> {
+  return api(token, "/modules", {
     method: "POST",
     body: JSON.stringify(data)
   });
 }
 
 export function updateModule(
+  token: string,
   id: number | string,
   data: ModuleUpdateDTO
 ): Promise<ModuleDTO> {
-  return api(`/modules/${id}`, {
+  return api(token, `/modules/${id}`, {
     method: "PUT",
     body: JSON.stringify(data)
   });
 }
 
-export function deleteModule(id: number | string): Promise<void> {
-  return api(`/modules/${id}`, { method: "DELETE" });
+export function deleteModule(
+  token: string,
+  id: number | string
+): Promise<void> {
+  return api(token, `/modules/${id}`, { method: "DELETE" });
 }

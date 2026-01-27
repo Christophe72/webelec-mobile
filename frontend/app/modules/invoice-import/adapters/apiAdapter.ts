@@ -4,9 +4,7 @@
  */
 
 import { InvoiceImportResponse, InvoiceImportRequest } from "../domain/types";
-import { getToken } from "@/lib/api/auth-storage";
-
-const API_URL = process.env.NEXT_PUBLIC_API_BASE;
+import { bffFetch } from "@/lib/api/bffFetch";
 
 export interface IInvoiceImportAdapter {
   import(request: InvoiceImportRequest): Promise<InvoiceImportResponse>;
@@ -16,37 +14,17 @@ export interface IInvoiceImportAdapter {
  * HTTP adapter for production use
  */
 export class HttpInvoiceImportAdapter implements IInvoiceImportAdapter {
-  constructor(private baseUrl: string = API_URL || "") {
-    if (!this.baseUrl) {
-      throw new Error("API base URL is not configured");
-    }
-  }
+  constructor(private token: string) {}
 
   async import(request: InvoiceImportRequest): Promise<InvoiceImportResponse> {
     const formData = new FormData();
     formData.append("file", request.file);
     formData.append("societeId", request.societeId.toString());
 
-    const token = getToken();
-    const headers: HeadersInit = {};
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${this.baseUrl}/factures/import`, {
+    return bffFetch<InvoiceImportResponse>("/api/factures/import", this.token, {
       method: "POST",
-      headers,
       body: formData,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({
-        message: "Import failed",
-      }));
-      throw new Error(errorData.message || "Import failed");
-    }
-
-    return await response.json();
   }
 }
 

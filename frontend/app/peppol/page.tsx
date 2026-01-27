@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AccountValidationWizard } from "@/app/modules/account-validation";
 import {
   AccountValidationEngine,
@@ -15,6 +15,7 @@ import {
 import { getFactures } from "@/lib/api/facture";
 import { envoyerPeppol, getUbl } from "@/lib/api/peppol";
 import type { FactureDTO } from "@/types";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 export default function PeppolAccountValidationPage() {
   const societeId = 1;
@@ -32,7 +33,11 @@ export default function PeppolAccountValidationPage() {
       }),
     [],
   );
-  const importAdapter = useMemo(() => new HttpInvoiceImportAdapter(), []);
+  const { status, token } = useAuth();
+  const importAdapter = useMemo(
+    () => (token ? new HttpInvoiceImportAdapter(token) : null),
+    [token]
+  );
   const [importOpen, setImportOpen] = useState(false);
   const [factures, setFactures] = useState<FactureDTO[]>([]);
   const [loadingFactures, setLoadingFactures] = useState(false);
@@ -64,11 +69,12 @@ export default function PeppolAccountValidationPage() {
     );
   };
 
-  const loadFactures = async () => {
+  const loadFactures = useCallback(async () => {
+    if (status !== "authenticated" || !token) return;
     setLoadingFactures(true);
     setActionError(null);
     try {
-      const data = await getFactures({ societeId });
+      const data = await getFactures(token, { societeId });
       setFactures(data ?? []);
     } catch (err) {
       setActionError(
@@ -79,11 +85,12 @@ export default function PeppolAccountValidationPage() {
     } finally {
       setLoadingFactures(false);
     }
-  };
+  }, [societeId, status, token]);
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     loadFactures();
-  }, []);
+  }, [loadFactures, status, token]);
 
   const handleImportSuccess = () => {
     setLastImportMessage("✅ Import réussi! Les factures ont été importées.");
@@ -91,10 +98,11 @@ export default function PeppolAccountValidationPage() {
   };
 
   const handleVerify = async (factureId: number) => {
+    if (status !== "authenticated" || !token) return;
     setVerifyingId(factureId);
     setActionError(null);
     try {
-      await getUbl(String(factureId));
+      await getUbl(token, String(factureId));
       setPeppolStates((prev) => ({
         ...prev,
         [factureId]: {
@@ -119,10 +127,11 @@ export default function PeppolAccountValidationPage() {
   };
 
   const handleSend = async (factureId: number) => {
+    if (status !== "authenticated" || !token) return;
     setSendingId(factureId);
     setActionError(null);
     try {
-      const result = await envoyerPeppol(String(factureId));
+      const result = await envoyerPeppol(token, String(factureId));
       setPeppolStates((prev) => ({
         ...prev,
         [factureId]: {
@@ -422,13 +431,15 @@ export default function PeppolAccountValidationPage() {
         </div>
       </div>
 
-      <InvoiceImportDialog
-        open={importOpen}
-        onOpenChange={setImportOpen}
-        societeId={societeId}
-        adapter={importAdapter}
-        onSuccess={handleImportSuccess}
-      />
+      {importAdapter && (
+        <InvoiceImportDialog
+          open={importOpen}
+          onOpenChange={setImportOpen}
+          societeId={societeId}
+          adapter={importAdapter}
+          onSuccess={handleImportSuccess}
+        />
+      )}
     </div>
   );
 }

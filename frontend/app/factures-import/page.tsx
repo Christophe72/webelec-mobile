@@ -1,19 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   InvoiceImportDialog,
   HttpInvoiceImportAdapter,
 } from "@/app/modules/invoice-import";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 export default function FacturesImportPage() {
   const [importOpen, setImportOpen] = useState(false);
   const [lastImportMessage, setLastImportMessage] = useState<string | null>(
     null,
   );
+  const { token } = useAuth();
 
   // Créer l'adaptateur HTTP pour les appels réels au backend
-  const adapter = new HttpInvoiceImportAdapter();
+  const adapter = useMemo(
+    () => (token ? new HttpInvoiceImportAdapter(token) : null),
+    [token]
+  );
 
   const handleSuccess = () => {
     setLastImportMessage("✅ Import réussi! Les factures ont été importées.");
@@ -53,13 +58,15 @@ export default function FacturesImportPage() {
         </div>
 
         {/* Dialog d&apos;import */}
-        <InvoiceImportDialog
-          open={importOpen}
-          onOpenChange={setImportOpen}
-          societeId={1} // À remplacer par l'ID de la société connectée
-          adapter={adapter}
-          onSuccess={handleSuccess}
-        />
+        {adapter && (
+          <InvoiceImportDialog
+            open={importOpen}
+            onOpenChange={setImportOpen}
+            societeId={1} // À remplacer par l'ID de la société connectée
+            adapter={adapter}
+            onSuccess={handleSuccess}
+          />
+        )}
 
         {/* Documentation */}
         <div className="rounded-lg border border-zinc-200/70 bg-white/80 p-6 shadow-sm max-w-4xl mx-auto dark:border-zinc-800 dark:bg-zinc-900/60">

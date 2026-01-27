@@ -44,7 +44,7 @@ public class SocieteSecurityService {
     }
 
     /**
-     * Vérifie si l'utilisateur courant est ADMIN ou GERANT dans la société donnée.
+     * Vérifie si l'utilisateur courant est ADMIN ou ARTISAN (ex-GERANT) dans la société donnée.
      */
     public boolean isAdminOrGerantInSociete(Long societeId) {
         Utilisateur utilisateur = getCurrentUtilisateur();
@@ -54,8 +54,9 @@ public class SocieteSecurityService {
         return utilisateur.getSocietes().stream()
                 .anyMatch(usr -> usr.getSociete() != null && 
                          usr.getSociete().getId().equals(societeId) &&
-                         (usr.getRole() == UtilisateurRole.ADMIN || 
-                          usr.getRole() == UtilisateurRole.GERANT));
+                         (usr.getRole() == UtilisateurRole.ADMIN ||
+                          usr.getRole() == UtilisateurRole.GERANT ||
+                          usr.getRole() == UtilisateurRole.ARTISAN));
     }
 
     /**

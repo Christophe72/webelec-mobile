@@ -10,6 +10,7 @@ import {
   getPiecesByDevis,
   getPiecesByFacture,
 } from "@/lib/api/piece";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 interface FileManagerProps {
   entityType: "intervention" | "devis" | "facture";
@@ -25,26 +26,39 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { status, token } = useAuth();
+
+  const requireAuth = () => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  };
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     loadFiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entityType, entityId]);
+  }, [entityType, entityId, status, token]);
 
   async function loadFiles() {
+    const authToken = requireAuth();
+    if (!authToken) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       let data: PieceJustificativeResponse[];
       switch (entityType) {
         case "intervention":
-          data = await getPiecesByIntervention(entityId);
+          data = await getPiecesByIntervention(authToken, entityId);
           break;
         case "devis":
-          data = await getPiecesByDevis(entityId);
+          data = await getPiecesByDevis(authToken, entityId);
           break;
         case "facture":
-          data = await getPiecesByFacture(entityId);
+          data = await getPiecesByFacture(authToken, entityId);
           break;
         default:
           data = [];
@@ -62,6 +76,8 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
       setError("Please select a file");
       return;
     }
+    const authToken = requireAuth();
+    if (!authToken) return;
 
     setUploading(true);
     setError(null);
@@ -85,7 +101,7 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
         uploadData.factureId = entityId;
       }
 
-      await uploadPiece(uploadData);
+      await uploadPiece(authToken, uploadData);
       setSelectedFile(null);
       await loadFiles();
     } catch (err) {
@@ -97,7 +113,9 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
 
   async function handleDownload(fileId: number) {
     try {
-      await downloadPiece(fileId);
+      const authToken = requireAuth();
+      if (!authToken) return;
+      await downloadPiece(authToken, fileId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Download failed");
     }
@@ -109,7 +127,9 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
     }
 
     try {
-      await deletePiece(fileId);
+      const authToken = requireAuth();
+      if (!authToken) return;
+      await deletePiece(authToken, fileId);
       await loadFiles();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");

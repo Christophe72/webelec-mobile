@@ -4,6 +4,7 @@ import javax.crypto.SecretKey;
 
 import com.webelec.backend.config.JwtProperties;
 import com.webelec.backend.model.Utilisateur;
+import com.webelec.backend.model.UtilisateurRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -353,7 +354,7 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("uid", utilisateur.getId());
 
-        String role = utilisateur.getRole() != null ? utilisateur.getRole().name() : null;
+        UtilisateurRole role = utilisateur.getRole();
         Long societeId = utilisateur.getSociete() != null ? utilisateur.getSociete().getId() : null;
 
         if ((role == null || societeId == null)
@@ -361,7 +362,7 @@ public class JwtService {
                 && !utilisateur.getSocietes().isEmpty()) {
             var link = utilisateur.getSocietes().get(0);
             if (role == null && link.getRole() != null) {
-                role = link.getRole().name();
+                role = link.getRole();
             }
             if (societeId == null && link.getSociete() != null) {
                 societeId = link.getSociete().getId();
@@ -369,7 +370,7 @@ public class JwtService {
         }
 
         if (role != null) {
-            claims.put("role", role);
+            claims.put("role", role.canonicalName());
         }
         if (societeId != null) {
             claims.put("societeId", societeId);

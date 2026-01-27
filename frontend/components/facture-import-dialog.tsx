@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { importFactures } from "@/lib/api/facture";
 import { FactureImportResponse } from "@/types";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 interface FactureImportDialogProps {
   open: boolean;
@@ -21,6 +22,7 @@ export function FactureImportDialog({
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FactureImportResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { status, token } = useAuth();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -45,12 +47,16 @@ export function FactureImportDialog({
 
   const handleImport = async () => {
     if (!file) return;
+    if (status !== "authenticated" || !token) {
+      setError("Vous devez être connecté pour importer des factures.");
+      return;
+    }
 
     setLoading(true);
     setError(null);
 
     try {
-      const response = await importFactures(file, societeId);
+      const response = await importFactures(token, file, societeId);
       setResult(response);
 
       // If complete success, call onSuccess and close after delay

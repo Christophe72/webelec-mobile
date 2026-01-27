@@ -1,32 +1,16 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Info, AlertTriangle, AlertCircle } from "lucide-react"
+import { Info } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ActivityItem } from "./ActivityItem"
 import type { DashboardEvent } from "@/types/dashboard"
 
 interface RecentActivityProps {
   events: DashboardEvent[]
   isLoading?: boolean
-}
-
-function getRelativeTime(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-
-  if (diffInSeconds < 60) return "à l'instant"
-  if (diffInSeconds < 3600) {
-    const minutes = Math.floor(diffInSeconds / 60)
-    return `il y a ${minutes} minute${minutes > 1 ? "s" : ""}`
-  }
-  if (diffInSeconds < 86400) {
-    const hours = Math.floor(diffInSeconds / 3600)
-    return `il y a ${hours} heure${hours > 1 ? "s" : ""}`
-  }
-  const days = Math.floor(diffInSeconds / 86400)
-  return `il y a ${days} jour${days > 1 ? "s" : ""}`
+  maxItems?: number
 }
 
 function getEntityRoute(entityType: DashboardEvent["entityType"], entityId: string): string {
@@ -38,19 +22,6 @@ function getEntityRoute(entityType: DashboardEvent["entityType"], entityId: stri
     RGIE: `/rgie/${entityId}`,
   }
   return routes[entityType]
-}
-
-function SeverityIcon({ severity }: { severity: DashboardEvent["severity"] }) {
-  const iconProps = { className: "h-5 w-5 flex-shrink-0" }
-
-  switch (severity) {
-    case "INFO":
-      return <Info {...iconProps} className="h-5 w-5 shrink-0 text-blue-500" />
-    case "WARNING":
-      return <AlertTriangle {...iconProps} className="h-5 w-5 shrink-0 text-amber-500" />
-    case "CRITICAL":
-      return <AlertCircle {...iconProps} className="h-5 w-5 shrink-0 text-orange-600" />
-  }
 }
 
 function ActivitySkeleton() {
@@ -80,12 +51,12 @@ function EmptyState() {
   )
 }
 
-export function RecentActivity({ events, isLoading = false }: RecentActivityProps) {
+export function RecentActivity({ events, isLoading = false, maxItems = 5 }: RecentActivityProps) {
   const router = useRouter()
 
-  const sortedEvents = [...events].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
+  const sortedEvents = [...events]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, maxItems)
 
   const handleEventClick = (event: DashboardEvent) => {
     const route = getEntityRoute(event.entityType, event.entityId)
@@ -103,27 +74,13 @@ export function RecentActivity({ events, isLoading = false }: RecentActivityProp
         ) : events.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-2">
             {sortedEvents.map((event) => (
-              <button
+              <ActivityItem
                 key={event.id}
-                onClick={() => handleEventClick(event)}
-                className={`
-                  w-full flex items-start gap-3 p-3 rounded-lg text-left
-                  transition-colors hover:bg-muted/50
-                  ${event.severity === "CRITICAL" ? "bg-orange-50/50 dark:bg-orange-950/20" : ""}
-                `}
-              >
-                <SeverityIcon severity={event.severity} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium leading-none mb-1 truncate">
-                    {event.message}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {getRelativeTime(event.createdAt)}
-                  </p>
-                </div>
-              </button>
+                event={event}
+                onClick={handleEventClick}
+              />
             ))}
           </div>
         )}

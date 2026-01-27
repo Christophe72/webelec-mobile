@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { bffFetch } from "@/lib/api/bffFetch";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 export type QueryResult = {
   result?: string;
@@ -42,10 +44,15 @@ export function RgieQueryPanel(props: RgieQueryPanelProps) {
   const [context, setContext] = useState("");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<QueryResult | null>(null);
+  const { status, token } = useAuth();
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!task.trim()) {
       setResponse({ error: "Merci de préciser la tâche." });
+      return;
+    }
+    if (status !== "authenticated" || !token) {
+      setResponse({ error: "Vous devez être connecté pour lancer l'analyse." });
       return;
     }
 
@@ -53,19 +60,12 @@ export function RgieQueryPanel(props: RgieQueryPanelProps) {
     setResponse(null);
 
     try {
-      const res = await fetch(endpoint, {
+      const data = await bffFetch<QueryResult>(endpoint, token, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ task, context }),
-        credentials: "include", // <-- Ajouté pour transmettre le cookie JWT
       });
-
-      const data = (await res.json()) as QueryResult;
-      if (!res.ok) {
-        setResponse({ error: data.error || "Erreur inconnue." });
-      } else {
-        setResponse({ result: data.result || "Aucune réponse générée." });
-      }
+      setResponse({ result: data.result || "Aucune réponse générée." });
     } catch (err) {
       console.error(err);
       setResponse({ error: "Impossible de contacter le service." });
@@ -78,10 +78,12 @@ export function RgieQueryPanel(props: RgieQueryPanelProps) {
       <section className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.5)] backdrop-blur">
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-sm font-medium text-emerald-100">
+            <label htmlFor="rgie-task" className="block text-sm font-medium text-emerald-100">
               {taskLabel}
             </label>
             <input
+              id="rgie-task"
+              name="task"
               className="mt-2 w-full rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-base text-white outline-none transition focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-300/30"
               placeholder="Ex: Installer un différentiel 30 mA dans une salle de bain"
               value={task}
@@ -90,10 +92,12 @@ export function RgieQueryPanel(props: RgieQueryPanelProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-emerald-100">
+            <label htmlFor="rgie-context" className="block text-sm font-medium text-emerald-100">
               {contextLabel}
             </label>
             <textarea
+              id="rgie-context"
+              name="context"
               className="mt-2 w-full rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-base text-white outline-none transition focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-300/30"
               placeholder="Ex: Locaux humides, circuit existant en 2.5 mm², disjoncteur 20 A, IPx4 requis"
               rows={4}

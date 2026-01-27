@@ -28,7 +28,7 @@
  */
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import type { ProduitDTO, ProduitCreateDTO, SocieteResponse } from "@/types";
 import {
   getProduits,
@@ -38,6 +38,7 @@ import {
 } from "@/lib/api/catalogue";
 import { getSocietes } from "@/lib/api/societe";
 import { NumberInput } from "@/components/ui/number-input";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const generateReference = (produits: ProduitDTO[]): string => {
   const year = new Date().getFullYear();
@@ -74,14 +75,26 @@ export function CataloguePanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { status, token } = useAuth();
 
-  const loadData = async () => {
+  const requireAuth = useCallback(() => {
+    if (status === "authenticated" && token) return token;
+    setError("Vous devez être connecté pour accéder aux données.");
+    return null;
+  }, [status, token]);
+
+  const loadData = useCallback(async () => {
+    const authToken = requireAuth();
+    if (!authToken) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
       const [produitsData, societesData] = await Promise.all([
-        getProduits(),
-        getSocietes(),
+        getProduits(authToken),
+        getSocietes(authToken),
       ]);
       setProduits(produitsData ?? []);
       setSocietes(societesData ?? []);
@@ -90,9 +103,10 @@ export function CataloguePanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [requireAuth]);
 
   useEffect(() => {
+    if (status !== "authenticated" || !token) return;
     void loadData();
 
     const handler = () => {
@@ -103,10 +117,19 @@ export function CataloguePanel() {
     return () => {
       window.removeEventListener("catalogue:refresh", handler);
     };
-  }, []);
+  }, [loadData, status, token]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setLoading(false);
+      setError("Vous devez être connecté pour accéder aux données.");
+    }
+  }, [status]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const authToken = requireAuth();
+    if (!authToken) return;
     if (!form.reference.trim() || !form.nom.trim()) {
       setError("Référence et nom sont requis");
       return;
@@ -119,9 +142,9 @@ export function CataloguePanel() {
       setSaving(true);
       setError(null);
       if (editingId) {
-        await updateProduit(editingId, form);
+        await updateProduit(authToken, editingId, form);
       } else {
-        await createProduit(form);
+        await createProduit(authToken, form);
       }
       setForm(emptyProduit(produits));
       setEditingId(null);
@@ -146,9 +169,11 @@ export function CataloguePanel() {
   };
 
   const handleDelete = async (id: number) => {
+    const authToken = requireAuth();
+    if (!authToken) return;
     try {
       setError(null);
-      await deleteProduit(id);
+      await deleteProduit(authToken, id);
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
@@ -181,10 +206,12 @@ export function CataloguePanel() {
 
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="catalogue-reference" className="mb-1.5 block text-xs font-semibold text-muted">
             Référence*
           </label>
           <input
+            id="catalogue-reference"
+            name="reference"
             type="text"
             value={form.reference}
             onChange={(e) =>
@@ -195,10 +222,12 @@ export function CataloguePanel() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="catalogue-nom" className="mb-1.5 block text-xs font-semibold text-muted">
             Nom du produit*
           </label>
           <input
+            id="catalogue-nom"
+            name="nom"
             type="text"
             value={form.nom}
             onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
@@ -207,10 +236,12 @@ export function CataloguePanel() {
           />
         </div>
         <div className="sm:col-span-2">
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="catalogue-description" className="mb-1.5 block text-xs font-semibold text-muted">
             Description
           </label>
           <textarea
+            id="catalogue-description"
+            name="description"
             value={form.description ?? ""}
             onChange={(e) =>
               setForm((f) => ({ ...f, description: e.target.value }))
@@ -221,10 +252,12 @@ export function CataloguePanel() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="catalogue-quantite" className="mb-1.5 block text-xs font-semibold text-muted">
             Quantité en stock
           </label>
           <NumberInput
+            id="catalogue-quantite"
+            name="quantiteStock"
             value={form.quantiteStock}
             onChange={(e) =>
               setForm((f) => ({ ...f, quantiteStock: Number(e.target.value) }))
@@ -235,10 +268,12 @@ export function CataloguePanel() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="catalogue-prix" className="mb-1.5 block text-xs font-semibold text-muted">
             Prix unitaire (€)
           </label>
           <NumberInput
+            id="catalogue-prix"
+            name="prixUnitaire"
             step={0.01}
             value={form.prixUnitaire}
             onChange={(e) =>
@@ -250,10 +285,12 @@ export function CataloguePanel() {
           />
         </div>
         <div className="sm:col-span-2">
-          <label className="mb-1.5 block text-xs font-semibold text-muted">
+          <label htmlFor="catalogue-societe" className="mb-1.5 block text-xs font-semibold text-muted">
             Société*
           </label>
           <select
+            id="catalogue-societe"
+            name="societeId"
             value={form.societeId || ""}
             onChange={(e) =>
               setForm((f) => ({ ...f, societeId: Number(e.target.value) }))

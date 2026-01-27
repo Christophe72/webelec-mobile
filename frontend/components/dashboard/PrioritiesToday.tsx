@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { AlertCircle, Package, PhoneOutgoing } from "lucide-react"
+import { AlertCircle, Package, PhoneOutgoing, ExternalLink } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import type { DashboardEvent, AcknowledgedPriority } from "@/types/dashboard"
 
 interface PrioritiesTodayProps {
@@ -89,6 +90,43 @@ function getEntityRoute(entityType: DashboardEvent["entityType"], entityId: stri
   return routes[entityType]
 }
 
+function getPriorityAction(priority: Priority): { label: string; route: string } {
+  switch (priority.type) {
+    case "STOCK":
+      return {
+        label: "Créer commande",
+        route: `/catalogue?action=order&item=${priority.entityId}`,
+      }
+    case "URGENT":
+      if (priority.entityType === "RGIE") {
+        return {
+          label: "Ouvrir audit",
+          route: `/rgie/auditeur-pro/${priority.entityId}`,
+        }
+      }
+      if (priority.entityType === "CHANTIER") {
+        return {
+          label: "Voir chantier",
+          route: `/chantiers/${priority.entityId}`,
+        }
+      }
+      return {
+        label: "Voir détails",
+        route: getEntityRoute(priority.entityType, priority.entityId),
+      }
+    case "RELANCE":
+      return {
+        label: "Contacter client",
+        route: `/devis/${priority.entityId}`,
+      }
+    default:
+      return {
+        label: "Voir",
+        route: getEntityRoute(priority.entityType, priority.entityId),
+      }
+  }
+}
+
 function PriorityIcon({ type }: { type: PriorityType }) {
   const iconProps = { className: "h-5 w-5 flex-shrink-0" }
 
@@ -145,11 +183,6 @@ export function PrioritiesToday({
     (priority) => !dismissedPriorities.includes(priority.id)
   )
 
-  const handlePriorityClick = (priority: Priority) => {
-    const route = getEntityRoute(priority.entityType, priority.entityId)
-    router.push(route)
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -163,50 +196,68 @@ export function PrioritiesToday({
             {visiblePriorities.map((priority) => {
               const acknowledgedAt = acknowledgedMap.get(priority.id)
               const isAcknowledged = Boolean(acknowledgedAt)
+              const action = getPriorityAction(priority)
+
               return (
                 <div
                   key={priority.id}
                   data-testid="priority-item"
                   className={`
-                    w-full flex items-start gap-3 p-3 rounded-lg
-                    transition-colors hover:bg-muted/50 group
-                    ${priority.type === "URGENT" ? "bg-orange-50/50 dark:bg-orange-950/20" : ""}
-                    ${isAcknowledged ? "opacity-60" : ""}
+                    w-full flex flex-col gap-3 p-3 rounded-lg border
+                    transition-colors
+                    ${priority.type === "URGENT"
+                      ? "border-orange-500/30 bg-orange-500/5"
+                      : "border-border/50 bg-background"
+                    }
+                    ${isAcknowledged ? "opacity-50" : ""}
                   `}
                 >
-                  <PriorityIcon type={priority.type} />
-                  <button
-                    type="button"
-                    onClick={() => handlePriorityClick(priority)}
-                    className="flex-1 min-w-0 text-left"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        {priority.label}
-                      </span>
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5">
+                      <PriorityIcon type={priority.type} />
                     </div>
-                    <p className="text-sm font-medium leading-tight truncate">
-                      {priority.message}
-                    </p>
-                  </button>
-                  {acknowledgedAt ? (
-                    <p className="text-xs text-neutral-500">
-                      Traité {timeAgo(acknowledgedAt)}
-                    </p>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setDismissedPriorities((prev) => [...prev, priority.id])
-                        onAcknowledge?.(priority.id)
-                      }}
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                    data-testid="priority-ack"
-                  >
-                    ✓ Traité
-                  </button>
-                )}
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                          {priority.label}
+                        </span>
+                        {isAcknowledged && (
+                          <span className="text-[10px] text-emerald-600 font-medium">
+                            ✓ Fait
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium leading-snug">
+                        {priority.message}
+                      </p>
+                    </div>
+                  </div>
+
+                  {!isAcknowledged && (
+                    <div className="flex items-center gap-2 pl-8">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => router.push(action.route)}
+                        className="h-7 text-xs gap-1"
+                      >
+                        {action.label}
+                        <ExternalLink className="h-3 w-3" />
+                      </Button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setDismissedPriorities((prev) => [...prev, priority.id])
+                          onAcknowledge?.(priority.id)
+                        }}
+                        className="text-xs text-muted-foreground hover:text-emerald-600 transition-colors font-medium px-2 py-1 rounded hover:bg-emerald-500/10"
+                        data-testid="priority-ack"
+                      >
+                        Marquer fait
+                      </button>
+                    </div>
+                  )}
                 </div>
               )
             })}

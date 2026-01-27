@@ -1,84 +1,82 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { login, me, refresh } from "@/lib/api/auth";
-import {
-  setToken,
-  clearToken,
-  getToken,
-  setRefreshToken,
-  getRefreshToken,
-} from "@/lib/api/auth-storage";
+import { useAuth } from "@/lib/auth/AuthProvider";
+
+function decodeTokenInfo(value?: string | null): string | null {
+  if (!value) return null;
+  try {
+    const [, payloadBase64] = value.split(".");
+    const payload = JSON.parse(
+      atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/")),
+    ) as { sub?: string; role?: string; exp?: number };
+
+    const exp = payload.exp
+      ? new Date(payload.exp * 1000).toLocaleString()
+      : "n/a";
+
+    return `sub=${payload.sub ?? "n/a"} · role=${payload.role ?? "n/a"} · exp=${exp}`;
+  } catch {
+    return "JWT illisible";
+  }
+}
 
 export default function LoginTestPage() {
+  const { token, setToken, clear } = useAuth();
+
+  // Form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // UI feedback
   const [message, setMessage] = useState<string | null>(null);
-  const [hasToken, setHasToken] = useState<null | boolean>(null);
   const [meStatus, setMeStatus] = useState<string | null>(null);
-  const [tokenInfo, setTokenInfo] = useState<string | null>(null);
   const [refreshStatus, setRefreshStatus] = useState<string | null>(null);
-  const [localTime, setLocalTime] = useState<string | null>(null);
 
-  const buildTokenInfo = useCallback(() => {
-    const token = getToken();
-    if (!token) {
-      setTokenInfo(null);
-      return;
-    }
-    const parts = token.split(".");
-    if (parts.length < 2) {
-      setTokenInfo("JWT illisible");
-      return;
-    }
-    try {
-      const payload = JSON.parse(
-        atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")),
-      ) as { sub?: string; role?: string; exp?: number };
-      const exp = payload.exp
-        ? new Date(payload.exp * 1000).toLocaleString()
-        : "n/a";
-      const sub = payload.sub ?? "n/a";
-      const role = payload.role ?? "n/a";
-      setTokenInfo(`sub=${sub} · role=${role} · exp=${exp}`);
-    } catch {
-      setTokenInfo("JWT illisible");
-    }
-  }, []);
+  // Debug / info
+  const [refreshTokenValue, setRefreshTokenValue] = useState<string | null>(null);
+  const [accessTokenShadow, setAccessTokenShadow] = useState<string | null>(null);
 
-  useEffect(() => {
-    // On lit le token uniquement côté client après le montage
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHasToken(!!getToken());
-    buildTokenInfo();
-    setLocalTime(new Date().toLocaleString());
-  }, [buildTokenInfo]);
+  // 🔑 DÉRIVÉS
+  const accessToken = accessTokenShadow ?? token;
+  const hasToken = Boolean(accessToken);
+  const tokenInfo = useMemo(() => decodeTokenInfo(accessToken), [accessToken]);
+  const localTime = useMemo(
+    () => (accessToken ? new Date().toLocaleString() : null),
+    [accessToken],
+  );
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setMessage(null);
     setMeStatus(null);
+
     try {
       const res = await login({ email, motDePasse: password });
+
+      // ✅ Provider = source de vérité
       setToken(res.accessToken);
-      setRefreshToken(res.refreshToken);
-      setHasToken(true);
-      buildTokenInfo();
-      setMessage(
-        `Connexion réussie pour ${res.utilisateur.email}, token stocké.`,
-      );
+
+      // shadow UI immédiat
+      setAccessTokenShadow(res.accessToken);
+      setRefreshTokenValue(res.refreshToken ?? null);
+
+      setMessage(`Connexion réussie pour ${res.utilisateur.email}`);
     } catch (err) {
-      setMessage(
-        err instanceof Error ? err.message : "Erreur lors de la connexion.",
-      );
+      setMessage(err instanceof Error ? err.message : "Erreur lors de la connexion.");
     }
   }
 
   async function handleCheckMe() {
+    if (!accessToken) {
+      setMeStatus("Aucun token disponible");
+      return;
+    }
     setMeStatus("Vérification en cours...");
     try {
-      const user = await me();
+      const user = await me(accessToken);
       setMeStatus(`OK: ${user.email}`);
     } catch (err) {
       setMeStatus(err instanceof Error ? err.message : "Erreur /auth/me");
@@ -86,210 +84,112 @@ export default function LoginTestPage() {
   }
 
   async function handleCheckRefresh() {
-    setRefreshStatus("Refresh en cours...");
-    const token = getRefreshToken();
-    if (!token) {
+    if (!refreshTokenValue) {
       setRefreshStatus("Aucun refresh token");
       return;
     }
+    setRefreshStatus("Refresh en cours...");
     try {
-      const res = await refresh({ refreshToken: token });
+      const res = await refresh({ refreshToken: refreshTokenValue });
+
       setToken(res.accessToken);
+      setAccessTokenShadow(res.accessToken);
+
       if (res.refreshToken) {
-        setRefreshToken(res.refreshToken);
+        setRefreshTokenValue(res.refreshToken);
       }
-      buildTokenInfo();
-      setRefreshStatus("OK: refresh token accepté");
+
+      setRefreshStatus("OK: refresh accepté");
     } catch (err) {
-      setRefreshStatus(
-        err instanceof Error ? err.message : "Erreur /auth/refresh",
-      );
+      setRefreshStatus(err instanceof Error ? err.message : "Erreur /auth/refresh");
     }
   }
 
   function handleLogout() {
-    clearToken();
-    setHasToken(false);
-    setMessage("Token supprimé.");
-    setTokenInfo(null);
+    clear();
+    setMessage("Déconnecté.");
+    setAccessTokenShadow(null);
+    setRefreshTokenValue(null);
   }
 
   const quickLinks = [
-    {
-      href: "/dashboard",
-      title: "Dashboard",
-      description: "Vue synthétique des indicateurs clés",
-    },
-    {
-      href: "/societes",
-      title: "Sociétés",
-      description: "CRUD complet via l'API backend",
-    },
-    {
-      href: "/clients",
-      title: "Clients",
-      description: "Contacts liés via l'API backend",
-    },
-    {
-      href: "/modules",
-      title: "Modules",
-      description: "Activer les briques fonctionnelles",
-    },
-    {
-      href: "/chantiers",
-      title: "Chantiers",
-      description: "Piloter les interventions",
-    },
-    {
-      href: "/catalogue",
-      title: "Catalogue",
-      description: "Tester les produits et le stock",
-    },
-    {
-      href: "/calculateur?tab=disjoncteur",
-      title: "Calculatrice disjoncteur",
-      description: "Aide au choix du disjoncteur",
-    },
-    {
-      href: "/files-demo",
-      title: "Gestion fichiers",
-      description: "Uploader des pièces jointes",
-    },
-    {
-      href: "/ia",
-      title: "IA",
-      description: "Assistant RGIE",
-    },
-    {
-      href: "/rgie/auditeur-pro",
-      title: "Auditeur RGIE",
-      description: "IA conformité via /api/query",
-    },
+    { href: "/dashboard", title: "Dashboard", description: "Vue synthétique" },
+    { href: "/societes", title: "Sociétés", description: "CRUD backend" },
+    { href: "/clients", title: "Clients", description: "Contacts" },
+    { href: "/modules", title: "Modules", description: "Fonctionnalités" },
+    { href: "/chantiers", title: "Chantiers", description: "Interventions" },
+    { href: "/catalogue", title: "Catalogue", description: "Stock & produits" },
+    { href: "/calculateur?tab=disjoncteur", title: "Calculateur", description: "Disjoncteurs" },
+    { href: "/ia", title: "IA", description: "Assistant RGIE" },
+    { href: "/rgie/auditeur-pro", title: "Auditeur RGIE", description: "Conformité" },
   ];
 
   return (
-    <div className="mx-auto mt-4 sm:mt-8 md:mt-12 max-w-md px-4 sm:px-0">
-      <div className="rounded-2xl border border-border bg-card/80 p-4 sm:p-6 shadow-sm backdrop-blur">
-        <h1 className="text-lg sm:text-xl font-semibold mb-4">
-          Test login JWT
-        </h1>
+    <div className="mx-auto mt-10 max-w-md px-4">
+      <div className="rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur">
+        <h1 className="mb-4 text-xl font-semibold">Test login JWT</h1>
 
-        {hasToken === null ? (
-          <p>Chargement…</p>
-        ) : hasToken ? (
-          <div>
-            <p className="mb-4">Token actif</p>
-            <button
-              type="button"
-              onClick={handleCheckMe}
-              className="mb-3 w-full rounded-lg border border-border bg-muted/40 px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm transition-all"
-            >
+        {hasToken ? (
+          <>
+            <p className="mb-3 text-sm">Token actif</p>
+            <div className="mb-4 rounded-lg border border-border/80 bg-muted/40 p-3 text-xs text-muted-foreground">
+              <p>{tokenInfo ?? "JWT illisible"}</p>
+              <p>Horodatage local : {localTime ?? "n/a"}</p>
+            </div>
+
+            <button onClick={handleCheckMe} className="btn mb-2 w-full" type="button">
               Tester /auth/me
             </button>
-            <button
-              type="button"
-              onClick={handleCheckRefresh}
-              className="mb-3 w-full rounded-lg border border-border bg-muted/40 px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm transition-all"
-            >
+            <button onClick={handleCheckRefresh} className="btn mb-2 w-full" type="button">
               Tester /auth/refresh
             </button>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full rounded-lg border border-border px-3 py-2 sm:px-4 text-xs sm:text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm transition-all"
-            >
+            <button onClick={handleLogout} className="btn w-full" type="button">
               Déconnexion
             </button>
-          </div>
+
+            {meStatus && <p className="mt-3 text-xs text-muted-foreground">/auth/me : {meStatus}</p>}
+            {refreshStatus && (
+              <p className="text-xs text-muted-foreground">/auth/refresh : {refreshStatus}</p>
+            )}
+            {message && <p className="text-xs font-medium text-emerald-600">{message}</p>}
+          </>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
-              name="email"
               type="email"
-              autoComplete="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+              className="input"
             />
             <input
               type="password"
-              name="password"
-              autoComplete="current-password" // ou "new-password" si c'est pour créer un compte
               placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+              className="input"
             />
-            <button
-              type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-black px-3 py-2 sm:px-4 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black"
-            >
+            <button type="submit" className="btn w-full">
               Se connecter
             </button>
+            {message && <p className="text-xs text-muted-foreground">{message}</p>}
           </form>
         )}
+      </div>
 
-        <div className="mt-4 text-xs text-muted-foreground">
-          <p>
-            Token actuel :{" "}
-            {hasToken === null ? "..." : hasToken ? "présent" : "absent"}
-          </p>
-        </div>
-
-        {message && (
-          <div className="mt-4 rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm text-foreground">
-            {message}
-          </div>
-        )}
-
-        {meStatus && (
-          <div className="mt-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-foreground">
-            {meStatus}
-          </div>
-        )}
-
-        {refreshStatus && (
-          <div className="mt-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-foreground">
-            {refreshStatus}
-          </div>
-        )}
-
-        {tokenInfo && (
-          <div className="mt-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-[11px] text-foreground">
-            {tokenInfo}
-          </div>
-        )}
-
-        <div className="mt-2 text-[11px] text-muted-foreground">
-          API base: {process.env.NEXT_PUBLIC_API_BASE ?? "n/a"}
-        </div>
-        {localTime && (
-          <div className="mt-1 text-[11px] text-muted-foreground">
-            Heure locale: {localTime}
-          </div>
-        )}
-
-        <div className="mt-4 sm:mt-6 space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Accès rapide
-          </p>
-          <div className="grid grid-cols-1 gap-2">
-            {quickLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-lg sm:rounded-xl border border-border px-3 py-2 sm:px-4 sm:py-3 text-sm font-medium text-foreground hover:-translate-y-px hover:shadow-sm hover:border-primary/50 transition-all"
-              >
-                <span className="block text-sm sm:text-base font-semibold">
-                  {link.title}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {link.description}
-                </span>
-              </Link>
-            ))}
-          </div>
+      <div className="mt-6 rounded-xl border border-border bg-card/70 p-4">
+        <p className="mb-3 text-sm font-medium">Raccourcis ERP</p>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {quickLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-lg border border-border/70 bg-muted/30 p-3 text-sm hover:border-primary hover:text-primary"
+            >
+              <div className="font-semibold">{link.title}</div>
+              <div className="text-xs text-muted-foreground">{link.description}</div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

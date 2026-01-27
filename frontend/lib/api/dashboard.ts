@@ -1,91 +1,103 @@
-import type { DashboardMetricsResponse } from "@/lib/types/dashboard"
+import type {
+  DashboardMetrics,
+  DashboardMetricsResponse,
+} from "@/types/dashboard"
 import { bffFetch } from "@/lib/api/bffFetch"
 
 /**
- * Récupère les métriques du dashboard via le proxy Next.js
- * Ne jamais appeler le backend directement depuis le client (CORS, 403, etc.)
+ * Récupère les métriques du dashboard via la BFF Next.js
+ * Le backend Spring n'est JAMAIS appelé directement
  */
-export async function fetchDashboardMetrics(): Promise<DashboardMetricsResponse> {
+export async function fetchDashboardMetrics(
+  token: string
+): Promise<DashboardMetricsResponse> {
   try {
-    const res = await bffFetch("/api/dashboard/metrics", {
-      cache: "no-store",
-    })
+    const data = await bffFetch<DashboardMetricsResponse>(
+      "/api/dashboard/metrics",
+      token
+    )
 
-    if (!res.ok) {
-      return {
-        status: "error",
-        error: `Erreur API: ${res.status}`,
-        metrics: {
-          activeSitesCount: 0,
-          stockAlertsCount: 0,
-          rgieAlertsCount: 0,
-          criticalNotificationsCount: 0,
-        },
-      }
-    }
-
-    const data = await res.json()
-    if (data?.status === "error") {
+    if (data.status === "error") {
       return {
         status: "error",
         error: data.error ?? "Erreur API",
-        metrics: data.metrics ?? {
-          activeSitesCount: 0,
-          stockAlertsCount: 0,
-          rgieAlertsCount: 0,
-          criticalNotificationsCount: 0,
-        },
+        metrics: data.metrics ?? emptyMetrics(),
       }
     }
 
     return {
       status: "success",
-      metrics: data.metrics || data,
+      metrics: data.metrics,
     }
   } catch (error) {
-    console.error("Erreur lors du chargement des métriques:", error)
+    const status =
+      typeof error === "object" && error !== null && "status" in error
+        ? (error as { status?: number }).status
+        : undefined
+    if (status !== 401) {
+      console.error("Erreur lors du chargement des métriques:", error)
+    }
+
     return {
       status: "error",
-      error: error instanceof Error ? error.message : "Erreur inconnue",
-      metrics: {
-        activeSitesCount: 0,
-        stockAlertsCount: 0,
-        rgieAlertsCount: 0,
-        criticalNotificationsCount: 0,
-      },
+      error:
+        status === 401
+          ? "Non autorisé"
+          : error instanceof Error
+            ? error.message
+            : "Erreur inconnue",
+      metrics: emptyMetrics(),
     }
   }
 }
 
 /**
- * Calcule les métriques à partir des événements (fallback si API indisponible)
+ * Fallback : calcule les métriques à partir des événements
+ * (utilisé uniquement si l’API est indisponible)
  */
 export function calculateMetricsFromEvents(
   events: Array<{
-    entityType: string
-    severity: string
+    entityType: "DEVIS" | "CHANTIER" | "FACTURE" | "STOCK" | "RGIE"
+    severity: "INFO" | "WARNING" | "CRITICAL"
+    entityId: string
   }>
-) {
+): DashboardMetrics {
   const chantiersActifs = new Set(
-    events.filter(e => e.entityType === "CHANTIER").map((_, i) => i)
+    events
+      .filter(e => e.entityType === "CHANTIER")
+      .map(e => e.entityId)
   ).size
 
-  const alertesStock = events.filter(
-    e => e.entityType === "STOCK" && (e.severity === "WARNING" || e.severity === "CRITICAL")
+  const stockAlertsCount = events.filter(
+    e =>
+      e.entityType === "STOCK" &&
+      (e.severity === "WARNING" || e.severity === "CRITICAL")
   ).length
 
-  const alertesRGIE = events.filter(
+  const rgieAlertsCount = events.filter(
     e => e.entityType === "RGIE" && e.severity === "CRITICAL"
   ).length
 
-  const notificationsCritiques = events.filter(
+  const criticalNotificationsCount = events.filter(
     e => e.severity === "CRITICAL"
   ).length
 
   return {
     activeSitesCount: chantiersActifs,
-    stockAlertsCount: alertesStock,
-    rgieAlertsCount: alertesRGIE,
-    criticalNotificationsCount: notificationsCritiques,
+    stockAlertsCount,
+    rgieAlertsCount,
+    criticalNotificationsCount,
+  }
+}
+
+/**
+ * Métriques vides centralisées (évite les duplications)
+ */
+function emptyMetrics(): DashboardMetrics {
+  return {
+    activeSitesCount: 0,
+    stockAlertsCount: 0,
+    rgieAlertsCount: 0,
+    criticalNotificationsCount: 0,
   }
 }

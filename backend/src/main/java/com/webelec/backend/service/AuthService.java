@@ -92,7 +92,11 @@ public class AuthService {
 
     private UtilisateurRole parseRole(String value) {
         try {
-            return UtilisateurRole.valueOf(value);
+            String normalized = UtilisateurRole.normalizeRole(value);
+            if (normalized == null) {
+                throw new IllegalArgumentException("Rôle utilisateur invalide : " + value);
+            }
+            return UtilisateurRole.valueOf(normalized);
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException("Rôle utilisateur invalide : " + value);
         }

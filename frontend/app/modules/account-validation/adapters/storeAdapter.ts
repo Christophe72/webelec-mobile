@@ -1,6 +1,7 @@
 // modules/account-validation/adapters/storeAdapter.ts
 import { StorePort } from "../domain/engine";
 import { NormalizedAccountDetails } from "../domain/types";
+import { bffFetch } from "@/lib/api/bffFetch";
 
 export class NoopStoreAdapter implements StorePort {
   async storeTransposed(details: {
@@ -13,14 +14,19 @@ export class NoopStoreAdapter implements StorePort {
 }
 
 export class HttpStoreAdapter implements StorePort {
-  constructor(private apiUrl: string, private apiKey?: string) {}
+  constructor(
+    private token: string,
+    private apiUrl: string,
+    private apiKey?: string
+  ) {}
 
   async storeTransposed(details: {
     original: NormalizedAccountDetails;
     resolved: NormalizedAccountDetails;
   }): Promise<void> {
     try {
-      const res = await fetch(`${this.apiUrl}/account-validation/transposed`, {
+      const baseUrl = this.apiUrl.startsWith("/api") ? this.apiUrl : "/api";
+      await bffFetch(`${baseUrl}/account-validation/transposed`, this.token, {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -32,10 +38,6 @@ export class HttpStoreAdapter implements StorePort {
           timestamp: new Date().toISOString(),
         }),
       });
-
-      if (!res.ok) {
-        console.error("Failed to store transposed account:", res.status);
-      }
     } catch (error) {
       console.error("Error storing transposed account:", error);
     }

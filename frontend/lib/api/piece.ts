@@ -1,45 +1,27 @@
 import { PieceJustificativeResponse, PieceUploadDTO } from "@/types";
-import { getToken } from "@/lib/api/auth-storage";
+import { bffFetch } from "@/lib/api/bffFetch";
 
-const API_URL: string = process.env.NEXT_PUBLIC_API_BASE ?? (() => {
-  throw new Error("NEXT_PUBLIC_API_BASE is not defined");
-})();
-
-function withAuth(init: RequestInit = {}): RequestInit {
-  const headers = new Headers(init.headers ?? undefined);
-  if (typeof window !== "undefined") {
-    const token = getToken();
-    if (token && !headers.has("Authorization")) {
-      headers.set("Authorization", `Bearer ${token}`);
-    }
+function buildHeaders(token: string, init?: RequestInit): Headers {
+  const headers = new Headers(init?.headers ?? undefined);
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
   }
-  return { ...init, headers };
+  return headers;
 }
 
 async function fetchJson<T>(
+  token: string,
   endpoint: string,
   init: RequestInit = {}
 ): Promise<T> {
-  const res = await fetch(
-    `${API_URL}${endpoint}`,
-    withAuth({ cache: "no-store", ...init })
-  );
-  if (!res.ok) {
-    const message = await res.text().catch(() => res.statusText);
-    throw new Error(
-      `[pieces] ${res.status} ${res.statusText}${
-        message ? ` - ${message}` : ""
-      }`
-    );
-  }
-  if (res.status === 204) {
-    return undefined as T;
-  }
-  return (await res.json()) as T;
+  return bffFetch<T>(`/api${endpoint}`, token, init);
 }
 
-async function fetchBinary(endpoint: string): Promise<Response> {
-  const res = await fetch(`${API_URL}${endpoint}`, withAuth({ cache: "no-store" }));
+async function fetchBinary(token: string, endpoint: string): Promise<Response> {
+  const res = await fetch(`/api${endpoint}`, {
+    headers: buildHeaders(token),
+    cache: "no-store"
+  });
   if (!res.ok) {
     throw new Error(res.statusText);
   }
@@ -63,31 +45,24 @@ function buildFormData(data: PieceUploadDTO): FormData {
 }
 
 export async function uploadPiece(
+  token: string,
   data: PieceUploadDTO
 ): Promise<PieceJustificativeResponse> {
-  const res = await fetch(
-    `${API_URL}/pieces/upload`,
-    withAuth({
-      method: "POST",
-      body: buildFormData(data),
-      cache: "no-store"
-    })
-  );
-  if (!res.ok) {
-    const msg = await res.text().catch(() => res.statusText);
-    throw new Error(msg);
-  }
-  return (await res.json()) as PieceJustificativeResponse;
+  return bffFetch<PieceJustificativeResponse>("/api/pieces/upload", token, {
+    method: "POST",
+    body: buildFormData(data),
+  });
 }
 
 export function getPiece(
+  token: string,
   id: number
 ): Promise<PieceJustificativeResponse> {
-  return fetchJson<PieceJustificativeResponse>(`/pieces/${id}`);
+  return fetchJson<PieceJustificativeResponse>(token, `/pieces/${id}`);
 }
 
-export async function downloadPiece(id: number): Promise<void> {
-  const res = await fetchBinary(`/pieces/${id}/download`);
+export async function downloadPiece(token: string, id: number): Promise<void> {
+  const res = await fetchBinary(token, `/pieces/${id}/download`);
   if (!res.ok) {
     throw new Error(`Failed to download piece: ${res.statusText}`);
   }
@@ -114,25 +89,28 @@ export async function downloadPiece(id: number): Promise<void> {
 }
 
 export function getPiecesByIntervention(
+  token: string,
   interventionId: number
 ): Promise<PieceJustificativeResponse[]> {
-  return fetchJson(`/pieces/intervention/${interventionId}`);
+  return fetchJson(token, `/pieces/intervention/${interventionId}`);
 }
 
 export function getPiecesByDevis(
+  token: string,
   devisId: number
 ): Promise<PieceJustificativeResponse[]> {
-  return fetchJson(`/pieces/devis/${devisId}`);
+  return fetchJson(token, `/pieces/devis/${devisId}`);
 }
 
 export function getPiecesByFacture(
+  token: string,
   factureId: number
 ): Promise<PieceJustificativeResponse[]> {
-  return fetchJson(`/pieces/facture/${factureId}`);
+  return fetchJson(token, `/pieces/facture/${factureId}`);
 }
 
-export function deletePiece(id: number): Promise<void> {
-  return fetchJson(`/pieces/${id}`, {
+export function deletePiece(token: string, id: number): Promise<void> {
+  return fetchJson(token, `/pieces/${id}`, {
     method: "DELETE"
   });
 }

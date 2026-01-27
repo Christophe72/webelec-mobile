@@ -56,10 +56,25 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                     // Endpoints publics : authentification et Swagger
-                    .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
+                    .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                     // Endpoints de health check (optionnel)
                     .requestMatchers("/actuator/health").permitAll()
+                    .requestMatchers(
+                        "/api/dashboard/**",
+                        "/api/devis/**",
+                        "/api/clients/**",
+                        "/api/catalogue/**",
+                        "/api/produits/**",
+                        "/api/produits-avances/**",
+                        "/api/stock/**"
+                    ).hasRole("ARTISAN")
+                    .requestMatchers("/api/chantiers/**")
+                    .hasAnyRole("ARTISAN", "TECH", "AUDITEUR")
+                    .requestMatchers("/api/rgie/**")
+                    .hasAnyRole("ARTISAN", "TECH", "AUDITEUR")
+                    .requestMatchers("/api/audit/**")
+                    .hasRole("AUDITEUR")
                     // Tous les autres endpoints nécessitent une authentification
                     .anyRequest().authenticated()
                 )

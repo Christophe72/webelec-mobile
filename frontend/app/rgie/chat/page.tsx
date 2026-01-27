@@ -92,6 +92,8 @@
 "use client";
 
 import { useState } from "react";
+import { bffFetch } from "@/lib/api/bffFetch";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { WebElecAI } from "../../../lib/sdk/webelec-ai";
 import { analyseEffet } from "@/lib/rgie/chat/page";
 import { Button } from "@/components/ui/button";
@@ -100,12 +102,12 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { RgieRegle as RgieRule } from "@/types";
 
 // Fonction pour obtenir l'embedding utilisateur (texte libre)
-async function getEmbedding(text: string): Promise<number[]> {
-  const res = await fetch("/api/embedding", {
+async function getEmbedding(token: string, text: string): Promise<number[]> {
+  return bffFetch<number[]>("/api/embedding", token, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),
   });
-  return await res.json();
 }
 type ChatMessage = {
   role: "user" | "ai";
@@ -119,6 +121,7 @@ export default function ChatRgiePage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const { status, token } = useAuth();
 
   const ai = new WebElecAI();
 
@@ -127,6 +130,13 @@ export default function ChatRgiePage() {
   // ------------------------------------------------------------
   const sendMessage = async () => {
     if (!input.trim()) return;
+    if (status !== "authenticated" || !token) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "ai", text: "Veuillez vous connecter pour utiliser le chat." },
+      ]);
+      return;
+    }
 
     const userMsg: ChatMessage = { role: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
@@ -135,7 +145,7 @@ export default function ChatRgiePage() {
 
     try {
       // 1. Embedding utilisateur
-      const embedding = await getEmbedding(input);
+      const embedding = await getEmbedding(token, input);
 
       // 2. Appel IA sécurisé (zéro hallucination)
       const ans = await ai.ask(input, embedding);
@@ -169,6 +179,13 @@ export default function ChatRgiePage() {
   // ------------------------------------------------------------
   const sendEffectAnalysis = async () => {
     if (!input.trim()) return;
+    if (status !== "authenticated" || !token) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "ai", text: "Veuillez vous connecter pour lancer l'analyse." },
+      ]);
+      return;
+    }
 
     const userMsg: ChatMessage = { role: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
@@ -176,7 +193,7 @@ export default function ChatRgiePage() {
     setLoading(true);
 
     try {
-      await analyseEffet(input, setMessages);
+      await analyseEffet(token, input, setMessages);
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
       setMessages((prev) => [

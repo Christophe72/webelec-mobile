@@ -32,7 +32,7 @@ public class SocieteSelectionDTO {
         return new SocieteSelectionDTO(
                 selection.societeId(),
                 selection.societeName(),
-                selection.role() != null ? selection.role().name() : null,
+                selection.role() != null ? selection.role().canonicalName() : null,
                 selection.selectedAt()
         );
     }

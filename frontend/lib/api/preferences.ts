@@ -12,9 +12,11 @@ import {
 /**
  * Récupère les préférences de l'utilisateur pour les calculateurs
  */
-export async function getCalculateurPreferences(): Promise<CalculateurPreferences | null> {
+export async function getCalculateurPreferences(
+  token: string
+): Promise<CalculateurPreferences | null> {
   try {
-    return await api<CalculateurPreferences>('/calculateur/preferences');
+    return await api<CalculateurPreferences>(token, '/calculateur/preferences');
   } catch (error) {
     // Si l'endpoint n'existe pas encore ou erreur, retourner null
     console.warn('Failed to load preferences from backend:', error);
@@ -26,10 +28,11 @@ export async function getCalculateurPreferences(): Promise<CalculateurPreference
  * Met à jour les préférences de l'utilisateur
  */
 export async function updateCalculateurPreferences(
+  token: string,
   preferences: CalculateurPreferencesUpdateDTO
 ): Promise<CalculateurPreferences> {
   try {
-    return await api<CalculateurPreferences>('/calculateur/preferences', {
+    return await api<CalculateurPreferences>(token, '/calculateur/preferences', {
       method: 'PUT',
       body: JSON.stringify({ preferences }),
     });

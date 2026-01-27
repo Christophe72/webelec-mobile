@@ -1,31 +1,45 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/webelec?currentSchema=public}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/webelec}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
 
   jpa:
+    open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # OK en dev uniquement
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
-        show_sql: true
         default_schema: public
 
   flyway:
-    # Flyway est activé en production (migrations). En dev, aucune migration n'est actuellement fournie,
-    # donc on le désactive pour laisser Hibernate créer/mettre à jour le schéma via ddl-auto.
-    enabled: false
+    enabled: false   # correct en dev si tu assumes Hibernate
     schemas: public
+
+  # Désactive l'arrêt automatique en dev
+  application:
+    admin:
+      enabled: false
+
+  # Désactive DevTools (restart automatique et livereload)
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
 
 server:
   port: 8080
 
-# Configuration CORS pour le développement (permissif)
+# CORS dev (simple et efficace)
 cors:
-  allowed-origins: "http://localhost:3000,http://localhost:5173,http://localhost:4200"
+  allowed-origins:
+    - http://localhost:3000
+    - http://localhost:5173
+    - http://localhost:4200
 
 webelec:
   security:
