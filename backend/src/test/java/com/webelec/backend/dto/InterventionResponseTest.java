@@ -67,7 +67,7 @@ class InterventionResponseTest {
         assertEquals("Dupont", dto.getClient().getNom());
         assertNotNull(dto.getUtilisateur());
         assertEquals(4L, dto.getUtilisateur().getId());
-        assertEquals("TECHNICIEN", dto.getUtilisateur().getRole());
+        assertEquals("TECH", dto.getUtilisateur().getRole());
     }
 
     @Test

@@ -110,14 +110,14 @@ class UserContextServiceTest {
         UserContextDTO dto = service.getContext(1L);
 
         assertEquals("Alexandre Leroy", dto.getFullName());
-        assertEquals("TECHNICIEN", dto.getRole());
+        assertEquals("TECH", dto.getRole());
         assertEquals(2, dto.getHabilitations().size());
         assertEquals(4L, dto.getNotifications().getUnreadCount());
         assertEquals(2L, dto.getNotifications().getCriticalCount());
         assertEquals(7L, dto.getTeam().getTeamId());
         assertEquals(7L, dto.getSelection().getSocieteId());
         assertEquals("Alpha Energies", dto.getSelection().getSocieteName());
-        assertEquals("TECHNICIEN", dto.getSelection().getRole());
+        assertEquals("TECH", dto.getSelection().getRole());
         assertEquals(Instant.parse("2026-01-12T22:19:43Z"), dto.getSelection().getSelectedAt());
     }
 
