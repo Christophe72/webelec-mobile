@@ -13,19 +13,26 @@ import {
 import { useAuth } from "@/lib/hooks/useAuth";
 
 interface FileManagerProps {
-  entityType: "intervention" | "devis" | "facture";
-  entityId: number;
+  entityType?: "intervention" | "devis" | "facture";
+  entityId?: number;
 }
 
 const DOCUMENT_TYPES = ["PHOTO", "PDF", "TICKET", "FACTURE", "DEVIS", "AUTRE"];
 
-export default function FileManager({ entityType, entityId }: FileManagerProps) {
+export default function FileManager({
+  entityType: initialEntityType = "intervention",
+  entityId: initialEntityId
+}: FileManagerProps) {
+  const [entityType, setEntityType] = useState<"intervention" | "devis" | "facture">(initialEntityType);
+  const [entityId, setEntityId] = useState<string>(initialEntityId?.toString() || "");
   const [files, setFiles] = useState<PieceJustificativeResponse[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<string>("PHOTO");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { status, token } = useAuth();
 
   const requireAuth = () => {
@@ -35,37 +42,45 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
   };
 
   useEffect(() => {
-    if (status !== "authenticated" || !token) return;
+    if (status !== "authenticated" || !token || !entityId) return;
     loadFiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entityType, entityId, status, token]);
 
   async function loadFiles() {
     const authToken = requireAuth();
-    if (!authToken) {
+    if (!authToken || !entityId) {
       setLoading(false);
       return;
     }
     setLoading(true);
     setError(null);
+    setSuccess(null);
     try {
       let data: PieceJustificativeResponse[];
+      const id = parseInt(entityId);
+      if (isNaN(id)) {
+        setError("ID invalide");
+        setLoading(false);
+        return;
+      }
+
       switch (entityType) {
         case "intervention":
-          data = await getPiecesByIntervention(authToken, entityId);
+          data = await getPiecesByIntervention(authToken, id);
           break;
         case "devis":
-          data = await getPiecesByDevis(authToken, entityId);
+          data = await getPiecesByDevis(authToken, id);
           break;
         case "facture":
-          data = await getPiecesByFacture(authToken, entityId);
+          data = await getPiecesByFacture(authToken, id);
           break;
         default:
           data = [];
       }
       setFiles(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load files");
+      setError(err instanceof Error ? err.message : "Erreur lors du chargement des fichiers");
     } finally {
       setLoading(false);
     }
@@ -73,15 +88,28 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
 
   async function handleUpload() {
     if (!selectedFile) {
-      setError("Please select a file");
+      setError("Veuillez sélectionner un fichier");
       return;
     }
+    if (!entityId) {
+      setError("Veuillez renseigner l'ID de l'entité");
+      return;
+    }
+
     const authToken = requireAuth();
     if (!authToken) return;
 
     setUploading(true);
     setError(null);
+    setSuccess(null);
     try {
+      const id = parseInt(entityId);
+      if (isNaN(id)) {
+        setError("ID invalide");
+        setUploading(false);
+        return;
+      }
+
       const uploadData: {
         file: File;
         type: string;
@@ -94,18 +122,23 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
       };
 
       if (entityType === "intervention") {
-        uploadData.interventionId = entityId;
+        uploadData.interventionId = id;
       } else if (entityType === "devis") {
-        uploadData.devisId = entityId;
+        uploadData.devisId = id;
       } else if (entityType === "facture") {
-        uploadData.factureId = entityId;
+        uploadData.factureId = id;
       }
 
       await uploadPiece(authToken, uploadData);
       setSelectedFile(null);
+      setSuccess("✅ Fichier ajouté avec succès");
       await loadFiles();
+
+      // Clear file input
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      setError(err instanceof Error ? `❌ ${err.message}` : "❌ Erreur lors de l'upload");
     } finally {
       setUploading(false);
     }
@@ -117,22 +150,25 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
       if (!authToken) return;
       await downloadPiece(authToken, fileId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Download failed");
+      setError(err instanceof Error ? `❌ ${err.message}` : "❌ Erreur lors du téléchargement");
     }
   }
 
   async function handleDelete(fileId: number) {
-    if (!confirm("Are you sure you want to delete this file?")) {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce fichier ?")) {
       return;
     }
 
     try {
       const authToken = requireAuth();
       if (!authToken) return;
+      setError(null);
+      setSuccess(null);
       await deletePiece(authToken, fileId);
+      setSuccess("✅ Fichier supprimé avec succès");
       await loadFiles();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Delete failed");
+      setError(err instanceof Error ? `❌ ${err.message}` : "❌ Erreur lors de la suppression");
     }
   }
 
@@ -144,28 +180,73 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
 
   function formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleString();
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   return (
-    <div className="file-manager">
-      <h2>Gestionnaire de fichiers</h2>
+    <div className="max-w-6xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Gestionnaire de fichiers</h1>
 
+      {/* Contexte de travail */}
+      <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg mb-6 border border-gray-300 dark:border-gray-600">
+        <h2 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-4">🧾 Contexte de travail</h2>
+        <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold text-gray-900 dark:text-gray-100">Entité :</label>
+            <select
+              value={entityType}
+              onChange={(e) => setEntityType(e.target.value as typeof entityType)}
+              className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            >
+              <option value="intervention">Intervention</option>
+              <option value="devis">Devis</option>
+              <option value="facture">Facture</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold text-gray-900 dark:text-gray-100">ID :</label>
+            <input
+              type="number"
+              value={entityId}
+              onChange={(e) => setEntityId(e.target.value)}
+              placeholder="2"
+              className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1.5 text-sm w-24 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Messages */}
+      {success && (
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded mb-4">
+          {success}
+        </div>
+      )}
       {error && (
-        <div className="error-message" style={{ color: "red", padding: "10px", marginBottom: "10px" }}>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
 
-      <div className="upload-section" style={{ marginBottom: "20px", padding: "15px", border: "1px solid #ddd" }}>
-        <h3>Uploader un fichier</h3>
-        <div style={{ marginBottom: "10px" }}>
-          <label>
-            Type de document:
+      {/* Ajouter un document */}
+      <div className="bg-white dark:bg-gray-800 border-2 border-blue-500 dark:border-blue-400 rounded-lg p-6 mb-6 shadow-md">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-5">➕ Ajouter un document</h2>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              Type de document :
+            </label>
             <select
               value={documentType}
               onChange={(e) => setDocumentType(e.target.value)}
-              style={{ marginLeft: "10px" }}
+              className="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-sm w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               {DOCUMENT_TYPES.map((type) => (
                 <option key={type} value={type}>
@@ -173,57 +254,107 @@ export default function FileManager({ entityType, entityId }: FileManagerProps) 
                 </option>
               ))}
             </select>
-          </label>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              Fichier :
+            </label>
+            <input
+              type="file"
+              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+              disabled={uploading}
+              className="block w-full text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              onClick={handleUpload}
+              disabled={uploading || !selectedFile}
+              className="bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded font-medium hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+            >
+              {uploading ? "Upload en cours..." : "Uploader"}
+            </button>
+          </div>
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <input
-            type="file"
-            onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-            disabled={uploading}
-          />
-        </div>
-        <button onClick={handleUpload} disabled={uploading || !selectedFile}>
-          {uploading ? "Upload en cours..." : "Upload"}
-        </button>
       </div>
 
-      <div className="files-list">
-        <h3>Fichiers attachés ({files.length})</h3>
+      {/* Documents attachés */}
+      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-6 mb-6">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-5">
+          📂 Documents attachés ({files.length})
+        </h2>
+
         {loading ? (
-          <p>Chargement...</p>
+          <p className="text-gray-600 dark:text-gray-400">Chargement...</p>
         ) : files.length === 0 ? (
-          <p>Aucun fichier attaché</p>
+          <p className="text-gray-600 dark:text-gray-400">Aucun fichier attaché</p>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: "2px solid #ddd" }}>
-                <th style={{ padding: "10px", textAlign: "left" }}>Nom</th>
-                <th style={{ padding: "10px", textAlign: "left" }}>Type</th>
-                <th style={{ padding: "10px", textAlign: "left" }}>Taille</th>
-                <th style={{ padding: "10px", textAlign: "left" }}>Date</th>
-                <th style={{ padding: "10px", textAlign: "left" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {files.map((file) => (
-                <tr key={file.id} style={{ borderBottom: "1px solid #eee" }}>
-                  <td style={{ padding: "10px" }}>{file.originalFilename}</td>
-                  <td style={{ padding: "10px" }}>{file.type}</td>
-                  <td style={{ padding: "10px" }}>{formatFileSize(file.fileSize)}</td>
-                  <td style={{ padding: "10px" }}>{formatDate(file.uploadDate)}</td>
-                  <td style={{ padding: "10px" }}>
-                    <button
-                      onClick={() => handleDownload(file.id)}
-                      style={{ marginRight: "5px" }}
-                    >
-                      Télécharger
-                    </button>
-                    <button onClick={() => handleDelete(file.id)}>Supprimer</button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Nom</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Type</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Taille</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Date</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {files.map((file) => (
+                  <tr key={file.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td className="py-3 px-4 text-gray-900 dark:text-gray-100">{file.originalFilename}</td>
+                    <td className="py-3 px-4 text-gray-900 dark:text-gray-100">{file.type}</td>
+                    <td className="py-3 px-4 text-gray-900 dark:text-gray-100">{formatFileSize(file.fileSize)}</td>
+                    <td className="py-3 px-4 text-gray-900 dark:text-gray-100">{formatDate(file.uploadDate)}</td>
+                    <td className="py-3 px-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleDownload(file.id)}
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                          title="Télécharger"
+                        >
+                          ⬇️
+                        </button>
+                        <button
+                          onClick={() => handleDelete(file.id)}
+                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium"
+                          title="Supprimer"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Aide / Mode d'emploi */}
+      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+        <button
+          onClick={() => setHelpOpen(!helpOpen)}
+          className="w-full text-left px-6 py-4 font-bold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between text-base"
+        >
+          <span>ℹ️ Aide / Mode d'emploi</span>
+          <span className="text-xl">{helpOpen ? "▼" : "▶"}</span>
+        </button>
+
+        {helpOpen && (
+          <div className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+            <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300">
+              <li>Choisir le type d'entité</li>
+              <li>Renseigner l'ID existant</li>
+              <li>Sélectionner le type de document</li>
+              <li>Choisir un fichier</li>
+              <li>Cliquer sur "Uploader"</li>
+            </ol>
+          </div>
         )}
       </div>
     </div>
