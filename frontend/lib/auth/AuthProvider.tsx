@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 type AuthContextValue = {
     token: string | null;
@@ -13,22 +13,22 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 const STORAGE_KEY = "webelec_access_token";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [token, setTokenState] = useState<string | null>(null);
+    const [token, setTokenState] = useState<string | null>(() => {
+        if (typeof window !== "undefined") {
+            return window.localStorage.getItem(STORAGE_KEY);
+        }
+        return null;
+    });
 
-    useEffect(() => {
-        const stored = window.localStorage.getItem(STORAGE_KEY);
-        if (stored) setTokenState(stored);
-    }, []);
-
-    const setToken = (t: string | null) => {
+    const setToken = useCallback((t: string | null) => {
         setTokenState(t);
         if (t) window.localStorage.setItem(STORAGE_KEY, t);
         else window.localStorage.removeItem(STORAGE_KEY);
-    };
+    }, []);
 
-    const clear = () => setToken(null);
+    const clear = useCallback(() => setToken(null), [setToken]);
 
-    const value = useMemo(() => ({ token, setToken, clear }), [token]);
+    const value = useMemo(() => ({ token, setToken, clear }), [token, setToken, clear]);
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
