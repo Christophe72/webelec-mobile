@@ -7,7 +7,8 @@
       "Bash(xargs ls:*)",
       "Read(//c/saas/webelec-saas/backend/src/main/java/com/webelec/backend/config/**)",
       "Read(//c/saas/webelec-saas/backend/src/main/resources/**)",
-      "Read(//c/saas/webelec-saas/backend/**)"
+      "Read(//c/saas/webelec-saas/backend/**)",
+      "Bash(timeout /t 10 /nobreak)"
     ]
   }
 }
