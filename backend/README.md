@@ -216,17 +216,18 @@ Résultat attendu actuel : 69 tests, BUILD SUCCESS.
 
 Chaque ressource expose des DTO validés (@NotBlank, @Email, etc.) et un format d'erreur commun `ApiError`.
 
-| Ressource        | Endpoint principal      | Fonctions clés                                    |
-| ---------------- | ----------------------- | ------------------------------------------------- |
-| Sociétés         | `/api/societes`         | CRUD complet + validation TVA, filtre par ID      |
-| Utilisateurs     | `/api/utilisateurs`     | CRUD, filtrage par société, rôles textuels        |
-| Clients          | `/api/clients`          | CRUD, filtre `/societe/{id}`                      |
-| Chantiers        | `/api/chantiers`        | Listing, création, filtre par société/chantier    |
-| Produits (stock) | `/api/produits`         | Gestion du stock, filtres société                 |
-| Produits avancés | `/api/produits-avances` | Catalogue enrichi (prix achat/vente, fournisseur) |
-| Interventions    | `/api/interventions`    | Filtres `/societe/{id}` et `/chantier/{id}`       |
-| Devis            | `/api/devis`            | Gestion des lignes, filtres société/client        |
-| Factures         | `/api/factures`         | Statuts d'encaissement, filtres société/client    |
+| Ressource        | Endpoint principal         | Fonctions clés                                                                     |
+| ---------------- | -------------------------- | ---------------------------------------------------------------------------------- |
+| Dashboard        | `/api/dashboard/metrics`   | Métriques temps réel (sites actifs, alertes stock/RGIE, notifications critiques)  |
+| Sociétés         | `/api/societes`            | CRUD complet + validation TVA, filtre par ID                                       |
+| Utilisateurs     | `/api/utilisateurs`        | CRUD, filtrage par société, rôles textuels                                         |
+| Clients          | `/api/clients`             | CRUD, filtre `/societe/{id}`                                                       |
+| Chantiers        | `/api/chantiers`           | Listing, création, filtre par société/chantier                                     |
+| Produits (stock) | `/api/produits`            | Gestion du stock, filtres société                                                  |
+| Produits avancés | `/api/produits-avances`    | Catalogue enrichi (prix achat/vente, fournisseur)                                  |
+| Interventions    | `/api/interventions`       | Filtres `/societe/{id}` et `/chantier/{id}`                                        |
+| Devis            | `/api/devis`               | Gestion des lignes, filtres société/client                                         |
+| Factures         | `/api/factures`            | Statuts d'encaissement, filtres société/client                                     |
 
 Pour des exemples de payloads et le contrat détaillé, consultez `src/main/resources/api-spec.yaml` ou les tests MockMvc correspondants.
 
@@ -489,6 +490,7 @@ mvnw.cmd clean package -DskipTests
 - `src/test/java/com/webelec/backend/controller/*ControllerTest.java` : exemples MockMvc
 - `src/test/java/com/webelec/backend/dto/*Test.java` : mapping DTO ↔ entités
 - `Dockerfile` : build containerisé pour la prod
+  ⚠️ **Important** : Toute modification du code Java nécessite un rebuild de l'image Docker (`docker compose build backend && docker compose up -d backend`) pour être prise en compte
 
 Le backend est prêt pour un branchement Next.js, l'intégration CI/CD et l'ajout de modules réglementaires RGIE lorsque les règles officielles sont disponibles dans le dépôt.
 

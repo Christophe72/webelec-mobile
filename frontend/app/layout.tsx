@@ -1,7 +1,9 @@
 import "./globals.css";
 
 import { AuthProvider } from "../lib/auth/AuthProvider";
-import { ThemeProvider } from "../components/providers/theme-provider";
+import { ThemeProvider } from "../components/theme-provider";
+import GlobalNav from "../components/global-nav";
+import { ClientThemeToggle } from "../components/client-theme-toggle";
 
 export default function RootLayout({
   children,
@@ -12,7 +14,11 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <body>
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <GlobalNav />
+            {children}
+            <ClientThemeToggle />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

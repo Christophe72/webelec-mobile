@@ -16,7 +16,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @Profile("dev")
-@EnableMethodSecurity
+// @EnableMethodSecurity  // ⚠️ DÉSACTIVÉ POUR LE DEV - à réactiver en production !
 public class DevSecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
