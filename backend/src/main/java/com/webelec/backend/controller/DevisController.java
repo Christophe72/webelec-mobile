@@ -3,7 +3,10 @@ package com.webelec.backend.controller;
 import com.webelec.backend.dto.DevisRequest;
 import com.webelec.backend.dto.DevisResponse;
 import com.webelec.backend.service.DevisService;
+import com.webelec.backend.service.DevisPdfService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +17,11 @@ import java.util.List;
 public class DevisController {
 
     private final DevisService service;
+    private final DevisPdfService pdfService;
 
-    public DevisController(DevisService service) {
+    public DevisController(DevisService service, DevisPdfService pdfService) {
         this.service = service;
+        this.pdfService = pdfService;
     }
 
     @GetMapping
@@ -48,5 +53,20 @@ public class DevisController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> getPdf(@PathVariable Long id) {
+        var devis = service.findById(id);
+        byte[] pdfBytes = pdfService.generateDevisPdf(devis);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "devis-" + devis.getNumero() + ".pdf");
+        headers.setContentLength(pdfBytes.length);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
     }
 }
