@@ -6,7 +6,6 @@ import com.webelec.backend.dto.FactureResponse;
 import com.webelec.backend.dto.PeppolResultDTO;
 import com.webelec.backend.dto.UblDTO;
 import com.webelec.backend.exception.ResourceNotFoundException;
-import com.webelec.backend.model.Facture;
 import com.webelec.backend.service.FactureImportService;
 import com.webelec.backend.service.FactureService;
 import com.webelec.backend.service.PeppolService;

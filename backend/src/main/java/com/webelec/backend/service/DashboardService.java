@@ -12,18 +12,15 @@ public class DashboardService {
 
     private final ChantierRepository chantierRepository;
     private final ProduitRepository produitRepository;
-    private final RgieHabilitationRepository rgieHabilitationRepository;
     private final UserNotificationRepository userNotificationRepository;
 
     public DashboardService(
-        ChantierRepository chantierRepository,
-        ProduitRepository produitRepository,
-        RgieHabilitationRepository rgieHabilitationRepository,
-        UserNotificationRepository userNotificationRepository
-    ) {
+            ChantierRepository chantierRepository,
+            ProduitRepository produitRepository,
+            RgieHabilitationRepository rgieHabilitationRepository,
+            UserNotificationRepository userNotificationRepository) {
         this.chantierRepository = chantierRepository;
         this.produitRepository = produitRepository;
-        this.rgieHabilitationRepository = rgieHabilitationRepository;
         this.userNotificationRepository = userNotificationRepository;
     }
 
@@ -33,8 +30,8 @@ public class DashboardService {
 
         // Compter les produits avec stock faible (quantité < 10 par exemple)
         int stockAlertsCount = (int) produitRepository.findBySocieteId(societeId).stream()
-            .filter(p -> p.getQuantiteStock() != null && p.getQuantiteStock() < 10)
-            .count();
+                .filter(p -> p.getQuantiteStock() != null && p.getQuantiteStock() < 10)
+                .count();
 
         // Compter les habilitations RGIE expirées ou bientôt expirées
         int rgieAlertsCount = 0; // À implémenter selon logique métier
@@ -43,10 +40,9 @@ public class DashboardService {
         int criticalNotificationsCount = (int) userNotificationRepository.countByUtilisateurIdAndReadFalse(userId);
 
         return new DashboardMetrics(
-            activeSitesCount,
-            stockAlertsCount,
-            rgieAlertsCount,
-            criticalNotificationsCount
-        );
+                activeSitesCount,
+                stockAlertsCount,
+                rgieAlertsCount,
+                criticalNotificationsCount);
     }
 }
