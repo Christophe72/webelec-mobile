@@ -341,18 +341,18 @@ export default function FileManager({
           onClick={() => setHelpOpen(!helpOpen)}
           className="w-full text-left px-6 py-4 font-bold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between text-base"
         >
-          <span>ℹ️ Aide / Mode d'emploi</span>
+          <span>ℹ️ Aide / Mode d&apos;emploi</span>
           <span className="text-xl">{helpOpen ? "▼" : "▶"}</span>
         </button>
 
         {helpOpen && (
           <div className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
             <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300">
-              <li>Choisir le type d'entité</li>
-              <li>Renseigner l'ID existant</li>
+              <li>Choisir le type d&apos;entité</li>
+              <li>Renseigner l&apos;ID existant</li>
               <li>Sélectionner le type de document</li>
               <li>Choisir un fichier</li>
-              <li>Cliquer sur "Uploader"</li>
+              <li>Cliquer sur &quot;Uploader&quot;</li>
             </ol>
           </div>
         )}

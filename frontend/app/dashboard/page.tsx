@@ -112,7 +112,7 @@ export default function DashboardPage() {
             Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Vue d'ensemble de votre activité électrique
+            Vue d&apos;ensemble de votre activité électrique
           </p>
         </div>
 
@@ -161,7 +161,7 @@ export default function DashboardPage() {
               {metrics?.activeSitesCount || 0}
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-              En cours d'exécution
+              En cours d&apos;exécution
             </div>
           </div>
 
