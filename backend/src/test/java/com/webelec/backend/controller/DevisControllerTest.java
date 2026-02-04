@@ -7,6 +7,7 @@ import com.webelec.backend.model.Devis;
 import com.webelec.backend.model.Societe;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.service.DevisService;
+import com.webelec.backend.service.DevisPdfService;
 import com.webelec.backend.security.JwtAuthenticationFilter;
 import com.webelec.backend.security.JwtService;
 import com.webelec.backend.security.UtilisateurDetailsService;
@@ -40,6 +41,8 @@ class DevisControllerTest {
     private ObjectMapper objectMapper;
     @MockitoBean
     private DevisService service;
+    @MockitoBean
+    private DevisPdfService pdfService;
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
