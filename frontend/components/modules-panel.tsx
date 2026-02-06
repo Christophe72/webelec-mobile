@@ -13,6 +13,7 @@ import {
   updateModule
 } from "@/lib/api/module";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 const emptyForm: ModuleCreateDTO = {
   nom: "",
@@ -49,7 +50,7 @@ export function ModulesPanel() {
       const data = await getModules(authToken);
       setModules(data ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setLoading(false);
     }
@@ -89,7 +90,7 @@ export function ModulesPanel() {
       setEditingId(null);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setSaving(false);
     }
@@ -103,7 +104,7 @@ export function ModulesPanel() {
       await deleteModule(authToken, id);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     }
   };
 
@@ -131,7 +132,7 @@ export function ModulesPanel() {
       await updateModule(authToken, module.id, { actif: !module.actif });
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     }
   };
 

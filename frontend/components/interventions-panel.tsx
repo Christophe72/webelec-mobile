@@ -18,6 +18,7 @@ import { getSocietes } from "@/lib/api/societe";
 import { getClients } from "@/lib/api/client";
 import { getChantiers } from "@/lib/api/chantier";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -70,7 +71,7 @@ export function InterventionsPanel() {
       setClients(clientsData ?? []);
       setChantiers(chantiersData ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setLoading(false);
     }
@@ -112,7 +113,7 @@ export function InterventionsPanel() {
       setEditingId(null);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setSaving(false);
     }
@@ -139,7 +140,7 @@ export function InterventionsPanel() {
       await deleteIntervention(authToken, id);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     }
   };
 

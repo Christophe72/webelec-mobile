@@ -41,6 +41,7 @@
 import { useMemo, useState } from "react";
 import { bffFetch } from "@/lib/api/bffFetch";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 import { WebElecAuditorPro } from "@/lib/sdk/webelec-auditor";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -183,7 +184,7 @@ export default function AuditeurProPage() {
       );
       setResult(res);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erreur inconnue");
+      setError(formatApiError(e, "Erreur inconnue"));
     } finally {
       setLoading(false);
     }

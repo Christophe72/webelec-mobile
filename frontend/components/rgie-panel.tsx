@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { bffFetch } from "@/lib/api/bffFetch";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 type RgieThemeOption =
   | "all"
@@ -84,7 +85,7 @@ export function RgiePanel() {
       setData(json.items ?? []);
       setTotal(json.count ?? json.items?.length ?? 0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setLoading(false);
     }

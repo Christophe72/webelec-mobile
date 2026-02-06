@@ -2,6 +2,10 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import RgieQueryPanel from "./RgieQueryPanel";
 
+jest.mock("@/lib/hooks/useAuth", () => ({
+  useAuth: () => ({ status: "unauthenticated", token: null }),
+}));
+
 test("renders RgieQueryPanel component", () => {
   render(<RgieQueryPanel />);
   const heading = screen.getByText(/Résultat/i);

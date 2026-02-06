@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchDashboardMetrics } from "@/lib/api/dashboard";
 import type { DashboardMetrics } from "@/types/dashboard";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 import { DashboardKPIs } from "@/components/dashboard/DashboardKPIs";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
@@ -35,11 +36,11 @@ export default function DashboardPage() {
           }
         } else if (!cancelled) {
           setMetrics(data.metrics ?? null);
-          setError(data.error ?? "Erreur dashboard");
+          setError(formatApiError(data.error ?? "Erreur dashboard", "Erreur dashboard"));
         }
       } catch (error) {
         if (!cancelled) {
-          setError(error instanceof Error ? error.message : "Erreur dashboard");
+          setError(formatApiError(error, "Erreur dashboard"));
         }
       } finally {
         if (!cancelled) setLoading(false);

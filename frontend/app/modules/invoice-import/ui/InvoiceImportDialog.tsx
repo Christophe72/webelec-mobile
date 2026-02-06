@@ -7,6 +7,7 @@ import {
   DEFAULT_IMPORT_CONFIG,
 } from "../domain/types";
 import { IInvoiceImportAdapter } from "../adapters/apiAdapter";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 interface InvoiceImportDialogProps {
   open: boolean;
@@ -83,7 +84,7 @@ export function InvoiceImportDialog({
         }, 2000);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur lors de l'import");
+      setError(formatApiError(err, "Erreur lors de l'import"));
     } finally {
       setLoading(false);
     }

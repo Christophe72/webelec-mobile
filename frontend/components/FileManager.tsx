@@ -11,6 +11,7 @@ import {
   getPiecesByFacture,
 } from "@/lib/api/piece";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 interface FileManagerProps {
   entityType?: "intervention" | "devis" | "facture";
@@ -80,7 +81,7 @@ export default function FileManager({
       }
       setFiles(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur lors du chargement des fichiers");
+      setError(formatApiError(err, "Erreur lors du chargement des fichiers"));
     } finally {
       setLoading(false);
     }
@@ -138,7 +139,7 @@ export default function FileManager({
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
     } catch (err) {
-      setError(err instanceof Error ? `❌ ${err.message}` : "❌ Erreur lors de l'upload");
+      setError(`❌ ${formatApiError(err, "Erreur lors de l'upload")}`);
     } finally {
       setUploading(false);
     }
@@ -150,7 +151,7 @@ export default function FileManager({
       if (!authToken) return;
       await downloadPiece(authToken, fileId);
     } catch (err) {
-      setError(err instanceof Error ? `❌ ${err.message}` : "❌ Erreur lors du téléchargement");
+      setError(`❌ ${formatApiError(err, "Erreur lors du téléchargement")}`);
     }
   }
 
@@ -168,7 +169,7 @@ export default function FileManager({
       setSuccess("✅ Fichier supprimé avec succès");
       await loadFiles();
     } catch (err) {
-      setError(err instanceof Error ? `❌ ${err.message}` : "❌ Erreur lors de la suppression");
+      setError(`❌ ${formatApiError(err, "Erreur lors de la suppression")}`);
     }
   }
 

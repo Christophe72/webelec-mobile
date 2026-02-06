@@ -22,6 +22,7 @@ import { getClients } from "@/lib/api/client";
 import { getProduits } from "@/lib/api/catalogue";
 import type { ClientDTO, FactureDTO, ProduitDTO } from "@/types";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 const parseDate = (value?: string | null) => {
   if (!value) return null;
@@ -73,7 +74,7 @@ export default function DashboardPanel() {
         setProduits(produitsData ?? []);
       } catch (err) {
         if (!isActive) return;
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
+        setError(formatApiError(err, "Erreur inconnue"));
       } finally {
         if (!isActive) return;
         setLoading(false);

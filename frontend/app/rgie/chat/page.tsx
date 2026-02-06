@@ -94,6 +94,7 @@
 import { useState } from "react";
 import { bffFetch } from "@/lib/api/bffFetch";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 import { WebElecAI } from "../../../lib/sdk/webelec-ai";
 import { analyseEffet } from "@/lib/rgie/chat/page";
 import { Button } from "@/components/ui/button";
@@ -160,7 +161,7 @@ export default function ChatRgiePage() {
 
       setMessages((prev) => [...prev, aiMsg]);
     } catch (e: unknown) {
-      const errorMessage = e instanceof Error ? e.message : String(e);
+      const errorMessage = formatApiError(e, "Erreur inconnue");
       setMessages((prev) => [
         ...prev,
         {
@@ -195,7 +196,7 @@ export default function ChatRgiePage() {
     try {
       await analyseEffet(token, input, setMessages);
     } catch (e: unknown) {
-      const errorMessage = e instanceof Error ? e.message : String(e);
+      const errorMessage = formatApiError(e, "Erreur inconnue");
       setMessages((prev) => [
         ...prev,
         {

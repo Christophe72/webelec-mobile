@@ -8,6 +8,7 @@ import {
   getSocietes,
 } from "@/lib/api/societe";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 const emptyForm: SocieteRequest = {
   nom: "",
@@ -42,7 +43,7 @@ export function SocietesPanel() {
       const data = await getSocietes(authToken);
       setSocietes(data ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setLoading(false);
     }
@@ -83,7 +84,7 @@ export function SocietesPanel() {
       setForm(emptyForm);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     }
   };
 
@@ -95,7 +96,7 @@ export function SocietesPanel() {
       await deleteSocieteById(authToken, id.toString());
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     }
   };
 

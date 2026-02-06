@@ -21,6 +21,7 @@ import { getClients } from "@/lib/api/client";
 import { getChantiers } from "@/lib/api/chantier";
 import { NumberInput } from "@/components/ui/number-input";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -62,6 +63,30 @@ const emptyDevis = (existingDevis: DevisDTO[] = []): DevisCreateDTO => ({
   lignes: [],
 });
 
+export const buildDevisLines = (
+  lignes: DevisCreateDTO["lignes"],
+  lineDesc: string,
+  montantHT: number
+) =>
+  lignes.length > 0
+    ? lignes
+    : [
+        {
+          description: lineDesc || "Ligne principale",
+          quantite: 1,
+          prixUnitaire: montantHT,
+          total: montantHT,
+        },
+      ];
+
+export const buildDevisPayload = (
+  form: DevisCreateDTO,
+  lineDesc: string
+): DevisCreateDTO | DevisUpdateDTO => ({
+  ...form,
+  lignes: buildDevisLines(form.lignes, lineDesc, form.montantHT),
+});
+
 export function DevisPanel() {
   const [devis, setDevis] = useState<DevisDTO[]>([]);
   const [societes, setSocietes] = useState<SocieteResponse[]>([]);
@@ -74,6 +99,7 @@ export function DevisPanel() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { status, token } = useAuth();
+  const isEditing = editingId !== null;
 
   const requireToken = useCallback(() => {
     if (status === "authenticated" && token) return token;
@@ -102,7 +128,7 @@ export function DevisPanel() {
       setClients(clientsData ?? []);
       setChantiers(chantiersData ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setLoading(false);
     }
@@ -120,6 +146,28 @@ export function DevisPanel() {
     }
   }, [status]);
 
+  const societeById = useMemo(() => {
+    const map = new Map<number, SocieteResponse>();
+    societes.forEach((societe) => map.set(societe.id, societe));
+    return map;
+  }, [societes]);
+
+  const clientById = useMemo(() => {
+    const map = new Map<number, ClientDTO>();
+    clients.forEach((client) => map.set(client.id, client));
+    return map;
+  }, [clients]);
+
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }),
+    []
+  );
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const authToken = requireToken();
@@ -133,27 +181,12 @@ export function DevisPanel() {
       return;
     }
 
-    const lignes =
-      form.lignes.length > 0
-        ? form.lignes
-        : [
-            {
-              description: lineDesc || "Ligne principale",
-              quantite: 1,
-              prixUnitaire: form.montantHT,
-              total: form.montantHT,
-            },
-          ];
-
-    const payload: DevisCreateDTO | DevisUpdateDTO = {
-      ...form,
-      lignes,
-    };
+    const payload = buildDevisPayload(form, lineDesc);
 
     try {
       setSaving(true);
       setError(null);
-      if (editingId) {
+      if (isEditing && editingId !== null) {
         await updateDevis(authToken, editingId, payload);
       } else {
         await createDevis(authToken, payload as DevisCreateDTO);
@@ -163,7 +196,7 @@ export function DevisPanel() {
       setEditingId(null);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setSaving(false);
     }
@@ -182,9 +215,9 @@ export function DevisPanel() {
       societeId: item.societeId,
       clientId: item.clientId,
       chantierId: item.chantierId,
-      lignes: item.lignes,
+      lignes: item.lignes ?? [],
     });
-    setLineDesc(item.lignes[0]?.description ?? "Prestation forfaitaire");
+    setLineDesc(item.lignes?.[0]?.description ?? "Prestation forfaitaire");
   };
 
   const handleDelete = async (id: number) => {
@@ -195,13 +228,13 @@ export function DevisPanel() {
       await deleteDevis(authToken, id);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     }
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setForm(emptyDevis());
+    setForm(emptyDevis(devis));
     setLineDesc("Prestation forfaitaire");
   };
 
@@ -491,8 +524,8 @@ export function DevisPanel() {
           <p className="py-4 text-muted">Aucun devis enregistré.</p>
         ) : (
           devis.map((item) => {
-            const societe = societes.find((s) => s.id === item.societeId);
-            const client = clients.find((c) => c.id === item.clientId);
+            const societe = societeById.get(item.societeId);
+            const client = clientById.get(item.clientId);
             return (
               <article
                 key={item.id}
@@ -507,9 +540,8 @@ export function DevisPanel() {
                     {client ? `${client.prenom} ${client.nom}` : "Client ?"}
                   </p>
                   <p className="text-xs text-muted">
-                    Emis le {new Date(item.dateEmission).toLocaleDateString()} •
-                    Expire le{" "}
-                    {new Date(item.dateExpiration).toLocaleDateString()}
+                    Emis le {dateFormatter.format(new Date(item.dateEmission))} •
+                    Expire le {dateFormatter.format(new Date(item.dateExpiration))}
                   </p>
                   <p className="text-sm font-semibold text-foreground">
                     {item.montantTTC.toLocaleString("fr-FR", {

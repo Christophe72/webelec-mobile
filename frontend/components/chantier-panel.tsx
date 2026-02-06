@@ -15,8 +15,8 @@ import {
 } from "@/lib/api/chantier";
 import { getSocietes } from "@/lib/api/societe";
 import { getClients } from "@/lib/api/client";
-import type { ApiError } from "@/lib/api/base";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 type ChantierFormState = {
   nom: string;
@@ -49,12 +49,7 @@ export function ChantierPanel() {
   const { status, token } = useAuth();
 
   const handleApiError = useCallback((err: unknown, fallback: string) => {
-    const status = (err as ApiError | null)?.status;
-    if (status === 401) {
-      setError("Vous devez être connecté pour accéder aux données.");
-      return;
-    }
-    setError(err instanceof Error ? err.message : fallback);
+    setError(formatApiError(err, fallback));
   }, []);
 
   const requireToken = useCallback(() => {

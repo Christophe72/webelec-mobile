@@ -39,6 +39,7 @@ import {
 import { getSocietes } from "@/lib/api/societe";
 import { NumberInput } from "@/components/ui/number-input";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 const generateReference = (produits: ProduitDTO[]): string => {
   const year = new Date().getFullYear();
@@ -99,7 +100,7 @@ export function CataloguePanel() {
       setProduits(produitsData ?? []);
       setSocietes(societesData ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setLoading(false);
     }
@@ -150,7 +151,7 @@ export function CataloguePanel() {
       setEditingId(null);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setSaving(false);
     }
@@ -176,7 +177,7 @@ export function CataloguePanel() {
       await deleteProduit(authToken, id);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     }
   };
 

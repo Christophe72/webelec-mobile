@@ -2,235 +2,27 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getSocietes } from "@/lib/api/societe";
-import { createProduit } from "@/lib/api/catalogue";
-import { useAuth } from "@/lib/hooks/useAuth";
-import type { SocieteResponse } from "@/types";
 import { NumberInput } from "@/components/ui/number-input";
-
-type CatalogueItem = {
-  label: string;
-};
-
-type CatalogueCategory = {
-  id: string;
-  title: string;
-  items: CatalogueItem[];
-};
+import { CATEGORIES, type CatalogueItem } from "@/data/catalogue-categories";
+import { createProduit } from "@/lib/api/catalogue";
+import { getSocietes } from "@/lib/api/societe";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
+import type { SocieteResponse } from "@/types";
 
 type MaterialItem = {
   label: string;
+  slug: string;
   reference: string;
   quantiteStock: number;
   prixUnitaire: number;
-};
-
-const CATEGORIES: CatalogueCategory[] = [
-  {
-    id: "protection-distribution",
-    title: "Protection & distribution",
-    items: [
-      { label: "Disjoncteur de branchement 40 A" },
-      { label: "Disjoncteur de branchement 63 A" },
-      { label: "Interrupteur différentiel 300 mA – 40 A" },
-      { label: "Interrupteur différentiel 300 mA – 63 A" },
-      { label: "Interrupteur différentiel 30 mA – 40 A" },
-      { label: "Interrupteur différentiel 30 mA – 63 A" },
-      { label: "Disjoncteur 10 A – courbe C" },
-      { label: "Disjoncteur 16 A – courbe C" },
-      { label: "Disjoncteur 20 A – courbe C" },
-      { label: "Disjoncteur 25 A – courbe C" },
-      { label: "Disjoncteur 32 A – courbe C" },
-      { label: "Disjoncteur 40 A – courbe C" },
-      { label: "Peigne d’alimentation monophasé" },
-      { label: "Peigne d’alimentation tétrapolaire" },
-      { label: "Barrette de répartition" },
-      { label: "Bornier de terre" },
-      { label: "Tableau électrique" },
-      { label: "Coffret modulaire" },
-      { label: "Parafoudre type 2" },
-    ],
-  },
-  {
-    id: "conducteurs-cables",
-    title: "Conducteurs & câbles",
-    items: [
-      { label: "Conducteur phase" },
-      { label: "Conducteur neutre" },
-      { label: "Conducteur de protection (terre)" },
-      { label: "Fil VOB 1,5 mm²" },
-      { label: "Fil VOB 2,5 mm²" },
-      { label: "Fil VOB 4 mm²" },
-      { label: "Fil VOB 6 mm²" },
-      { label: "Fil VOB 10 mm²" },
-      { label: "Câble XVB 3G1,5" },
-      { label: "Câble XVB 3G2,5" },
-      { label: "Câble XVB 3G4" },
-      { label: "Câble XVB 3G6" },
-      { label: "Câble XVB 5G6" },
-      { label: "Câble EXVB 3G2,5" },
-      { label: "Câble EXVB 3G6" },
-    ],
-  },
-  {
-    id: "sections-normalisees",
-    title: "Sections normalisées (références métier)",
-    items: [
-      { label: "Section 1,5 mm²" },
-      { label: "Section 2,5 mm²" },
-      { label: "Section 4 mm²" },
-      { label: "Section 6 mm²" },
-      { label: "Section 10 mm²" },
-      { label: "Section 16 mm²" },
-      { label: "Section 25 mm²" },
-    ],
-  },
-  {
-    id: "cheminement-protection-mecanique",
-    title: "Cheminement & protection mécanique",
-    items: [
-      { label: "Gaine ICTA Ø16" },
-      { label: "Gaine ICTA Ø20" },
-      { label: "Gaine ICTA Ø25" },
-      { label: "Tube rigide PVC Ø16" },
-      { label: "Tube rigide PVC Ø20" },
-      { label: "Goulotte électrique" },
-      { label: "Chemin de câble" },
-      { label: "Boîte de dérivation" },
-      { label: "Boîte d’encastrement" },
-      { label: "Boîte étanche IP55" },
-      { label: "Boîte étanche IP65" },
-    ],
-  },
-  {
-    id: "commande-appareillage",
-    title: "Commande & appareillage",
-    items: [
-      { label: "Interrupteur simple" },
-      { label: "Interrupteur va-et-vient" },
-      { label: "Interrupteur permutateur" },
-      { label: "Bouton-poussoir" },
-      { label: "Variateur" },
-      { label: "Télérupteur 16 A" },
-      { label: "Contacteur 20 A" },
-      { label: "Contacteur 25 A" },
-      { label: "Minuterie d’escalier" },
-      { label: "Horloge programmable" },
-    ],
-  },
-  {
-    id: "prises-sorties",
-    title: "Prises & sorties",
-    items: [
-      { label: "Prise de courant 16 A" },
-      { label: "Prise double 16 A" },
-      { label: "Prise commandée 16 A" },
-      { label: "Prise extérieure 16 A IP55" },
-      { label: "Prise étanche 16 A IP65" },
-      { label: "Prise RJ45" },
-      { label: "Prise TV coaxiale" },
-      { label: "Prise USB" },
-    ],
-  },
-  {
-    id: "eclairage",
-    title: "Éclairage",
-    items: [
-      { label: "Point lumineux" },
-      { label: "Luminaire plafonnier" },
-      { label: "Applique murale" },
-      { label: "Spot encastré" },
-      { label: "Spot LED" },
-      { label: "Réglette LED" },
-      { label: "Éclairage extérieur" },
-      { label: "Éclairage de sécurité" },
-    ],
-  },
-  {
-    id: "appareils-dedies",
-    title: "Appareils dédiés",
-    items: [
-      { label: "Circuit lave-linge – disjoncteur 20 A – 2,5 mm²" },
-      { label: "Circuit lave-vaisselle – disjoncteur 20 A – 2,5 mm²" },
-      { label: "Circuit sèche-linge – disjoncteur 20 A – 2,5 mm²" },
-      { label: "Circuit four – disjoncteur 25 A – 4 mm²" },
-      { label: "Circuit taque – disjoncteur 32 A – 6 mm²" },
-      { label: "Circuit chauffe-eau – disjoncteur 20 A – 2,5 mm²" },
-      { label: "Circuit chauffage électrique – disjoncteur 20–32 A" },
-    ],
-  },
-  {
-    id: "mise-a-la-terre",
-    title: "Mise à la terre",
-    items: [
-      { label: "Prise de terre" },
-      { label: "Piquet de terre" },
-      { label: "Boucle de fond de fouille" },
-      { label: "Barrette de coupure de terre" },
-      { label: "Conducteur principal de terre 16 mm²" },
-      { label: "Collecteur de terre" },
-    ],
-  },
-  {
-    id: "securite-controle",
-    title: "Sécurité & contrôle",
-    items: [
-      { label: "Testeur de tension" },
-      { label: "Testeur différentiel" },
-      { label: "Mesureur de terre" },
-      { label: "Étiquette de repérage" },
-      { label: "Schéma unifilaire" },
-      { label: "Schéma de position" },
-      { label: "Repérage des circuits" },
-    ],
-  },
-] as const;
-
-const toSlug = (value: string) =>
-  value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-
-const extractCapacities = (label: string) => {
-  const normalized = label.replace(/–/g, "-");
-  const capacities: string[] = [];
-
-  const amperageMatch = normalized.match(/(\d+(?:-\d+)?\s*A)/g);
-  if (amperageMatch) capacities.push(...amperageMatch.map((v) => v.trim()));
-
-  const milliAmpMatch = normalized.match(/(\d+\s*mA)/g);
-  if (milliAmpMatch) capacities.push(...milliAmpMatch.map((v) => v.trim()));
-
-  const sectionMatch = normalized.match(/(\d+(?:,\d+)?\s*mm²)/g);
-  if (sectionMatch) capacities.push(...sectionMatch.map((v) => v.trim()));
-
-  const diameterMatch = normalized.match(/(Ø\s*\d+)/g);
-  if (diameterMatch) capacities.push(...diameterMatch.map((v) => v.trim()));
-
-  const ipMatch = normalized.match(/(IP\d+)/g);
-  if (ipMatch) capacities.push(...ipMatch.map((v) => v.trim()));
-
-  const cableMatch = normalized.match(/(\dG\d+(?:,\d+)?)/g);
-  if (cableMatch) capacities.push(...cableMatch.map((v) => v.trim()));
-
-  const curveMatch = normalized.match(/courbe\s*[A-Z]/i);
-  if (curveMatch)
-    capacities.push(curveMatch[0].replace(/courbe\s*/i, "Courbe "));
-
-  const typeMatch = normalized.match(/type\s*\d+/i);
-  if (typeMatch) capacities.push(typeMatch[0].replace(/type\s*/i, "Type "));
-
-  return Array.from(new Set(capacities));
 };
 
 export default function CatalogueComposantsList() {
   const [activeCategoryId, setActiveCategoryId] = useState(
     CATEGORIES[0]?.id ?? ""
   );
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<CatalogueItem[]>([]);
   const [materialItems, setMaterialItems] = useState<MaterialItem[]>([]);
   const [activeCapacities, setActiveCapacities] = useState<string[]>([]);
   const [societes, setSocietes] = useState<SocieteResponse[]>([]);
@@ -254,7 +46,7 @@ export default function CatalogueComposantsList() {
         const data = await getSocietes(authToken);
         setSocietes(data ?? []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
+        setError(formatApiError(err, "Erreur inconnue"));
       }
     };
 
@@ -268,26 +60,23 @@ export default function CatalogueComposantsList() {
 
   const capacityOptions = useMemo(() => {
     if (!activeCategory) return [];
-    const allCaps = activeCategory.items.flatMap((item) =>
-      extractCapacities(item.label)
-    );
+    const allCaps = activeCategory.items.flatMap((item) => item.capacities);
     return Array.from(new Set(allCaps)).sort();
   }, [activeCategory]);
 
   const filteredItems = useMemo(() => {
     if (!activeCategory) return [];
     if (activeCapacities.length === 0) return activeCategory.items;
-    return activeCategory.items.filter((item) => {
-      const capacities = extractCapacities(item.label);
-      return activeCapacities.some((cap) => capacities.includes(cap));
-    });
+    return activeCategory.items.filter((item) =>
+      activeCapacities.some((cap) => item.capacities.includes(cap))
+    );
   }, [activeCategory, activeCapacities]);
 
-  const toggleItem = (label: string) => {
+  const toggleItem = (item: CatalogueItem) => {
     setSelectedItems((prev) =>
-      prev.includes(label)
-        ? prev.filter((item) => item !== label)
-        : [...prev, label]
+      prev.some((entry) => entry.slug === item.slug)
+        ? prev.filter((entry) => entry.slug !== item.slug)
+        : [...prev, item]
     );
   };
 
@@ -300,12 +89,13 @@ export default function CatalogueComposantsList() {
   const addSelectionToMaterial = () => {
     if (selectedItems.length === 0) return;
     setMaterialItems((prev) => {
-      const existing = new Set(prev.map((item) => item.label));
+      const existing = new Set(prev.map((item) => item.slug));
       const nextItems = selectedItems
-        .filter((label) => !existing.has(label))
-        .map((label) => ({
-          label,
-          reference: toSlug(label),
+        .filter((item) => !existing.has(item.slug))
+        .map((item) => ({
+          label: item.label,
+          slug: item.slug,
+          reference: item.slug,
           quantiteStock: 0,
           prixUnitaire: 0,
         }));
@@ -314,21 +104,18 @@ export default function CatalogueComposantsList() {
     setSelectedItems([]);
   };
 
-  const removeMaterialItem = (label: string) => {
-    setMaterialItems((prev) => prev.filter((item) => item.label !== label));
+  const removeMaterialItem = (slug: string) => {
+    setMaterialItems((prev) => prev.filter((item) => item.slug !== slug));
   };
 
   const clearSelection = () => {
     setSelectedItems([]);
   };
 
-  const updateMaterialItem = (
-    label: string,
-    changes: Partial<MaterialItem>
-  ) => {
+  const updateMaterialItem = (slug: string, changes: Partial<MaterialItem>) => {
     setMaterialItems((prev) =>
       prev.map((item) =>
-        item.label === label ? { ...item, ...changes } : item
+        item.slug === slug ? { ...item, ...changes } : item
       )
     );
   };
@@ -379,7 +166,7 @@ export default function CatalogueComposantsList() {
       setSuccess("Matériel ajouté au catalogue.");
       window.dispatchEvent(new CustomEvent("catalogue:refresh"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setSaving(false);
     }
@@ -496,13 +283,14 @@ export default function CatalogueComposantsList() {
               ) : (
                 <ol className="space-y-2 text-sm text-foreground list-decimal pl-5">
                   {filteredItems.map((item) => {
-                    const caps = extractCapacities(item.label);
-                    const isSelected = selectedItems.includes(item.label);
+                    const isSelected = selectedItems.some(
+                      (entry) => entry.slug === item.slug
+                    );
                     return (
                       <li key={item.label} className="pl-1">
                         <button
                           type="button"
-                          onClick={() => toggleItem(item.label)}
+                          onClick={() => toggleItem(item)}
                           className={`w-full rounded-lg border px-3 py-2 text-left transition ${
                             isSelected
                               ? "border-black bg-black/5 dark:border-white dark:bg-white/10"
@@ -515,9 +303,9 @@ export default function CatalogueComposantsList() {
                             </span>
                             <div className="flex flex-wrap gap-2">
                               <span className="text-xs text-muted">
-                                {toSlug(item.label)}
+                                {item.slug}
                               </span>
-                              {caps.map((cap) => (
+                              {item.capacities.map((cap) => (
                                 <span
                                   key={`${item.label}-${cap}`}
                                   className="rounded-full border border-border/60 px-2 py-0.5 text-[11px] text-muted-foreground"
@@ -548,12 +336,12 @@ export default function CatalogueComposantsList() {
               ) : (
                 <div className="space-y-3">
                   <ul className="space-y-2 text-sm">
-                    {selectedItems.map((label) => (
+                    {selectedItems.map((item) => (
                       <li
-                        key={label}
+                        key={item.slug}
                         className="rounded-lg border border-border/60 px-3 py-2"
                       >
-                        {label}
+                        {item.label}
                       </li>
                     ))}
                   </ul>
@@ -592,7 +380,7 @@ export default function CatalogueComposantsList() {
                   <ul className="space-y-3 text-sm">
                     {materialItems.map((item) => (
                       <li
-                        key={item.label}
+                        key={item.slug}
                         className="space-y-2 rounded-lg border border-border/60 px-3 py-2"
                       >
                         <div className="flex items-start justify-between gap-4">
@@ -601,12 +389,12 @@ export default function CatalogueComposantsList() {
                               {item.label}
                             </p>
                             <p className="text-xs text-muted">
-                              {toSlug(item.label)}
+                              {item.slug}
                             </p>
                           </div>
                           <button
                             type="button"
-                            onClick={() => removeMaterialItem(item.label)}
+                            onClick={() => removeMaterialItem(item.slug)}
                             className="text-xs font-semibold text-muted-foreground hover:text-foreground"
                           >
                             Retirer
@@ -615,17 +403,17 @@ export default function CatalogueComposantsList() {
                         <div className="grid gap-2 sm:grid-cols-3">
                           <div>
                             <label
-                              htmlFor={`reference-${toSlug(item.label)}`}
+                              htmlFor={`reference-${item.slug}`}
                               className="text-[11px] uppercase text-muted"
                             >
                               Référence
                             </label>
                             <input
-                              id={`reference-${toSlug(item.label)}`}
+                              id={`reference-${item.slug}`}
                               type="text"
                               value={item.reference}
                               onChange={(event) =>
-                                updateMaterialItem(item.label, {
+                                updateMaterialItem(item.slug, {
                                   reference: event.target.value,
                                 })
                               }
@@ -634,16 +422,16 @@ export default function CatalogueComposantsList() {
                           </div>
                           <div>
                             <label
-                              htmlFor={`quantite-${toSlug(item.label)}`}
+                              htmlFor={`quantite-${item.slug}`}
                               className="text-[11px] uppercase text-muted"
                             >
                               Quantité
                             </label>
                             <NumberInput
-                              id={`quantite-${toSlug(item.label)}`}
+                              id={`quantite-${item.slug}`}
                               value={item.quantiteStock}
                               onChange={(event) =>
-                                updateMaterialItem(item.label, {
+                                updateMaterialItem(item.slug, {
                                   quantiteStock: Number(event.target.value),
                                 })
                               }
@@ -654,17 +442,17 @@ export default function CatalogueComposantsList() {
                           </div>
                           <div>
                             <label
-                              htmlFor={`prix-${toSlug(item.label)}`}
+                              htmlFor={`prix-${item.slug}`}
                               className="text-[11px] uppercase text-muted"
                             >
                               Prix unitaire (€)
                             </label>
                             <NumberInput
-                              id={`prix-${toSlug(item.label)}`}
+                              id={`prix-${item.slug}`}
                               step={0.01}
                               value={item.prixUnitaire}
                               onChange={(event) =>
-                                updateMaterialItem(item.label, {
+                                updateMaterialItem(item.slug, {
                                   prixUnitaire: Number(event.target.value),
                                 })
                               }

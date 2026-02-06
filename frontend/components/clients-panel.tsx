@@ -15,6 +15,7 @@ import {
 } from "@/lib/api/client";
 import { getSocietes } from "@/lib/api/societe";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 const emptyClient: ClientCreateDTO = {
   nom: "",
@@ -27,6 +28,50 @@ const emptyClient: ClientCreateDTO = {
 const phoneRegex = /^[+]?[\d\s().-]{6,}$/;
 const normalizePhone = (value: string) => value.replace(/[^+\d]/g, "");
 
+export const buildClientPayload = (form: ClientCreateDTO): ClientCreateDTO => ({
+  ...form,
+  nom: form.nom.trim(),
+  prenom: form.prenom.trim(),
+  telephone: (form.telephone ?? "").trim() || undefined,
+  adresse: (form.adresse ?? "").trim() || undefined,
+});
+
+export const validateClientForm = (
+  form: ClientCreateDTO,
+  clients: ClientDTO[],
+  editingId: number | null
+) => {
+  const payload = buildClientPayload(form);
+  const issues: string[] = [];
+
+  if (!payload.nom) {
+    issues.push("Le nom est requis.");
+  }
+  if (!payload.prenom) {
+    issues.push("Le prénom est requis.");
+  }
+  if (!payload.societeId) {
+    issues.push("Sélectionnez une société.");
+  }
+  if (payload.telephone && !phoneRegex.test(payload.telephone)) {
+    issues.push("Format de téléphone invalide.");
+  }
+  if (payload.telephone) {
+    const normalizedTelephone = normalizePhone(payload.telephone);
+    const duplicateTelephone = clients.some(
+      (client) =>
+        client.id !== editingId &&
+        client.telephone &&
+        normalizePhone(client.telephone) === normalizedTelephone
+    );
+    if (duplicateTelephone) {
+      issues.push("Ce téléphone est déjà utilisé par un autre client.");
+    }
+  }
+
+  return { payload, issues };
+};
+
 export function ClientsPanel() {
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [societes, setSocietes] = useState<SocieteResponse[]>([]);
@@ -38,6 +83,7 @@ export function ClientsPanel() {
   const [formErrors, setFormErrors] = useState<string[]>([]);
   const [filterQuery, setFilterQuery] = useState("");
   const { status, token } = useAuth();
+  const isEditing = editingId !== null;
 
   const requireToken = useCallback(() => {
     if (status === "authenticated" && token) return token;
@@ -90,7 +136,7 @@ export function ClientsPanel() {
       setClients(clientsData ?? []);
       setSocietes(societesData ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setLoading(false);
     }
@@ -113,36 +159,7 @@ export function ClientsPanel() {
     const authToken = requireToken();
     if (!authToken) return;
     setFormErrors([]);
-    const trimmedNom = form.nom.trim();
-    const trimmedPrenom = form.prenom.trim();
-    const trimmedTelephone = (form.telephone ?? "").trim();
-    const issues: string[] = [];
-
-    if (!trimmedNom) {
-      issues.push("Le nom est requis.");
-    }
-    if (!trimmedPrenom) {
-      issues.push("Le prénom est requis.");
-    }
-    if (!form.societeId) {
-      issues.push("Sélectionnez une société.");
-    }
-    if (trimmedTelephone && !phoneRegex.test(trimmedTelephone)) {
-      issues.push("Format de téléphone invalide.");
-    }
-    if (trimmedTelephone) {
-      const normalizedTelephone = normalizePhone(trimmedTelephone);
-      const duplicateTelephone = clients.some(
-        (client) =>
-          client.id !== editingId &&
-          client.telephone &&
-          normalizePhone(client.telephone) === normalizedTelephone
-      );
-      if (duplicateTelephone) {
-        issues.push("Ce téléphone est déjà utilisé par un autre client.");
-      }
-    }
-
+    const { payload, issues } = validateClientForm(form, clients, editingId);
     if (issues.length > 0) {
       setFormErrors(issues);
       return;
@@ -151,15 +168,8 @@ export function ClientsPanel() {
     try {
       setSaving(true);
       setError(null);
-      const payload: ClientCreateDTO = {
-        ...form,
-        nom: trimmedNom,
-        prenom: trimmedPrenom,
-        telephone: trimmedTelephone || undefined,
-        adresse: (form.adresse ?? "").trim() || undefined,
-      };
 
-      if (editingId) {
+      if (isEditing && editingId !== null) {
         const updatePayload: ClientUpdateDTO = { ...payload };
         await updateClient(authToken, editingId, updatePayload);
       } else {
@@ -169,7 +179,7 @@ export function ClientsPanel() {
       setEditingId(null);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     } finally {
       setSaving(false);
     }
@@ -196,7 +206,7 @@ export function ClientsPanel() {
       await deleteClient(authToken, id);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(formatApiError(err, "Erreur inconnue"));
     }
   };
 
@@ -307,8 +317,8 @@ export function ClientsPanel() {
             disabled={saving}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white transition bg-black rounded-lg shadow-sm hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black disabled:opacity-70"
           >
-            {saving ? "Sauvegarde…" : editingId ? "Mettre à jour" : "Créer"}
-          </button>
+          {saving ? "Sauvegarde…" : editingId ? "Mettre à jour" : "Créer"}
+        </button>
         </div>
       </form>
 

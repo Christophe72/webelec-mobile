@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { bffFetch } from "@/lib/api/bffFetch";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 export type QueryResult = {
   result?: string;
@@ -68,7 +69,7 @@ export function RgieQueryPanel(props: RgieQueryPanelProps) {
       setResponse({ result: data.result || "Aucune réponse générée." });
     } catch (err) {
       console.error(err);
-      setResponse({ error: "Impossible de contacter le service." });
+      setResponse({ error: formatApiError(err, "Impossible de contacter le service.") });
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { importFactures } from "@/lib/api/facture";
 import { FactureImportResponse } from "@/types";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { formatApiError } from "@/lib/ui/format-api-error";
 
 interface FactureImportDialogProps {
   open: boolean;
@@ -67,9 +68,7 @@ export function FactureImportDialog({
         }, 2000);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Erreur lors de l\u2019import",
-      );
+      setError(formatApiError(err, "Erreur lors de l’import"));
     } finally {
       setLoading(false);
     }
