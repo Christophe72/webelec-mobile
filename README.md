@@ -138,10 +138,6 @@ Pour toute question ou problème :
 - Vérifier les issues GitHub existantes
 - Créer une nouvelle issue si nécessaire
 
-... mermaid
-radar-beta
-  axis axis1, axis2, axis3
-  curve id1["Label1"]{1, 2, 3}
-  curve id2["Label2"]{4, 5, 6}, id3{7, 8, 9}
-  curve id4{ axis3: 30, axis1: 20, axis2: 10 }
-  ...
+
+
+  mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
