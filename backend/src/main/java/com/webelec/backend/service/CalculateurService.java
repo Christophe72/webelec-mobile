@@ -1,10 +1,13 @@
 package com.webelec.backend.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.webelec.backend.dto.CalculHistoryCreateDTO;
 import com.webelec.backend.exception.ResourceNotFoundException;
 import com.webelec.backend.model.CalculHistory;
+import com.webelec.backend.model.UserPreferences;
 import com.webelec.backend.repository.CalculHistoryRepository;
+import com.webelec.backend.repository.UserPreferencesRepository;
 import com.webelec.backend.security.AuthenticatedUtilisateur;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
@@ -17,10 +20,14 @@ import java.util.List;
 public class CalculateurService {
 
     private final CalculHistoryRepository repository;
+    private final UserPreferencesRepository preferencesRepository;
     private final boolean allowAnonymous;
 
-    public CalculateurService(CalculHistoryRepository repository, Environment environment) {
+    public CalculateurService(CalculHistoryRepository repository,
+                              UserPreferencesRepository preferencesRepository,
+                              Environment environment) {
         this.repository = repository;
+        this.preferencesRepository = preferencesRepository;
         this.allowAnonymous = environment.acceptsProfiles(Profiles.of("dev"));
     }
 
@@ -77,19 +84,31 @@ public class CalculateurService {
         repository.deleteById(id);
     }
 
-    // Gestion des préférences utilisateur (stockées en JSON dans une table séparée ou redis)
-    // Pour V1, on va juste retourner des valeurs par défaut et accepter les mises à jour
-    // Dans une vraie implémentation, il faudrait une table user_preferences
-
     public JsonNode getPreferences() {
-        // TODO: Implémenter avec une vraie table user_preferences
-        // Pour l'instant, retourner null pour forcer le frontend à utiliser localStorage
-        return null;
+        Long userId = getCurrentUserId();
+        return preferencesRepository.findByUserId(userId)
+                .map(UserPreferences::getPreferences)
+                .orElse(null);
     }
 
     public JsonNode updatePreferences(JsonNode preferences) {
-        // TODO: Implémenter avec une vraie table user_preferences
-        // Pour l'instant, juste retourner ce qui a été envoyé
-        return preferences;
+        Long userId = getCurrentUserId();
+        JsonNode safePreferences = preferences != null
+                ? preferences
+                : JsonNodeFactory.instance.objectNode();
+
+        UserPreferences entity = preferencesRepository.findByUserId(userId)
+                .orElseGet(() -> {
+                    UserPreferences created = new UserPreferences();
+                    created.setUserId(userId);
+                    return created;
+                });
+
+        if (safePreferences.equals(entity.getPreferences())) {
+            return entity.getPreferences();
+        }
+
+        entity.setPreferences(safePreferences);
+        return preferencesRepository.save(entity).getPreferences();
     }
 }
