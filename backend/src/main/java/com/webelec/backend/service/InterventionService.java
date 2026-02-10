@@ -29,7 +29,7 @@ public class InterventionService {
     }
 
     public List<Intervention> findAll() {
-        return repository.findAll();
+        return repository.findAllWithDetails();
     }
 
     private void checkAppartenanceSociete(Long societeId) {
@@ -50,15 +50,15 @@ public class InterventionService {
 
     public List<Intervention> findBySociete(Long societeId) {
         checkAppartenanceSociete(societeId);
-        return repository.findBySocieteId(societeId);
+        return repository.findBySocieteIdWithDetails(societeId);
     }
 
     public List<Intervention> findByChantier(Long chantierId) {
-        return repository.findByChantierId(chantierId);
+        return repository.findByChantierIdWithDetails(chantierId);
     }
 
     public Optional<Intervention> findById(Long id) {
-        return repository.findById(id);
+        return repository.findByIdWithDetails(id);
     }
 
     public Intervention create(Intervention intervention) {
@@ -67,7 +67,7 @@ public class InterventionService {
     }
 
     public Intervention update(Long id, Intervention payload) {
-        Intervention existing = repository.findById(id)
+        Intervention existing = repository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Intervention non trouvée"));
         checkAppartenanceSociete(existing.getSociete().getId());
 

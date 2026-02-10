@@ -48,7 +48,7 @@ export default function FilesDemoPage() {
 
       <div className="mt-8 p-4 border border-primary/20 bg-primary/5 rounded-lg">
         <h3 className="text-lg font-semibold text-foreground mb-3">Instructions</h3>
-        <ul className="space-y-2 text-foreground list-disc list-inside">
+        <ul className="space-y-2 text-foreground list-disc list-inside marker:text-foreground">
           <li>Sélectionnez le type d&apos;entité (intervention, devis ou facture)</li>
           <li>Entrez l&apos;ID de l&apos;entité (doit exister dans la base de données)</li>
           <li>Sélectionnez un type de document (PHOTO, PDF, TICKET, etc.)</li>

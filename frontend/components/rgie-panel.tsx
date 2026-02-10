@@ -181,7 +181,7 @@ export function RgiePanel() {
                 Gravité {regle.gravite.niveau}/5 ({regle.gravite.sur_5})
               </div>
               {regle.symptomes.length > 0 && (
-                <ul className="mt-1 list-disc pl-4 text-foreground">
+                <ul className="mt-1 list-disc pl-4 text-foreground marker:text-foreground">
                   {regle.symptomes.slice(0, 2).map((s) => (
                     <li key={s}>{s}</li>
                   ))}

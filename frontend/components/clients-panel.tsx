@@ -221,25 +221,31 @@ export function ClientsPanel() {
     : undefined;
 
   return (
-    <section className="w-full max-w-5xl p-6 mx-auto mt-8 border shadow-sm rounded-2xl border-zinc-200/70 bg-white/60 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-      <div className="flex items-center justify-between">
+    <section className="w-full max-w-7xl p-6 mx-auto mt-8 border shadow-sm rounded-2xl border-zinc-200/70 bg-white/60 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-xs tracking-widest uppercase text-muted">CRM</p>
+          <p className="text-xs tracking-widest uppercase text-gray-600 dark:text-gray-400">CRM</p>
           <h2 className="text-xl font-semibold">Clients</h2>
-          <p className="mt-1 text-xs text-muted">
-            Créez, modifiez ou supprimez les contacts liés à vos sociétés.
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+            Gestion des contacts clients.
           </p>
         </div>
         <button
           type="button"
           onClick={loadData}
-          className="px-3 py-2 text-sm font-medium border rounded-lg shadow-sm border-zinc-200 text-foreground hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
+          className="px-3 py-2 text-sm font-medium border rounded-lg border-zinc-200 text-foreground dark:border-zinc-700"
         >
           Rafraîchir
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid gap-3 mt-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        {/* Formulaire à gauche */}
+        <div className="xl:col-span-1">
+          <h3 className="text-sm font-semibold text-foreground mb-3">
+            {isEditing ? "Modifier le client" : "Nouveau client"}
+          </h3>
+          <form onSubmit={handleSubmit} className="grid gap-3">
         <input
           id="client-nom"
           name="nom"
@@ -276,7 +282,7 @@ export function ClientsPanel() {
           onChange={(e) => setForm((f) => ({ ...f, adresse: e.target.value }))}
           placeholder="Adresse"
           rows={2}
-          className="px-3 py-2 text-sm border rounded-lg shadow-inner sm:col-span-2 border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="px-3 py-2 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <label htmlFor="societeId-select" className="sr-only">
           Société liée*
@@ -299,15 +305,15 @@ export function ClientsPanel() {
         </select>
         {selectedSociete && (
           <div className="text-xs text-muted">
-            Société sélectionnée : {selectedSociete.nom}
+            {selectedSociete.nom}
           </div>
         )}
-        <div className="flex justify-end gap-2 sm:col-span-2">
+        <div className="flex justify-end gap-2">
           {editingId && (
             <button
               type="button"
               onClick={cancelEdit}
-              className="px-4 py-2 text-sm font-medium border rounded-lg shadow-sm border-zinc-200 text-foreground hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
+              className="px-4 py-2 text-sm font-medium border rounded-lg border-zinc-200 text-foreground dark:border-zinc-700"
             >
               Annuler
             </button>
@@ -315,56 +321,59 @@ export function ClientsPanel() {
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white transition bg-black rounded-lg shadow-sm hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black disabled:opacity-70"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-black rounded-lg dark:bg-white dark:text-black disabled:opacity-70"
           >
           {saving ? "Sauvegarde…" : editingId ? "Mettre à jour" : "Créer"}
         </button>
         </div>
-      </form>
+          </form>
 
-      {formErrors.length > 0 && (
-        <div className="px-3 py-2 mt-4 text-sm border rounded-lg border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/60 dark:bg-amber-900/40 dark:text-amber-100">
-          <ul className="pl-5 space-y-1 list-disc">
-            {formErrors.map((message) => (
-              <li key={message}>{message}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+          {formErrors.length > 0 && (
+            <div className="px-3 py-2 mt-4 text-sm border rounded-lg border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/60 dark:bg-amber-900/40 dark:text-amber-100">
+              <ul className="pl-5 space-y-1 list-disc marker:text-current">
+                {formErrors.map((message) => (
+                  <li key={message}>{message}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-      {error && (
-        <div className="px-3 py-2 mt-4 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50 dark:border-red-700/60 dark:bg-red-900/40 dark:text-red-100">
-          {error}
+          {error && (
+            <div className="px-3 py-2 mt-4 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50 dark:border-red-700/60 dark:bg-red-900/40 dark:text-red-100">
+              {error}
+            </div>
+          )}
         </div>
-      )}
 
-      <div className="flex flex-col gap-3 mt-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex-1">
-          <label htmlFor="clients-search" className="text-xs tracking-wide uppercase text-muted">
-            Recherche
-          </label>
-          <input
-            id="clients-search"
-            name="search"
-            type="search"
-            value={filterQuery}
-            onChange={(event) => setFilterQuery(event.target.value)}
-            placeholder="Nom, société ou téléphone"
-            className="w-full px-3 py-2 mt-1 text-sm border rounded-lg shadow-inner border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div className="text-xs text-muted">
-          {loading
-            ? "Chargement des clients…"
-            : `Clients affichés : ${filteredClients.length}/${clients.length}`}
-        </div>
-      </div>
+        {/* Liste des clients à droite */}
+        <div className="xl:col-span-2">
+          <div className="mb-3">
+            <h3 className="text-sm font-semibold text-foreground mb-2">
+              Liste des clients
+            </h3>
+            <div className="flex flex-col gap-2">
+              <input
+                id="clients-search"
+                name="search"
+                type="search"
+                value={filterQuery}
+                onChange={(event) => setFilterQuery(event.target.value)}
+                placeholder="Rechercher par nom, société ou téléphone"
+                className="w-full px-3 py-2 text-sm border rounded-lg border-zinc-200 bg-white/70 text-foreground dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+              <div className="text-xs text-gray-600 dark:text-gray-400">
+                {loading
+                  ? "Chargement…"
+                  : `${filteredClients.length} client${filteredClients.length > 1 ? "s" : ""}`}
+              </div>
+            </div>
+          </div>
 
-      <div className="mt-4 text-sm divide-y divide-zinc-200 dark:divide-zinc-800">
+          <div className="text-sm divide-y divide-zinc-200 dark:divide-zinc-800 max-h-[600px] overflow-y-auto">
         {loading && clients.length === 0 ? (
-          <p className="py-4 text-muted">Chargement…</p>
+          <p className="py-4 text-gray-600 dark:text-gray-400">Chargement…</p>
         ) : filteredClients.length === 0 ? (
-          <p className="py-4 text-muted">
+          <p className="py-4 text-gray-600 dark:text-gray-400">
             {hasFilter
               ? "Aucun client ne correspond à votre recherche."
               : "Aucun client pour le moment."}
@@ -390,26 +399,26 @@ export function ClientsPanel() {
                     </p>
                   )}
                   {client.telephone && (
-                    <p className="text-xs text-muted">
-                      {`☎ ${client.telephone}`}
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Tél. {client.telephone}
                     </p>
                   )}
                   {client.adresse && (
-                    <p className="text-xs text-muted">{client.adresse}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">{client.adresse}</p>
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => handleEdit(client)}
-                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-foreground hover:-translate-y-px hover:shadow-sm dark:border-zinc-700"
+                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-foreground dark:border-zinc-700"
                   >
                     Modifier
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(client.id)}
-                    className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:-translate-y-px hover:shadow-sm dark:border-red-700/60 dark:text-red-100"
+                    className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 dark:border-red-700/60 dark:text-red-100"
                   >
                     Supprimer
                   </button>
@@ -418,6 +427,8 @@ export function ClientsPanel() {
             );
           })
         )}
+          </div>
+        </div>
       </div>
     </section>
   );

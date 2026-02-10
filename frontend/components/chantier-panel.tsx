@@ -212,14 +212,14 @@ export function ChantierPanel() {
       : "Client inconnu";
 
   return (
-    <section className="mx-auto mt-12 w-full max-w-5xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="mx-auto mt-12 w-full max-w-7xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted">
+          <p className="text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400">
             API demo
           </p>
           <h2 className="text-xl font-semibold">Chantiers</h2>
-          <p className="mt-1 text-xs text-muted">
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
             Création, édition rapide et suppression liées à l&apos;API
             chantiers.
           </p>
@@ -242,7 +242,7 @@ export function ChantierPanel() {
           <button
             type="button"
             onClick={() => loadChantiers()}
-            className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700 disabled:opacity-60"
+            className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-foreground dark:border-zinc-700 disabled:opacity-60"
             disabled={loading}
           >
             {loading ? "Chargement…" : "Rafraîchir"}
@@ -250,7 +250,13 @@ export function ChantierPanel() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        {/* Formulaire à gauche */}
+        <div className="xl:col-span-1">
+          <h3 className="text-sm font-semibold text-foreground mb-3">
+            {editingId ? "Modifier le chantier" : "Nouveau chantier"}
+          </h3>
+          <form onSubmit={handleSubmit} className="grid gap-3">
         <input
           id="chantier-nom"
           name="nom"
@@ -330,7 +336,7 @@ export function ChantierPanel() {
           value={form.adresse || ""}
           onChange={(e) => setForm((f) => ({ ...f, adresse: e.target.value }))}
           placeholder="Adresse"
-          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60 sm:col-span-2"
+          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
         <textarea
           id="chantier-description"
@@ -341,45 +347,53 @@ export function ChantierPanel() {
           }
           placeholder="Notes / description"
           rows={3}
-          className="sm:col-span-2 rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+          className="rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
         />
-        <div className="sm:col-span-2 flex justify-end gap-2">
+        <div className="flex justify-end gap-2">
           {editingId && (
             <button
               type="button"
               onClick={cancelEdit}
-              className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
+              className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-foreground dark:border-zinc-700"
             >
               Annuler
             </button>
           )}
           <button
             type="submit"
-            className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black disabled:opacity-70"
+            className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white dark:bg-white dark:text-black disabled:opacity-70"
             disabled={saving}
           >
             {saving ? "Sauvegarde…" : editingId ? "Mettre à jour" : "Créer"}
           </button>
         </div>
-      </form>
+          </form>
 
-      {error && (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-700/50 dark:bg-red-900/40 dark:text-red-100">
-          {error}
+          {error && (
+            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-700/50 dark:bg-red-900/40 dark:text-red-100">
+              {error}
+            </div>
+          )}
         </div>
-      )}
 
-      <div className="mt-6 text-xs text-muted">
-        {loading
-          ? "Chargement des chantiers…"
-          : `Chantiers chargés : ${chantiers.length}`}
-      </div>
+        {/* Liste des chantiers à droite */}
+        <div className="xl:col-span-2">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-foreground">
+              Liste des chantiers
+            </h3>
+            <div className="text-xs text-gray-600 dark:text-gray-400">
+              {loading
+                ? "Chargement…"
+                : `${chantiers.length} chantier${chantiers.length > 1 ? "s" : ""}`}
+            </div>
+          </div>
 
-      <div className="mt-4 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+          <div className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800 max-h-[600px] overflow-y-auto">
         {loading && chantiers.length === 0 ? (
-          <p className="py-4 text-muted">Chargement…</p>
+          <p className="py-4 text-gray-600 dark:text-gray-400">Chargement…</p>
         ) : chantiers.length === 0 ? (
-          <p className="py-4 text-muted">Aucun chantier pour le moment.</p>
+          <p className="py-4 text-gray-600 dark:text-gray-400">Aucun chantier pour le moment.</p>
         ) : (
           chantiers.map((chantier) => (
             <article
@@ -396,7 +410,7 @@ export function ChantierPanel() {
                     {clientLabel(chantier.client?.id)}
                   </span>
                 </div>
-                <p className="text-muted">
+                <p className="text-gray-600 dark:text-gray-400">
                   {chantier.adresse || "Adresse non renseignée"}
                 </p>
                 {chantier.description && (
@@ -409,14 +423,14 @@ export function ChantierPanel() {
                 <button
                   type="button"
                   onClick={() => handleEdit(chantier)}
-                  className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-foreground hover:-translate-y-px hover:shadow-sm dark:border-zinc-700"
+                  className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-foreground dark:border-zinc-700"
                 >
                   Modifier
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDelete(chantier.id)}
-                  className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:-translate-y-px hover:shadow-sm dark:border-red-700/60 dark:text-red-100 disabled:opacity-50"
+                  className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 dark:border-red-700/60 dark:text-red-100 disabled:opacity-50"
                   disabled={saving}
                 >
                   Supprimer
@@ -425,6 +439,8 @@ export function ChantierPanel() {
             </article>
           ))
         )}
+          </div>
+        </div>
       </div>
     </section>
   );

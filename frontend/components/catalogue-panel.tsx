@@ -73,7 +73,7 @@ export function CataloguePanel() {
   const [societes, setSocietes] = useState<SocieteResponse[]>([]);
   const [form, setForm] = useState<ProduitCreateDTO>(emptyProduit([]));
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { status, token } = useAuth();
@@ -107,9 +107,6 @@ export function CataloguePanel() {
   }, [requireAuth]);
 
   useEffect(() => {
-    if (status !== "authenticated" || !token) return;
-    void loadData();
-
     const handler = () => {
       void loadData();
     };
@@ -118,7 +115,7 @@ export function CataloguePanel() {
     return () => {
       window.removeEventListener("catalogue:refresh", handler);
     };
-  }, [loadData, status, token]);
+  }, [loadData]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -187,213 +184,232 @@ export function CataloguePanel() {
   };
 
   return (
-    <section className="mx-auto mt-8 w-full max-w-5xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-      <div className="flex items-center justify-between">
+    <section className="mx-auto mt-8 w-full max-w-7xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted">Stock</p>
+          <p className="text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400">Stock</p>
           <h2 className="text-xl font-semibold">Catalogue produits</h2>
-          <p className="mt-1 text-xs text-muted">
-            Références centralisées et stocks synchronisés avec `/produits`.
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+            Gestion des références et stocks.
           </p>
         </div>
         <button
           type="button"
           onClick={loadData}
-          className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
+          className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-foreground dark:border-zinc-700"
         >
           Rafraîchir
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="catalogue-reference" className="mb-1.5 block text-xs font-semibold text-muted">
-            Référence*
-          </label>
-          <input
-            id="catalogue-reference"
-            name="reference"
-            type="text"
-            value={form.reference}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, reference: e.target.value }))
-            }
-            placeholder="Ex: PROD-2026-0001"
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div>
-          <label htmlFor="catalogue-nom" className="mb-1.5 block text-xs font-semibold text-muted">
-            Nom du produit*
-          </label>
-          <input
-            id="catalogue-nom"
-            name="nom"
-            type="text"
-            value={form.nom}
-            onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
-            placeholder="Ex: Disjoncteur 20A, Câble H07V-K..."
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="catalogue-description" className="mb-1.5 block text-xs font-semibold text-muted">
-            Description
-          </label>
-          <textarea
-            id="catalogue-description"
-            name="description"
-            value={form.description ?? ""}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, description: e.target.value }))
-            }
-            placeholder="Ex: Caractéristiques techniques, spécifications..."
-            rows={2}
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div>
-          <label htmlFor="catalogue-quantite" className="mb-1.5 block text-xs font-semibold text-muted">
-            Quantité en stock
-          </label>
-          <NumberInput
-            id="catalogue-quantite"
-            name="quantiteStock"
-            value={form.quantiteStock}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, quantiteStock: Number(e.target.value) }))
-            }
-            placeholder="10"
-            min={0}
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div>
-          <label htmlFor="catalogue-prix" className="mb-1.5 block text-xs font-semibold text-muted">
-            Prix unitaire (€)
-          </label>
-          <NumberInput
-            id="catalogue-prix"
-            name="prixUnitaire"
-            step={0.01}
-            value={form.prixUnitaire}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, prixUnitaire: Number(e.target.value) }))
-            }
-            placeholder="49.99"
-            min={0}
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="catalogue-societe" className="mb-1.5 block text-xs font-semibold text-muted">
-            Société*
-          </label>
-          <select
-            id="catalogue-societe"
-            name="societeId"
-            value={form.societeId || ""}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
-            }
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          >
-            <option value="">-- Sélectionner une société --</option>
-            {societes.map((societe) => (
-              <option key={societe.id} value={societe.id}>
-                {societe.nom}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="sm:col-span-2 flex justify-end gap-2">
-          {editingId && (
-            <button
-              type="button"
-              onClick={cancelEdit}
-              className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
-            >
-              Annuler
-            </button>
-          )}
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black disabled:opacity-70"
-          >
-            {saving ? "Sauvegarde…" : editingId ? "Mettre à jour" : "Créer"}
-          </button>
-        </div>
-      </form>
-
-      {error && (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-700/60 dark:bg-red-900/40 dark:text-red-100">
-          {error}
-        </div>
-      )}
-
-      <div className="mt-4 text-xs text-muted">
-        {loading
-          ? "Chargement du catalogue…"
-          : `Produits chargés : ${produits.length}`}
-      </div>
-
-      <div className="mt-4 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
-        {loading && produits.length === 0 ? (
-          <p className="py-4 text-muted">Chargement…</p>
-        ) : produits.length === 0 ? (
-          <p className="py-4 text-muted">Aucun produit enregistré.</p>
-        ) : (
-          produits.map((produit) => {
-            const societe = societes.find((s) => s.id === produit.societeId);
-            return (
-              <article
-                key={produit.id}
-                className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        {/* Formulaire à gauche */}
+        <div className="xl:col-span-1">
+          <h3 className="text-sm font-semibold text-foreground mb-3">
+            {editingId ? "Modifier le produit" : "Nouveau produit"}
+          </h3>
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            <div>
+              <label htmlFor="catalogue-reference" className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Référence*
+              </label>
+              <input
+                id="catalogue-reference"
+                name="reference"
+                type="text"
+                value={form.reference}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, reference: e.target.value }))
+                }
+                placeholder="Ex: PROD-2026-0001"
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="catalogue-nom" className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Nom du produit*
+              </label>
+              <input
+                id="catalogue-nom"
+                name="nom"
+                type="text"
+                value={form.nom}
+                onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
+                placeholder="Ex: Disjoncteur 20A, Câble H07V-K..."
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="catalogue-description" className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Description
+              </label>
+              <textarea
+                id="catalogue-description"
+                name="description"
+                value={form.description ?? ""}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, description: e.target.value }))
+                }
+                placeholder="Caractéristiques techniques..."
+                rows={2}
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="catalogue-quantite" className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Quantité en stock
+              </label>
+              <NumberInput
+                id="catalogue-quantite"
+                name="quantiteStock"
+                value={form.quantiteStock}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, quantiteStock: Number(e.target.value) }))
+                }
+                placeholder="10"
+                min={0}
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="catalogue-prix" className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Prix unitaire (€)
+              </label>
+              <NumberInput
+                id="catalogue-prix"
+                name="prixUnitaire"
+                step={0.01}
+                value={form.prixUnitaire}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, prixUnitaire: Number(e.target.value) }))
+                }
+                placeholder="49.99"
+                min={0}
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="catalogue-societe" className="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Société*
+              </label>
+              <select
+                id="catalogue-societe"
+                name="societeId"
+                value={form.societeId || ""}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
+                }
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
               >
-                <div className="space-y-1">
-                  <p className="font-semibold text-foreground">
-                    {produit.reference} — {produit.nom}
-                  </p>
-                  {societe && (
-                    <p className="text-xs uppercase tracking-wide text-muted">
-                      {societe.nom}
-                    </p>
-                  )}
-                  {produit.description && (
-                    <p className="text-xs text-muted">{produit.description}</p>
-                  )}
-                  <p className="text-xs text-muted">
-                    Stock : {produit.quantiteStock} • Prix :{" "}
-                    {produit.prixUnitaire.toLocaleString("fr-FR", {
-                      style: "currency",
-                      currency: "EUR",
-                    })}
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleEdit(produit)}
-                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-foreground hover:-translate-y-px hover:shadow-sm dark:border-zinc-700"
+                <option value="">Sélectionner une société</option>
+                {societes.map((societe) => (
+                  <option key={societe.id} value={societe.id}>
+                    {societe.nom}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex justify-end gap-2">
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={cancelEdit}
+                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-foreground dark:border-zinc-700"
+                >
+                  Annuler
+                </button>
+              )}
+              <button
+                type="submit"
+                disabled={saving}
+                className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white dark:bg-white dark:text-black disabled:opacity-70"
+              >
+                {saving ? "Sauvegarde…" : editingId ? "Mettre à jour" : "Créer"}
+              </button>
+            </div>
+          </form>
+
+          {error && (
+            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-700/60 dark:bg-red-900/40 dark:text-red-100">
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Liste des produits à droite */}
+        <div className="xl:col-span-2">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-foreground">
+              Liste des produits
+            </h3>
+            <div className="text-xs text-gray-600 dark:text-gray-400">
+              {loading
+                ? "Chargement…"
+                : produits.length === 0
+                ? "Cliquez sur 'Rafraîchir'"
+                : `${produits.length} produit${produits.length > 1 ? "s" : ""}`}
+            </div>
+          </div>
+
+          <div className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800 max-h-[600px] overflow-y-auto">
+            {loading && produits.length === 0 ? (
+              <p className="py-4 text-gray-600 dark:text-gray-400">Chargement…</p>
+            ) : produits.length === 0 ? (
+              <p className="py-4 text-gray-600 dark:text-gray-400">Aucun produit enregistré.</p>
+            ) : (
+              produits.map((produit) => {
+                const societe = societes.find((s) => s.id === produit.societeId);
+                return (
+                  <article
+                    key={produit.id}
+                    className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    Modifier
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(produit.id)}
-                    className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:-translate-y-px hover:shadow-sm dark:border-red-700/60 dark:text-red-100"
-                  >
-                    Supprimer
-                  </button>
-                </div>
-              </article>
-            );
-          })
-        )}
+                    <div className="space-y-1">
+                      <p className="font-semibold text-foreground">
+                        {produit.reference} — {produit.nom}
+                      </p>
+                      {societe && (
+                        <p className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                          {societe.nom}
+                        </p>
+                      )}
+                      {produit.description && (
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{produit.description}</p>
+                      )}
+                      <p className="text-xs text-muted">
+                        Stock : {produit.quantiteStock} • Prix :{" "}
+                        {produit.prixUnitaire.toLocaleString("fr-FR", {
+                          style: "currency",
+                          currency: "EUR",
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(produit)}
+                        className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-foreground dark:border-zinc-700"
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(produit.id)}
+                        className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 dark:border-red-700/60 dark:text-red-100"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  </article>
+                );
+              })
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );
 }
+
 
 export default CataloguePanel;

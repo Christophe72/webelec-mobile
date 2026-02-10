@@ -281,7 +281,7 @@ export default function CatalogueComposantsList() {
                   Aucun composant ne correspond aux filtres.
                 </p>
               ) : (
-                <ol className="space-y-2 text-sm text-foreground list-decimal pl-5">
+                <ol className="space-y-2 text-sm text-foreground list-decimal pl-5 marker:text-foreground">
                   {filteredItems.map((item) => {
                     const isSelected = selectedItems.some(
                       (entry) => entry.slug === item.slug

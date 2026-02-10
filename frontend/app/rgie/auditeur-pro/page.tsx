@@ -306,7 +306,7 @@ export default function AuditeurProPage() {
 
               <div>
                 <h3 className="font-bold mb-2">Explication étape par étape</h3>
-                <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-2">
+                <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-2 marker:text-muted-foreground">
                   {result.steps.map((s, i) => (
                     <li key={i}>{s}</li>
                   ))}
@@ -368,7 +368,7 @@ export default function AuditeurProPage() {
                       <strong className="text-foreground">
                         Actions urgentes
                       </strong>
-                      <ul className="list-disc list-inside text-muted-foreground">
+                      <ul className="list-disc list-inside text-muted-foreground marker:text-muted-foreground">
                         {(result.nonConformities[solutionsIndex].regles[0]
                           .actions.urgentes.length
                           ? result.nonConformities[solutionsIndex].regles[0]
@@ -383,7 +383,7 @@ export default function AuditeurProPage() {
                       <strong className="text-foreground">
                         Actions correctives
                       </strong>
-                      <ul className="list-disc list-inside text-muted-foreground">
+                      <ul className="list-disc list-inside text-muted-foreground marker:text-muted-foreground">
                         {(result.nonConformities[solutionsIndex].regles[0]
                           .actions.correctives.length
                           ? result.nonConformities[solutionsIndex].regles[0]
@@ -396,7 +396,7 @@ export default function AuditeurProPage() {
                     </div>
                     <div>
                       <strong className="text-foreground">Prévention</strong>
-                      <ul className="list-disc list-inside text-muted-foreground">
+                      <ul className="list-disc list-inside text-muted-foreground marker:text-muted-foreground">
                         {(result.nonConformities[solutionsIndex].regles[0]
                           .actions.prevention.length
                           ? result.nonConformities[solutionsIndex].regles[0]

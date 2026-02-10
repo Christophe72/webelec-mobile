@@ -108,7 +108,7 @@ export default function FacturesImportPage() {
               <h3 className="font-semibold text-foreground mb-2">
                 Colonnes obligatoires
               </h3>
-              <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
+              <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground marker:text-muted-foreground">
                 <li>
                   <strong>numero</strong>: Numéro unique de facture
                 </li>
@@ -143,7 +143,7 @@ export default function FacturesImportPage() {
               <h3 className="font-semibold text-foreground mb-2">
                 Colonnes optionnelles
               </h3>
-              <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
+              <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground marker:text-muted-foreground">
                 <li>
                   <strong>clientEmail</strong>: Utilisé pour identifier un
                   client existant

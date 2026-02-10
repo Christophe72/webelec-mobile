@@ -348,7 +348,7 @@ export default function FileManager({
 
         {helpOpen && (
           <div className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-            <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300">
+            <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300 marker:text-current">
               <li>Choisir le type d&apos;entité</li>
               <li>Renseigner l&apos;ID existant</li>
               <li>Sélectionner le type de document</li>

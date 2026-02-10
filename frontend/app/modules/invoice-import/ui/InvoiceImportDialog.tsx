@@ -262,13 +262,13 @@ FAC-001,2025-01-15,2025-02-15,1000.00,210.00,1210.00,EN_ATTENTE,Dupont,Marc,marc
                             Ligne {r.rowNumber}
                             {r.invoiceNumero && ` (${r.invoiceNumero})`}:
                           </p>
-                          <ul className="list-disc list-inside text-red-600 ml-2">
+                          <ul className="list-disc list-inside text-red-600 ml-2 marker:text-current">
                             {r.errors.map((err, idx) => (
                               <li key={idx}>{err}</li>
                             ))}
                           </ul>
                           {r.warnings && r.warnings.length > 0 && (
-                            <ul className="list-disc list-inside text-yellow-600 ml-2">
+                            <ul className="list-disc list-inside text-yellow-600 ml-2 marker:text-current">
                               {r.warnings.map((warn, idx) => (
                                 <li key={idx}>{warn}</li>
                               ))}
