@@ -139,7 +139,8 @@ public class PieceJustificativeService {
     }
 
     public List<PieceJustificativeResponse> getFilesByFacture(Long factureId) {
-        return pieceRepository.findByFactureId(factureId).stream()
+        return pieceRepository
+        		.findByFactureId(factureId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }

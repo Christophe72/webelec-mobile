@@ -4,6 +4,9 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/webelec}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    hikari:
+      schema: public
+      connection-init-sql: SET search_path TO public  # force schema to avoid "aucun schéma" at startup
 
   jpa:
     open-in-view: false
