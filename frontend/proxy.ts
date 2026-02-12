@@ -9,8 +9,23 @@ const ClaimsSchema = z.object({
 // JWT désactivé hors production ou via flag explicite
 const AUTH_DISABLED =
   process.env.WEBELEC_AUTH_DISABLED === "true" ||
-  process.env.NEXT_PUBLIC_API_AUTH_DISABLED === "true" ||
-  process.env.NODE_ENV !== "production";
+  process.env.NEXT_PUBLIC_API_AUTH_DISABLED === "true";
+
+const PUBLIC_API_PATHS = [
+  /^\/api\/auth\/login(?:\/|$)/,
+  /^\/api\/auth\/register(?:\/|$)/,
+  /^\/api\/auth\/refresh(?:\/|$)/,
+];
+
+function isPublicApiPath(pathname: string): boolean {
+  return PUBLIC_API_PATHS.some((pattern) => pattern.test(pathname));
+}
+
+function getBearerToken(authHeader: string | null): string | null {
+  if (!authHeader) return null;
+  const match = authHeader.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || null;
+}
 
 export async function proxy(req: NextRequest) {
   // ✅ DEV : on laisse tout passer
@@ -18,10 +33,16 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if (isPublicApiPath(req.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
   // ⚠️ IMPORT DYNAMIQUE (clé du correctif)
   const { verifyJwtServer } = await import("@/lib/auth/server");
 
-  const token = req.cookies.get("token")?.value;
+  const token =
+    getBearerToken(req.headers.get("authorization")) ??
+    req.cookies.get("token")?.value;
   if (!token) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }

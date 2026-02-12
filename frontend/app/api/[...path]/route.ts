@@ -1,19 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const RAW_API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ??
-  process.env.API_BASE_URL ??
-  "http://localhost:8080";
-const API_BASE = RAW_API_BASE.endsWith("/api")
-  ? RAW_API_BASE
-  : `${RAW_API_BASE}/api`;
-
-function buildHeaders(req: NextRequest): Headers {
-  const headers = new Headers(req.headers);
-  headers.delete("host");
-  headers.delete("connection");
-  return headers;
-}
+import { proxyApi } from "../proxy";
 
 type RouteParams = { path?: string[] };
 
@@ -32,33 +18,7 @@ async function proxy(req: NextRequest, path: string): Promise<NextResponse> {
   if (!path) {
     return NextResponse.json({ error: "Not Found" }, { status: 404 });
   }
-
-  const search = req.nextUrl.search || "";
-  const upstreamUrl = `${API_BASE}/${path}${search}`;
-  const method = req.method.toUpperCase();
-
-  const body =
-    method === "GET" || method === "HEAD" ? undefined : await req.arrayBuffer();
-
-  try {
-    const res = await fetch(upstreamUrl, {
-      method,
-      headers: buildHeaders(req),
-      body,
-      cache: "no-store",
-    });
-
-    const resBody = await res.arrayBuffer();
-
-    return new NextResponse(resBody, {
-      status: res.status,
-      statusText: res.statusText,
-      headers: res.headers,
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Proxy error";
-    return NextResponse.json({ error: message }, { status: 502 });
-  }
+  return proxyApi(req, `/${path}`);
 }
 
 export async function GET(

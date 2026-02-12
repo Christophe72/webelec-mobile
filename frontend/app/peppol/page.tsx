@@ -7,7 +7,10 @@ import {
   MockBankWizardAdapter,
   LocalStorageStoreAdapter,
 } from "@/app/modules/account-validation";
-import type { ValidationResult } from "@/app/modules/account-validation";
+import type {
+  ValidationResult,
+  ValidationStatus,
+} from "@/app/modules/account-validation";
 import {
   HttpInvoiceImportAdapter,
   InvoiceImportDialog,
@@ -16,6 +19,7 @@ import { getFactures } from "@/lib/api/facture";
 import { envoyerPeppol, getUbl } from "@/lib/api/peppol";
 import type { FactureDTO } from "@/types";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { FactureExportDialog } from "@/components/facture-export-dialog";
 
 export default function PeppolAccountValidationPage() {
   const societeId = 1;
@@ -47,14 +51,20 @@ export default function PeppolAccountValidationPage() {
   );
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
   const [sendingId, setSendingId] = useState<number | null>(null);
+  const [accountStatus, setAccountStatus] = useState<ValidationStatus | null>(
+    null,
+  );
+  const [exportFacture, setExportFacture] = useState<FactureDTO | null>(null);
   const [peppolStates, setPeppolStates] = useState<
     Record<number, { verified?: boolean; sent?: boolean; message?: string }>
   >({});
   const formatAmount = (value?: number) =>
     value === null || value === undefined ? "-" : `${value.toFixed(2)} €`;
+  const isAccountValidated = accountStatus === "VALIDATED";
 
   const handleValidated = (result: ValidationResult) => {
     console.log("✅ Compte validé:", result);
+    setAccountStatus(result.status);
 
     // Exemple: sauvegarder dans votre base de données
     // await fetch('/api/accounts', { method: 'POST', body: JSON.stringify(result.details) });
@@ -176,6 +186,18 @@ export default function PeppolAccountValidationPage() {
               <p className="text-sm text-muted-foreground">
                 Import CSV, verification UBL et envoi Peppol.
               </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Statut compte:{" "}
+                <span
+                  className={
+                    isAccountValidated
+                      ? "text-emerald-600"
+                      : "text-amber-600"
+                  }
+                >
+                  {isAccountValidated ? "VALIDE" : "NON VALIDE"}
+                </span>
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button
@@ -265,6 +287,18 @@ export default function PeppolAccountValidationPage() {
                           {verifyingId === facture.id
                             ? "Verification..."
                             : "Verifier"}
+                        </button>
+                        <button
+                          onClick={() => setExportFacture(facture)}
+                          disabled={!isAccountValidated}
+                          title={
+                            isAccountValidated
+                              ? "Exporter la facture"
+                              : "Validation bancaire requise"
+                          }
+                          className="px-3 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+                        >
+                          Exporter
                         </button>
                         <button
                           onClick={() => handleSend(facture.id)}
@@ -440,6 +474,15 @@ export default function PeppolAccountValidationPage() {
           onSuccess={handleImportSuccess}
         />
       )}
+
+      <FactureExportDialog
+        open={!!exportFacture}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setExportFacture(null);
+        }}
+        facture={exportFacture}
+        accountValidated={isAccountValidated}
+      />
     </div>
   );
 }

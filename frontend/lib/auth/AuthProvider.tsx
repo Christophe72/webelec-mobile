@@ -1,6 +1,11 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  clearToken as clearStoredToken,
+  getToken as getStoredToken,
+  setToken as setStoredToken,
+} from "@/lib/api/auth-storage";
 
 type AuthContextValue = {
     token: string | null;
@@ -10,20 +15,31 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const STORAGE_KEY = "webelec_access_token";
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [token, setTokenState] = useState<string | null>(() => {
-        if (typeof window !== "undefined") {
-            return window.localStorage.getItem(STORAGE_KEY);
-        }
-        return null;
-    });
+    const [token, setTokenState] = useState<string | null>(() => getStoredToken());
+
+    useEffect(() => {
+        const sync = () => setTokenState(getStoredToken());
+        const scheduleSync = () => queueMicrotask(sync);
+
+        scheduleSync();
+
+        window.addEventListener("storage", scheduleSync);
+        window.addEventListener("auth:token-change", scheduleSync);
+
+        return () => {
+            window.removeEventListener("storage", scheduleSync);
+            window.removeEventListener("auth:token-change", scheduleSync);
+        };
+    }, []);
 
     const setToken = useCallback((t: string | null) => {
         setTokenState(t);
-        if (t) window.localStorage.setItem(STORAGE_KEY, t);
-        else window.localStorage.removeItem(STORAGE_KEY);
+        if (t) {
+            setStoredToken(t);
+            return;
+        }
+        clearStoredToken();
     }, []);
 
     const clear = useCallback(() => setToken(null), [setToken]);

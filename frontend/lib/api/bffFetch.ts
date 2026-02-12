@@ -1,5 +1,15 @@
 type BffError = Error & { status?: number; body?: unknown };
 
+const PUBLIC_AUTH_ENDPOINTS = [
+  /^\/api\/auth\/login(?:\/|$)/,
+  /^\/api\/auth\/register(?:\/|$)/,
+  /^\/api\/auth\/refresh(?:\/|$)/,
+];
+
+function isPublicAuthEndpoint(url: string): boolean {
+  return PUBLIC_AUTH_ENDPOINTS.some((pattern) => pattern.test(url));
+}
+
 export async function bffFetch<T>(
   url: string,
   token?: string | null,
@@ -11,8 +21,9 @@ export async function bffFetch<T>(
 
   // DEV MODE : autoriser les appels sans token
   const isAuthDisabled = process.env.NEXT_PUBLIC_API_AUTH_DISABLED === "true";
+  const isPublicEndpoint = isPublicAuthEndpoint(url);
 
-  if (!token && !isAuthDisabled) {
+  if (!token && !isAuthDisabled && !isPublicEndpoint) {
     const error = new Error("BFF error 401 (missing access token)") as BffError;
     error.status = 401;
     throw error;

@@ -51,6 +51,12 @@ public class FactureRequest {
     @Valid
     private List<FactureLigneRequest> lignes;
 
+    // Champs Peppol (optionnels)
+    private Boolean peppolEnabled = false;
+    private String peppolSenderEndpointId;
+    private String peppolReceiverEndpointId;
+    private String peppolFormat = "UBL_2_1"; // Par défaut UBL 2.1
+
     public String getNumero() {
         return numero;
     }
@@ -131,6 +137,38 @@ public class FactureRequest {
         this.lignes = lignes;
     }
 
+    public Boolean getPeppolEnabled() {
+        return peppolEnabled;
+    }
+
+    public void setPeppolEnabled(Boolean peppolEnabled) {
+        this.peppolEnabled = peppolEnabled;
+    }
+
+    public String getPeppolSenderEndpointId() {
+        return peppolSenderEndpointId;
+    }
+
+    public void setPeppolSenderEndpointId(String peppolSenderEndpointId) {
+        this.peppolSenderEndpointId = peppolSenderEndpointId;
+    }
+
+    public String getPeppolReceiverEndpointId() {
+        return peppolReceiverEndpointId;
+    }
+
+    public void setPeppolReceiverEndpointId(String peppolReceiverEndpointId) {
+        this.peppolReceiverEndpointId = peppolReceiverEndpointId;
+    }
+
+    public String getPeppolFormat() {
+        return peppolFormat;
+    }
+
+    public void setPeppolFormat(String peppolFormat) {
+        this.peppolFormat = peppolFormat;
+    }
+
     public Facture toEntity() {
         Societe societe = new Societe();
         societe.setId(societeId);
@@ -152,6 +190,11 @@ public class FactureRequest {
                 .statut(statut)
                 .societe(societe)
                 .client(client)
+                .peppolEnabled(peppolEnabled)
+                .peppolSenderEndpointId(peppolSenderEndpointId)
+                .peppolReceiverEndpointId(peppolReceiverEndpointId)
+                .peppolFormat(peppolFormat)
+                .peppolStatus(peppolEnabled != null && peppolEnabled ? "DRAFT" : null)
                 .build();
         mapped.forEach(l -> l.setFacture(facture));
         facture.setLignes(mapped);

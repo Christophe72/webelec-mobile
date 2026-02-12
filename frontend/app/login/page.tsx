@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import { login, me, refresh } from "@/lib/api/auth";
+import { getRefreshToken, setRefreshToken } from "@/lib/api/auth-storage";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
 function decodeTokenInfo(value?: string | null): string | null {
@@ -36,7 +37,9 @@ export default function LoginTestPage() {
   const [refreshStatus, setRefreshStatus] = useState<string | null>(null);
 
   // Debug / info
-  const [refreshTokenValue, setRefreshTokenValue] = useState<string | null>(null);
+  const [refreshTokenValue, setRefreshTokenValue] = useState<string | null>(
+    () => getRefreshToken()
+  );
   const [accessTokenShadow, setAccessTokenShadow] = useState<string | null>(null);
 
   // 🔑 DÉRIVÉS
@@ -61,6 +64,9 @@ export default function LoginTestPage() {
 
       // shadow UI immédiat
       setAccessTokenShadow(res.accessToken);
+      if (res.refreshToken) {
+        setRefreshToken(res.refreshToken);
+      }
       setRefreshTokenValue(res.refreshToken ?? null);
 
       setMessage(`Connexion réussie pour ${res.utilisateur.email}`);
@@ -96,6 +102,7 @@ export default function LoginTestPage() {
       setAccessTokenShadow(res.accessToken);
 
       if (res.refreshToken) {
+        setRefreshToken(res.refreshToken);
         setRefreshTokenValue(res.refreshToken);
       }
 

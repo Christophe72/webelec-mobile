@@ -1,0 +1,65 @@
+name: Deploy Backend WebElec
+
+on:
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: Branche ou tag à déployer (par défaut main)
+        default: main
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    env:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: ${{ secrets.PROD_DB_HOST }}
+      DB_PORT: ${{ secrets.PROD_DB_PORT }}
+      DB_NAME: ${{ secrets.PROD_DB_NAME }}
+      DB_USER: ${{ secrets.PROD_DB_USER }}
+      DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+      WEBELEC_JWT_SECRET: ${{ secrets.PROD_JWT_SECRET }}
+      CORS_ALLOWED_ORIGINS: ${{ secrets.PROD_CORS_ALLOWED_ORIGINS }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.git-ref || 'main' }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            m2-${{ runner.os }}-
+
+      - name: Build application (prod profile)
+        run: ./mvnw -B clean package -DskipTests -Dspring.profiles.active=prod
+
+      - name: Assemble deployment bundle
+        run: |
+          mkdir -p deploy
+          cp target/backend-0.0.1-SNAPSHOT.jar deploy/
+      - name: Deploy over SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+        run: |
+          echo "${SSH_PRIVATE_KEY}" > private_key
+          chmod 600 private_key
+          rsync -az -e "ssh -i private_key -o StrictHostKeyChecking=no" deploy/ ${SSH_USER}@${SSH_HOST}:/opt/webelec/backend/
+          ssh -i private_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "sudo systemctl restart webelec.service && sudo systemctl status webelec.service --no-pager"
+          rm -f private_key

@@ -741,4 +741,4 @@ services:
       WEBELEC_JWT_SECRET: ${WEBELEC_STAGE_JWT_SECRET}
 ```
 
-Gardez une politique de rotation régulière des secrets (DB/JWT) et attribuez des credentials distincts par environnement pour limiter l'impact d'un incident.
+Ajouter ces variables dans un fichier `.env` non commit ou via la stack orchestrateur (Docker secrets, Kubernetes `Secret`).

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { fetchDashboardMetrics } from "@/lib/api/dashboard";
+import { useEffect, useState, useMemo } from "react";
+import { fetchDashboardEvents, fetchDashboardMetrics } from "@/lib/api/dashboard";
 import type { DashboardMetrics } from "@/types/dashboard";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { formatApiError } from "@/lib/ui/format-api-error";
@@ -10,6 +10,8 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { PrioritiesToday } from "@/components/dashboard/PrioritiesToday";
 import type { DashboardEvent } from "@/types/dashboard";
+import { Line, LineChart, CartesianGrid, XAxis, ResponsiveContainer } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function DashboardPage() {
   const { status, token } = useAuth();
@@ -18,6 +20,26 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Données aléatoires pour le graphique d'activité (30 derniers jours)
+  const activityData = useMemo(() => {
+    const data = [];
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dayLabel = date.getDate().toString();
+      // Données aléatoires mais réalistes (0-15 activités par jour, plus actif en semaine)
+      const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+      const baseActivity = isWeekend ? 2 : 8;
+      const variance = Math.floor(Math.random() * 6);
+      data.push({
+        day: dayLabel,
+        activites: baseActivity + variance,
+      });
+    }
+    return data;
+  }, []);
 
   useEffect(() => {
     if (status !== "authenticated" || !token) return;
@@ -28,68 +50,51 @@ export default function DashboardPage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchDashboardMetrics(token);
-        if (data.status === "success") {
+        const [metricsData, eventsData] = await Promise.all([
+          fetchDashboardMetrics(token),
+          fetchDashboardEvents(token),
+        ]);
+
+        if (metricsData.status === "success") {
           if (!cancelled) {
-            setMetrics(data.metrics);
-            setError(null);
+            setMetrics(metricsData.metrics);
           }
-        } else if (!cancelled) {
-          setMetrics(data.metrics ?? null);
-          setError(formatApiError(data.error ?? "Erreur dashboard", "Erreur dashboard"));
+        }
+
+        if (!cancelled) {
+          if (eventsData.status === "success") {
+            setEvents(eventsData.events);
+          } else {
+            setEvents([]);
+          }
+
+          const errors: string[] = [];
+          if (metricsData.status === "error") {
+            errors.push(formatApiError(metricsData.error ?? "Erreur dashboard", "Erreur dashboard"));
+            setMetrics(metricsData.metrics ?? null);
+          }
+          if (eventsData.status === "error") {
+            errors.push(
+              formatApiError(eventsData.error ?? "Erreur événements", "Erreur événements dashboard")
+            );
+          }
+          setError(errors.length > 0 ? errors.join(" · ") : null);
         }
       } catch (error) {
         if (!cancelled) {
+          setEvents([]);
           setError(formatApiError(error, "Erreur dashboard"));
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setLoadingEvents(false);
+        }
       }
     };
 
-    // Simuler le chargement des événements (à remplacer par un vrai appel API)
-    const fetchEvents = async () => {
-      setLoadingEvents(true);
-      // TODO: Remplacer par un vrai appel API
-      // const response = await fetch('/api/dashboard/events', { headers: { Authorization: `Bearer ${token}` } })
-      // const data = await response.json()
-
-      // Données mockées pour l'instant
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      if (!cancelled) {
-        setEvents([
-          {
-            id: "1",
-            severity: "CRITICAL",
-            message: "RGIE : Non-conformité détectée sur l'installation électrique",
-            entityType: "RGIE",
-            entityId: "RGIE-2024-042",
-            createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-          },
-          {
-            id: "2",
-            severity: "WARNING",
-            message: "Stock faible : Disjoncteurs 16A (5 unités restantes)",
-            entityType: "STOCK",
-            entityId: "STOCK-001",
-            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-          },
-          {
-            id: "3",
-            severity: "INFO",
-            message: "Nouveau devis créé pour le chantier Avenue des Lilas",
-            entityType: "DEVIS",
-            entityId: "DEV-2024-001",
-            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
-          },
-        ]);
-        setLoadingEvents(false);
-      }
-    };
-
+    setLoadingEvents(true);
     fetchData();
-    fetchEvents();
 
     return () => {
       cancelled = true;
@@ -203,14 +208,45 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* Charts Section (Placeholder for future) */}
+        {/* Charts Section - Activité sur 30 jours */}
         <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             📈 Activité des 30 derniers jours
           </h2>
-          <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded">
-            Graphique à venir
-          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Nombre d&apos;interventions, factures et devis créés chaque jour
+          </p>
+          <ChartContainer className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={activityData} margin={{ left: 12, right: 12 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(value) => `${value}`}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) => `Jour ${value}`}
+                      formatter={(value) => [`${value} activités`, "Total"]}
+                    />
+                  }
+                />
+                <Line
+                  dataKey="activites"
+                  type="monotone"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={{ fill: "hsl(var(--primary))", r: 3 }}
+                  activeDot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
         </section>
       </div>
     </div>

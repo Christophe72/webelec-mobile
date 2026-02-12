@@ -48,6 +48,31 @@ public class Facture {
     @Column(length = 20)
     private String statut;
 
+    // Champs spécifiques Peppol
+    @Column(name = "peppol_enabled")
+    private Boolean peppolEnabled = false;
+
+    @Column(name = "peppol_sender_endpoint_id", length = 100)
+    private String peppolSenderEndpointId;
+
+    @Column(name = "peppol_receiver_endpoint_id", length = 100)
+    private String peppolReceiverEndpointId;
+
+    @Column(name = "peppol_status", length = 20)
+    private String peppolStatus; // DRAFT, READY, SENT, DELIVERED, ERROR
+
+    @Column(name = "peppol_format", length = 20)
+    private String peppolFormat; // UBL_2_1, CII
+
+    @Column(name = "peppol_sent_date")
+    private LocalDate peppolSentDate;
+
+    @Column(name = "peppol_transaction_id", length = 100)
+    private String peppolTransactionId;
+
+    @Column(name = "peppol_error_message", length = 500)
+    private String peppolErrorMessage;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "societe_id")
     private Societe societe;
@@ -165,6 +190,70 @@ public class Facture {
         this.lignes = lignes;
     }
 
+    public Boolean getPeppolEnabled() {
+        return peppolEnabled;
+    }
+
+    public void setPeppolEnabled(Boolean peppolEnabled) {
+        this.peppolEnabled = peppolEnabled;
+    }
+
+    public String getPeppolSenderEndpointId() {
+        return peppolSenderEndpointId;
+    }
+
+    public void setPeppolSenderEndpointId(String peppolSenderEndpointId) {
+        this.peppolSenderEndpointId = peppolSenderEndpointId;
+    }
+
+    public String getPeppolReceiverEndpointId() {
+        return peppolReceiverEndpointId;
+    }
+
+    public void setPeppolReceiverEndpointId(String peppolReceiverEndpointId) {
+        this.peppolReceiverEndpointId = peppolReceiverEndpointId;
+    }
+
+    public String getPeppolStatus() {
+        return peppolStatus;
+    }
+
+    public void setPeppolStatus(String peppolStatus) {
+        this.peppolStatus = peppolStatus;
+    }
+
+    public String getPeppolFormat() {
+        return peppolFormat;
+    }
+
+    public void setPeppolFormat(String peppolFormat) {
+        this.peppolFormat = peppolFormat;
+    }
+
+    public LocalDate getPeppolSentDate() {
+        return peppolSentDate;
+    }
+
+    public void setPeppolSentDate(LocalDate peppolSentDate) {
+        this.peppolSentDate = peppolSentDate;
+    }
+
+    public String getPeppolTransactionId() {
+        return peppolTransactionId;
+    }
+
+    public void setPeppolTransactionId(String peppolTransactionId) {
+        this.peppolTransactionId = peppolTransactionId;
+    }
+
+    public String getPeppolErrorMessage() {
+        return peppolErrorMessage;
+    }
+
+    public void setPeppolErrorMessage(String peppolErrorMessage) {
+        this.peppolErrorMessage = peppolErrorMessage;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -178,6 +267,14 @@ public class Facture {
         private BigDecimal montantTVA;
         private BigDecimal montantTTC;
         private String statut;
+        private Boolean peppolEnabled;
+        private String peppolSenderEndpointId;
+        private String peppolReceiverEndpointId;
+        private String peppolStatus;
+        private String peppolFormat;
+        private LocalDate peppolSentDate;
+        private String peppolTransactionId;
+        private String peppolErrorMessage;
         private Societe societe;
         private Client client;
         private List<FactureLigne> lignes = new ArrayList<>();
@@ -240,10 +337,58 @@ public class Facture {
             return this;
         }
 
+        public Builder peppolEnabled(Boolean peppolEnabled) {
+            this.peppolEnabled = peppolEnabled;
+            return this;
+        }
+
+        public Builder peppolSenderEndpointId(String peppolSenderEndpointId) {
+            this.peppolSenderEndpointId = peppolSenderEndpointId;
+            return this;
+        }
+
+        public Builder peppolReceiverEndpointId(String peppolReceiverEndpointId) {
+            this.peppolReceiverEndpointId = peppolReceiverEndpointId;
+            return this;
+        }
+
+        public Builder peppolStatus(String peppolStatus) {
+            this.peppolStatus = peppolStatus;
+            return this;
+        }
+
+        public Builder peppolFormat(String peppolFormat) {
+            this.peppolFormat = peppolFormat;
+            return this;
+        }
+
+        public Builder peppolSentDate(LocalDate peppolSentDate) {
+            this.peppolSentDate = peppolSentDate;
+            return this;
+        }
+
+        public Builder peppolTransactionId(String peppolTransactionId) {
+            this.peppolTransactionId = peppolTransactionId;
+            return this;
+        }
+
+        public Builder peppolErrorMessage(String peppolErrorMessage) {
+            this.peppolErrorMessage = peppolErrorMessage;
+            return this;
+        }
+
         public Facture build() {
             Facture facture = new Facture(id, numero, dateEmission, dateEcheance,
                     montantHT, montantTVA, montantTTC, statut, societe, client);
             facture.setLignes(lignes);
+            facture.setPeppolEnabled(peppolEnabled);
+            facture.setPeppolSenderEndpointId(peppolSenderEndpointId);
+            facture.setPeppolReceiverEndpointId(peppolReceiverEndpointId);
+            facture.setPeppolStatus(peppolStatus);
+            facture.setPeppolFormat(peppolFormat);
+            facture.setPeppolSentDate(peppolSentDate);
+            facture.setPeppolTransactionId(peppolTransactionId);
+            facture.setPeppolErrorMessage(peppolErrorMessage);
             return facture;
         }
     }

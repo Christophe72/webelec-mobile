@@ -11,6 +11,9 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
+const ALLOW_LOCAL_AI_FALLBACK =
+  process.env.WEBELEC_ALLOW_LOCAL_AI_FALLBACK === "true";
+
 function fallbackEmbedding(text: string, size = 32): number[] {
   const result = new Array<number>(size).fill(0);
   for (let i = 0; i < text.length; i++) {
@@ -28,6 +31,15 @@ export async function POST(req: Request) {
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
+    if (!ALLOW_LOCAL_AI_FALLBACK) {
+      return NextResponse.json(
+        {
+          error:
+            "OPENAI_API_KEY manquant. Active WEBELEC_ALLOW_LOCAL_AI_FALLBACK=true pour le mode demo local.",
+        },
+        { status: 503 }
+      );
+    }
     console.warn(
       "[embedding] OPENAI_API_KEY manquant, génération d'un embedding local"
     );

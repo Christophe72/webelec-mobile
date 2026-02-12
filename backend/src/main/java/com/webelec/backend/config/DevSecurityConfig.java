@@ -1,6 +1,6 @@
 package com.webelec.backend.config;
 
-import com.webelec.backend.security.JwtAuthenticationFilter;
+import com.webelec.backend.security.DevAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -19,9 +20,11 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class DevSecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
+    private final DevAuthenticationFilter devAuthenticationFilter;
 
-    public DevSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+    public DevSecurityConfig(DevAuthenticationFilter devAuthenticationFilter,
             CorsConfigurationSource corsConfigurationSource) {
+        this.devAuthenticationFilter = devAuthenticationFilter;
         this.corsConfigurationSource = corsConfigurationSource;
     }
 
@@ -42,11 +45,9 @@ public class DevSecurityConfig {
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authorizeHttpRequests(auth -> auth
                         // DEV MODE : tous les endpoints sont publics
-                        .anyRequest().permitAll());
-
-        // DEV MODE : pas de filtre JWT
-        // .addFilterBefore(jwtAuthenticationFilter,
-        // UsernamePasswordAuthenticationFilter.class);
+                        .anyRequest().permitAll())
+                // DEV MODE : ajout du filtre d'authentification automatique
+                .addFilterBefore(devAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

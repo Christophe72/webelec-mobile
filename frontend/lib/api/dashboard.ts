@@ -1,4 +1,6 @@
 import type {
+  DashboardEvent,
+  DashboardEventsResponse,
   DashboardMetrics,
   DashboardMetricsResponse,
 } from "@/types/dashboard"
@@ -52,15 +54,54 @@ export async function fetchDashboardMetrics(
 }
 
 /**
+ * Récupère les événements du dashboard via la BFF Next.js
+ */
+export async function fetchDashboardEvents(
+  token: string
+): Promise<DashboardEventsResponse> {
+  try {
+    const data = await bffFetch<DashboardEventsResponse>(
+      "/api/dashboard/events",
+      token
+    )
+
+    if (data.status === "error") {
+      return {
+        status: "error",
+        error: data.error ?? "Erreur API",
+        events: data.events ?? [],
+      }
+    }
+
+    return {
+      status: "success",
+      events: data.events ?? [],
+    }
+  } catch (error) {
+    const status =
+      typeof error === "object" && error !== null && "status" in error
+        ? (error as { status?: number }).status
+        : undefined
+
+    return {
+      status: "error",
+      error:
+        status === 401
+          ? "Non autorisé"
+          : error instanceof Error
+            ? error.message
+            : "Erreur inconnue",
+      events: [],
+    }
+  }
+}
+
+/**
  * Fallback : calcule les métriques à partir des événements
  * (utilisé uniquement si l’API est indisponible)
  */
 export function calculateMetricsFromEvents(
-  events: Array<{
-    entityType: "DEVIS" | "CHANTIER" | "FACTURE" | "STOCK" | "RGIE"
-    severity: "INFO" | "WARNING" | "CRITICAL"
-    entityId: string
-  }>
+  events: Pick<DashboardEvent, "entityType" | "severity" | "entityId">[]
 ): DashboardMetrics {
   const chantiersActifs = new Set(
     events

@@ -3,6 +3,8 @@ package com.webelec.backend.controller;
 import com.webelec.backend.dto.FactureImportResponse;
 import com.webelec.backend.dto.FactureRequest;
 import com.webelec.backend.dto.FactureResponse;
+import com.webelec.backend.dto.PaiementRequest;
+import com.webelec.backend.dto.PaiementResponse;
 import com.webelec.backend.dto.PeppolResultDTO;
 import com.webelec.backend.dto.UblDTO;
 import com.webelec.backend.exception.ResourceNotFoundException;
@@ -23,11 +25,13 @@ public class FactureController {
     private final FactureService service;
     private final FactureImportService importService;
     private final PeppolService peppolService;
+    private final com.webelec.backend.service.PaiementService paiementService;
 
-    public FactureController(FactureService service, FactureImportService importService, PeppolService peppolService) {
+    public FactureController(FactureService service, FactureImportService importService, PeppolService peppolService, com.webelec.backend.service.PaiementService paiementService) {
         this.service = service;
         this.importService = importService;
         this.peppolService = peppolService;
+        this.paiementService = paiementService;
     }
 
     @GetMapping
@@ -43,6 +47,16 @@ public class FactureController {
     @GetMapping("/client/{clientId}")
     public List<FactureResponse> getByClient(@PathVariable Long clientId) {
         return service.findByClient(clientId).stream().map(FactureResponse::from).toList();
+    }
+
+    @GetMapping("/societe/{societeId}/client/{clientId}")
+    public List<FactureResponse> getBySocieteAndClient(
+            @PathVariable Long societeId,
+            @PathVariable Long clientId) {
+        return service.findBySocieteAndClient(societeId, clientId)
+            .stream()
+            .map(FactureResponse::from)
+            .toList();
     }
 
     @GetMapping("/{id}")
@@ -93,5 +107,21 @@ public class FactureController {
     @PostMapping("/{id}/peppol")
     public PeppolResultDTO sendPeppol(@PathVariable Long id) {
         return peppolService.envoyer(id);
+    }
+
+    @PostMapping("/{id}/paiements")
+    public ResponseEntity<PaiementResponse> createPaiement(
+            @PathVariable Long id,
+            @Valid @RequestBody PaiementRequest request) {
+        var paiement = paiementService.createPaiement(id, request);
+        return ResponseEntity.ok(PaiementResponse.from(paiement));
+    }
+
+    @GetMapping("/{id}/paiements")
+    public List<PaiementResponse> getPaiementsByFacture(@PathVariable Long id) {
+        return paiementService.getPaiementsByFactureId(id)
+            .stream()
+            .map(PaiementResponse::from)
+            .toList();
     }
 }

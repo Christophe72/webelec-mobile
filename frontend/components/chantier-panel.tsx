@@ -212,8 +212,8 @@ export function ChantierPanel() {
       : "Client inconnu";
 
   return (
-    <section className="mx-auto mt-12 w-full max-w-7xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+    <section className="mx-auto mt-12 w-full max-w-7xl rounded-2xl border border-zinc-200/70 bg-white/60 p-4 sm:p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <p className="text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400">
             API demo
@@ -250,9 +250,9 @@ export function ChantierPanel() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         {/* Formulaire à gauche */}
-        <div className="xl:col-span-1">
+        <div className="md:col-span-1">
           <h3 className="text-sm font-semibold text-foreground mb-3">
             {editingId ? "Modifier le chantier" : "Nouveau chantier"}
           </h3>
@@ -377,7 +377,7 @@ export function ChantierPanel() {
         </div>
 
         {/* Liste des chantiers à droite */}
-        <div className="xl:col-span-2">
+        <div className="md:col-span-1 lg:col-span-2">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-foreground">
               Liste des chantiers

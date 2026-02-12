@@ -18,11 +18,17 @@ const navLinks: Array<{
   { href: "/clients", label: "Clients", roles: ["ARTISAN", "ADMIN"] },
   { href: "/modules", label: "Modules", roles: ["ARTISAN", "ADMIN"] },
   { href: "/chantiers", label: "Chantiers", roles: ["ARTISAN", "TECH", "ADMIN"] },
+  { href: "/interventions", label: "Interventions", roles: ["ARTISAN", "TECH", "ADMIN"] },
+  { href: "/devis", label: "Devis", roles: ["ARTISAN", "ADMIN"] },
+  { href: "/factures", label: "Créer facture", roles: ["ARTISAN", "ADMIN"] },
+  { href: "/factures-import", label: "Import factures", roles: ["ARTISAN", "ADMIN"] },
+  { href: "/peppol", label: "Peppol", roles: ["ARTISAN", "ADMIN"] },
   { href: "/catalogue", label: "Catalogue", roles: ["ARTISAN", "ADMIN"] },
   { href: "/calculateur?tab=disjoncteur", label: "Calculateur", roles: ["ARTISAN", "ADMIN"] },
   { href: "/files-demo", label: "Fichiers", roles: ["ARTISAN", "ADMIN"] },
   { href: "/ia", label: "IA", roles: ["ARTISAN", "ADMIN"] },
   { href: "/rgie/auditeur-pro", label: "Auditeur RGIE", roles: ["AUDITEUR", "ADMIN"] },
+  { href: "/rgie/chat", label: "Chat RGIE", roles: ["AUDITEUR", "ADMIN"] },
 ];
 
 function normalizeRole(role?: string | null): NavRole | null {

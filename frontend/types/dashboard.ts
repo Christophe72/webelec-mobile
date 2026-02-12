@@ -24,3 +24,9 @@ export type DashboardMetricsResponse = {
     status: "success" | "error"
     error?: string
 }
+
+export type DashboardEventsResponse = {
+    events: DashboardEvent[]
+    status: "success" | "error"
+    error?: string
+}

@@ -71,4 +71,13 @@ public class DashboardController {
                 userId
         );
     }
+
+    @GetMapping("/events")
+    public List<?> getEvents(
+            @AuthenticationPrincipal AuthenticatedUtilisateur principal
+    ) {
+        // Pour l'instant, retourner une liste vide
+        // Cet endpoint sera implémenté plus tard avec les vraies données d'événements
+        return List.of();
+    }
 }

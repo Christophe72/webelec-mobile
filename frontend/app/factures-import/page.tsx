@@ -39,37 +39,76 @@ export default function FacturesImportPage() {
           </p>
         </div>
 
-        {/* Bouton d&apos;action */}
-        <div className="mb-8">
-          <button
-            onClick={() => setImportOpen(true)}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold shadow-md transition-colors"
-          >
-            📥 Importer des factures
-          </button>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+          {/* Actions et contrôles à gauche */}
+          <div className="xl:col-span-1">
+            <div className="rounded-lg border border-zinc-200/70 bg-white/80 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/60 sticky top-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
+                Actions
+              </h3>
 
-          {lastImportMessage && (
-            <div className="mt-4 p-4 rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-700/50 dark:bg-emerald-900/30">
-              <p className="text-emerald-800 dark:text-emerald-100">
-                {lastImportMessage}
-              </p>
+              <button
+                onClick={() => setImportOpen(true)}
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold shadow-md transition-colors"
+              >
+                📥 Importer des factures
+              </button>
+
+              {lastImportMessage && (
+                <div className="mt-4 p-4 rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-700/50 dark:bg-emerald-900/30">
+                  <p className="text-emerald-800 dark:text-emerald-100 text-sm">
+                    {lastImportMessage}
+                  </p>
+                </div>
+              )}
+
+              <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                <h4 className="text-sm font-semibold text-foreground mb-3">
+                  Template CSV
+                </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Téléchargez un fichier template pré-formaté:
+                </p>
+                <a
+                  href="/factures-import-template.csv"
+                  download
+                  className="inline-flex items-center justify-center w-full px-4 py-2 rounded bg-zinc-100 text-zinc-700 hover:bg-zinc-200 text-sm font-medium dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+                >
+                  📥 Télécharger le template
+                </a>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                <h4 className="text-sm font-semibold text-foreground mb-2">Limites</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>
+                    • Taille max: <strong>10 MB</strong>
+                  </li>
+                  <li>
+                    • Format: <strong>CSV uniquement</strong>
+                  </li>
+                  <li>
+                    • Encodage: <strong>UTF-8</strong>
+                  </li>
+                </ul>
+              </div>
             </div>
+          </div>
+
+          {/* Dialog d&apos;import */}
+          {adapter && (
+            <InvoiceImportDialog
+              open={importOpen}
+              onOpenChange={setImportOpen}
+              societeId={1} // À remplacer par l'ID de la société connectée
+              adapter={adapter}
+              onSuccess={handleSuccess}
+            />
           )}
-        </div>
 
-        {/* Dialog d&apos;import */}
-        {adapter && (
-          <InvoiceImportDialog
-            open={importOpen}
-            onOpenChange={setImportOpen}
-            societeId={1} // À remplacer par l'ID de la société connectée
-            adapter={adapter}
-            onSuccess={handleSuccess}
-          />
-        )}
-
-        {/* Documentation */}
-        <div className="rounded-lg border border-zinc-200/70 bg-white/80 p-6 shadow-sm max-w-4xl mx-auto dark:border-zinc-800 dark:bg-zinc-900/60">
+          {/* Documentation à droite */}
+          <div className="xl:col-span-2">
+            <div className="rounded-lg border border-zinc-200/70 bg-white/80 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/60">
           <h2 className="text-xl font-bold mb-4 text-foreground">
             Guide d&apos;utilisation
           </h2>
@@ -211,43 +250,13 @@ export default function FacturesImportPage() {
               </ul>
             </div>
 
-            {/* Template */}
-            <div className="pt-4 border-t dark:border-zinc-800">
-              <h3 className="font-semibold text-foreground mb-2">
-                Template CSV
-              </h3>
-              <p className="text-sm text-muted-foreground mb-2">
-                Téléchargez un fichier template pré-formaté pour commencer:
-              </p>
-              <a
-                href="/factures-import-template.csv"
-                download
-                className="inline-flex items-center px-4 py-2 rounded bg-zinc-100 text-zinc-700 hover:bg-zinc-200 text-sm font-medium dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
-              >
-                📥 Télécharger le template CSV
-              </a>
-            </div>
-
-            {/* Limites */}
-            <div className="pt-4 border-t dark:border-zinc-800">
-              <h3 className="font-semibold text-foreground mb-2">Limites</h3>
-              <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>
-                  • Taille max du fichier: <strong>10 MB</strong>
-                </li>
-                <li>
-                  • Format supporté: <strong>CSV uniquement</strong>
-                </li>
-                <li>
-                  • Encodage: <strong>UTF-8</strong>
-                </li>
-              </ul>
+          </div>
             </div>
           </div>
         </div>
 
         {/* Lien vers la documentation */}
-        <div className="max-w-4xl mx-auto mt-6 text-center">
+        <div className="mt-6 text-center">
           <a
             href="/app/modules/invoice-import/README.md"
             className="text-blue-600 hover:text-blue-800 text-sm dark:text-blue-400 dark:hover:text-blue-300"

@@ -184,8 +184,8 @@ export function CataloguePanel() {
   };
 
   return (
-    <section className="mx-auto mt-8 w-full max-w-7xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-      <div className="flex items-center justify-between mb-6">
+    <section className="mx-auto mt-8 w-full max-w-7xl rounded-2xl border border-zinc-200/70 bg-white/60 p-4 sm:p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <p className="text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400">Stock</p>
           <h2 className="text-xl font-semibold">Catalogue produits</h2>
@@ -196,15 +196,15 @@ export function CataloguePanel() {
         <button
           type="button"
           onClick={loadData}
-          className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-foreground dark:border-zinc-700"
+          className="self-start rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-foreground dark:border-zinc-700 sm:self-auto"
         >
           Rafraîchir
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         {/* Formulaire à gauche */}
-        <div className="xl:col-span-1">
+        <div className="md:col-span-1">
           <h3 className="text-sm font-semibold text-foreground mb-3">
             {editingId ? "Modifier le produit" : "Nouveau produit"}
           </h3>
@@ -337,7 +337,7 @@ export function CataloguePanel() {
         </div>
 
         {/* Liste des produits à droite */}
-        <div className="xl:col-span-2">
+        <div className="md:col-span-1 lg:col-span-2">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-foreground">
               Liste des produits

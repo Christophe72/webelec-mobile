@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const PROXY_TIMEOUT_MS = 10000;
-// ⚠️ En Docker, tu pourras remplacer localhost plus tard
-const rawApiBase =
-  process.env.NEXT_PUBLIC_API_BASE ||
-  process.env.API_BASE_URL ||
-  "http://localhost:8080/api";
-const API_BASE = trimTrailingSlash(rawApiBase);
 
 function trimTrailingSlash(base: string): string {
   return base.replace(/\/+$/, "");
 }
+
+function resolveApiBase(): string {
+  const rawApiBase = process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE_URL;
+  if (!rawApiBase) {
+    throw new Error("Missing NEXT_PUBLIC_API_BASE or API_BASE_URL for API proxy");
+  }
+  const normalized = trimTrailingSlash(rawApiBase);
+  return normalized.endsWith("/api") ? normalized : `${normalized}/api`;
+}
+
+const API_BASE = resolveApiBase();
 
 function buildHeaders(req: NextRequest): HeadersInit {
   const headers = new Headers(req.headers);

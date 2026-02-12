@@ -212,6 +212,7 @@ public class DataSeeder {
                 .client(lucasBernard)
                 .build());
 
+        // Produits ElecPro
         produitRepository.save(Produit.builder()
                 .reference("BORNE-11KW")
                 .nom("Borne murale 11kW")
@@ -231,11 +232,93 @@ public class DataSeeder {
                 .build());
 
         produitRepository.save(Produit.builder()
+                .reference("DISJ-16A")
+                .nom("Disjoncteur 16A")
+                .description("Disjoncteur modulaire courbe C")
+                .quantiteStock(48)
+                .prixUnitaire(new BigDecimal("12.50"))
+                .societe(elecPro)
+                .build());
+
+        produitRepository.save(Produit.builder()
+                .reference("CABLE-2.5")
+                .nom("Câble 2.5mm²")
+                .description("Câble H07VK 2.5mm² (rouleau 100m)")
+                .quantiteStock(8)
+                .prixUnitaire(new BigDecimal("89.00"))
+                .societe(elecPro)
+                .build());
+
+        produitRepository.save(Produit.builder()
+                .reference("INTER-VA-ET-VIENT")
+                .nom("Interrupteur va-et-vient")
+                .description("Interrupteur simple encastré blanc")
+                .quantiteStock(65)
+                .prixUnitaire(new BigDecimal("3.80"))
+                .societe(elecPro)
+                .build());
+
+        produitRepository.save(Produit.builder()
+                .reference("PRISE-2P-T")
+                .nom("Prise 2P+T 16A")
+                .description("Prise encastrée avec terre")
+                .quantiteStock(82)
+                .prixUnitaire(new BigDecimal("4.20"))
+                .societe(elecPro)
+                .build());
+
+        // Produits VoltServices
+        produitRepository.save(Produit.builder()
                 .reference("LED-PRO-40W")
                 .nom("Projecteur LED 40W IP65")
                 .description("Projecteur extérieur blanc neutre")
                 .quantiteStock(30)
                 .prixUnitaire(new BigDecimal("79.90"))
+                .societe(voltServices)
+                .build());
+
+        produitRepository.save(Produit.builder()
+                .reference("TUBE-LED-120")
+                .nom("Tube LED 120cm")
+                .description("Tube LED T8 18W blanc froid")
+                .quantiteStock(45)
+                .prixUnitaire(new BigDecimal("15.90"))
+                .societe(voltServices)
+                .build());
+
+        produitRepository.save(Produit.builder()
+                .reference("DETECT-MOUV")
+                .nom("Détecteur de mouvement")
+                .description("Détecteur IR 180° encastrable")
+                .quantiteStock(15)
+                .prixUnitaire(new BigDecimal("28.50"))
+                .societe(voltServices)
+                .build());
+
+        produitRepository.save(Produit.builder()
+                .reference("GAINE-ICTA-20")
+                .nom("Gaine ICTA Ø20mm")
+                .description("Gaine annelée ICTA (couronne 100m)")
+                .quantiteStock(6)
+                .prixUnitaire(new BigDecimal("42.00"))
+                .societe(voltServices)
+                .build());
+
+        produitRepository.save(Produit.builder()
+                .reference("DIFF-30MA")
+                .nom("Interrupteur différentiel 30mA")
+                .description("Différentiel type A 40A 30mA")
+                .quantiteStock(0)
+                .prixUnitaire(new BigDecimal("78.00"))
+                .societe(voltServices)
+                .build());
+
+        produitRepository.save(Produit.builder()
+                .reference("BOITE-ENCAST")
+                .nom("Boîte d'encastrement")
+                .description("Boîte simple étanche Ø67mm")
+                .quantiteStock(120)
+                .prixUnitaire(new BigDecimal("1.25"))
                 .societe(voltServices)
                 .build());
 
@@ -269,10 +352,14 @@ public class DataSeeder {
                 .utilisateur(nabil)
                 .build());
 
-        Facture factureGarage = factureRepository.save(Facture.builder()
-                .numero("FAC-2025-001")
-                .dateEmission(LocalDate.now())
-                .dateEcheance(LocalDate.now().plusDays(30))
+        // Factures réparties sur 6 mois pour alimenter les graphiques
+        LocalDate now = LocalDate.now();
+
+        // Mois actuel
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2025-015")
+                .dateEmission(now.minusDays(3))
+                .dateEcheance(now.plusDays(27))
                 .montantHT(new BigDecimal("1588.00"))
                 .montantTVA(new BigDecimal("333.48"))
                 .montantTTC(new BigDecimal("1921.48"))
@@ -281,23 +368,178 @@ public class DataSeeder {
                 .client(marcDupont)
                 .build());
 
-        FactureLigne borneLigne = new FactureLigne(
-                null,
-                "Borne murale 11kW",
-                1,
-                new BigDecimal("1199.00"),
-                new BigDecimal("1199.00"),
-                factureGarage);
-        FactureLigne tableauLigne = new FactureLigne(
-                null,
-                "Tableau secondaire 63A",
-                1,
-                new BigDecimal("389.00"),
-                new BigDecimal("389.00"),
-                factureGarage);
-        factureGarage.getLignes().add(borneLigne);
-        factureGarage.getLignes().add(tableauLigne);
-        factureRepository.save(factureGarage);
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2025-016")
+                .dateEmission(now.minusDays(5))
+                .dateEcheance(now.plusDays(25))
+                .montantHT(new BigDecimal("890.00"))
+                .montantTVA(new BigDecimal("186.90"))
+                .montantTTC(new BigDecimal("1076.90"))
+                .statut("PAYEE")
+                .societe(elecPro)
+                .client(julieMartin)
+                .build());
+
+        // Mois -1
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2025-012")
+                .dateEmission(now.minusMonths(1).minusDays(8))
+                .dateEcheance(now.minusMonths(1).plusDays(22))
+                .montantHT(new BigDecimal("2450.00"))
+                .montantTVA(new BigDecimal("514.50"))
+                .montantTTC(new BigDecimal("2964.50"))
+                .statut("PAYEE")
+                .societe(elecPro)
+                .client(marcDupont)
+                .build());
+
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2025-013")
+                .dateEmission(now.minusMonths(1).minusDays(15))
+                .dateEcheance(now.minusMonths(1).plusDays(15))
+                .montantHT(new BigDecimal("1120.00"))
+                .montantTVA(new BigDecimal("235.20"))
+                .montantTTC(new BigDecimal("1355.20"))
+                .statut("PAYEE")
+                .societe(voltServices)
+                .client(lucasBernard)
+                .build());
+
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2025-014")
+                .dateEmission(now.minusMonths(1).minusDays(20))
+                .dateEcheance(now.minusMonths(1).plusDays(10))
+                .montantHT(new BigDecimal("675.00"))
+                .montantTVA(new BigDecimal("141.75"))
+                .montantTTC(new BigDecimal("816.75"))
+                .statut("PAYEE")
+                .societe(elecPro)
+                .client(julieMartin)
+                .build());
+
+        // Mois -2
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-009")
+                .dateEmission(now.minusMonths(2).minusDays(5))
+                .dateEcheance(now.minusMonths(2).plusDays(25))
+                .montantHT(new BigDecimal("3200.00"))
+                .montantTVA(new BigDecimal("672.00"))
+                .montantTTC(new BigDecimal("3872.00"))
+                .statut("PAYEE")
+                .societe(voltServices)
+                .client(lucasBernard)
+                .build());
+
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-010")
+                .dateEmission(now.minusMonths(2).minusDays(12))
+                .dateEcheance(now.minusMonths(2).plusDays(18))
+                .montantHT(new BigDecimal("1890.00"))
+                .montantTVA(new BigDecimal("396.90"))
+                .montantTTC(new BigDecimal("2286.90"))
+                .statut("PAYEE")
+                .societe(elecPro)
+                .client(marcDupont)
+                .build());
+
+        // Mois -3
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-006")
+                .dateEmission(now.minusMonths(3).minusDays(7))
+                .dateEcheance(now.minusMonths(3).plusDays(23))
+                .montantHT(new BigDecimal("2780.00"))
+                .montantTVA(new BigDecimal("583.80"))
+                .montantTTC(new BigDecimal("3363.80"))
+                .statut("PAYEE")
+                .societe(elecPro)
+                .client(julieMartin)
+                .build());
+
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-007")
+                .dateEmission(now.minusMonths(3).minusDays(18))
+                .dateEcheance(now.minusMonths(3).plusDays(12))
+                .montantHT(new BigDecimal("1450.00"))
+                .montantTVA(new BigDecimal("304.50"))
+                .montantTTC(new BigDecimal("1754.50"))
+                .statut("PAYEE")
+                .societe(voltServices)
+                .client(lucasBernard)
+                .build());
+
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-008")
+                .dateEmission(now.minusMonths(3).minusDays(22))
+                .dateEcheance(now.minusMonths(3).plusDays(8))
+                .montantHT(new BigDecimal("920.00"))
+                .montantTVA(new BigDecimal("193.20"))
+                .montantTTC(new BigDecimal("1113.20"))
+                .statut("PAYEE")
+                .societe(elecPro)
+                .client(marcDupont)
+                .build());
+
+        // Mois -4
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-003")
+                .dateEmission(now.minusMonths(4).minusDays(10))
+                .dateEcheance(now.minusMonths(4).plusDays(20))
+                .montantHT(new BigDecimal("1650.00"))
+                .montantTVA(new BigDecimal("346.50"))
+                .montantTTC(new BigDecimal("1996.50"))
+                .statut("PAYEE")
+                .societe(elecPro)
+                .client(julieMartin)
+                .build());
+
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-004")
+                .dateEmission(now.minusMonths(4).minusDays(16))
+                .dateEcheance(now.minusMonths(4).plusDays(14))
+                .montantHT(new BigDecimal("2340.00"))
+                .montantTVA(new BigDecimal("491.40"))
+                .montantTTC(new BigDecimal("2831.40"))
+                .statut("PAYEE")
+                .societe(voltServices)
+                .client(lucasBernard)
+                .build());
+
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-005")
+                .dateEmission(now.minusMonths(4).minusDays(25))
+                .dateEcheance(now.minusMonths(4).plusDays(5))
+                .montantHT(new BigDecimal("780.00"))
+                .montantTVA(new BigDecimal("163.80"))
+                .montantTTC(new BigDecimal("943.80"))
+                .statut("PAYEE")
+                .societe(elecPro)
+                .client(marcDupont)
+                .build());
+
+        // Mois -5
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-001")
+                .dateEmission(now.minusMonths(5).minusDays(8))
+                .dateEcheance(now.minusMonths(5).plusDays(22))
+                .montantHT(new BigDecimal("3450.00"))
+                .montantTVA(new BigDecimal("724.50"))
+                .montantTTC(new BigDecimal("4174.50"))
+                .statut("PAYEE")
+                .societe(voltServices)
+                .client(lucasBernard)
+                .build());
+
+        factureRepository.save(Facture.builder()
+                .numero("FAC-2024-002")
+                .dateEmission(now.minusMonths(5).minusDays(19))
+                .dateEcheance(now.minusMonths(5).plusDays(11))
+                .montantHT(new BigDecimal("1280.00"))
+                .montantTVA(new BigDecimal("268.80"))
+                .montantTTC(new BigDecimal("1548.80"))
+                .statut("PAYEE")
+                .societe(elecPro)
+                .client(julieMartin)
+                .build());
 
         Devis devisBoutique = devisRepository.save(Devis.builder()
                 .numero("DEV-2025-045")

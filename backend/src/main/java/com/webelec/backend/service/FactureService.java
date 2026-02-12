@@ -29,6 +29,10 @@ public class FactureService {
         return repository.findByClientId(clientId);
     }
 
+    public List<Facture> findBySocieteAndClient(Long societeId, Long clientId) {
+        return repository.findBySocieteIdAndClientId(societeId, clientId);
+    }
+
     public Optional<Facture> findById(Long id) {
         return repository.findById(id);
     }

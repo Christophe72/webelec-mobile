@@ -281,8 +281,8 @@ export function DevisPanel() {
   };
 
   return (
-    <section className="mx-auto mt-8 w-full max-w-5xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-      <div className="flex items-center justify-between">
+    <section className="mx-auto mt-8 w-full max-w-5xl rounded-2xl border border-zinc-200/70 bg-white/60 p-4 sm:p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-widest text-muted">
             Finance
@@ -295,281 +295,296 @@ export function DevisPanel() {
         <button
           type="button"
           onClick={loadData}
-          className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
+          className="self-start rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700 sm:self-auto"
         >
           Rafraîchir
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="devis-numero" className="mb-1.5 block text-xs font-semibold text-muted">
-            Numéro de devis*
-          </label>
-          <input
-            id="devis-numero"
-            name="numero"
-            type="text"
-            value={form.numero}
-            onChange={(e) => setForm((f) => ({ ...f, numero: e.target.value }))}
-            placeholder="Ex: DEV-2026-0001"
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div>
-          <label htmlFor="devis-statut" className="mb-1.5 block text-xs font-semibold text-muted">
-            Statut
-          </label>
-          <select
-            id="devis-statut"
-            name="statut"
-            value={form.statut}
-            onChange={(e) => setForm((f) => ({ ...f, statut: e.target.value }))}
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          >
-            <option value="BROUILLON">Brouillon</option>
-            <option value="ENVOYE">Envoyé</option>
-            <option value="SIGNE">Signé</option>
-            <option value="PERDU">Perdu</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="dateEmission" className="mb-1.5 block text-xs font-semibold text-muted">
-            Date d&apos;émission
-          </label>
-          <input
-            id="dateEmission"
-            name="dateEmission"
-            type="date"
-            value={form.dateEmission}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, dateEmission: e.target.value }))
-            }
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div>
-          <label htmlFor="dateExpiration" className="mb-1.5 block text-xs font-semibold text-muted">
-            Date d&apos;expiration
-          </label>
-          <input
-            id="dateExpiration"
-            name="dateExpiration"
-            type="date"
-            value={form.dateExpiration}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, dateExpiration: e.target.value }))
-            }
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div>
-          <label htmlFor="societeId" className="mb-1.5 block text-xs font-semibold text-muted">
-            Société*
-          </label>
-          <select
-            id="societeId"
-            name="societeId"
-            value={form.societeId || ""}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
-            }
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          >
-            <option value="">-- Sélectionner une société --</option>
-            {societes.map((societe) => (
-              <option key={societe.id} value={societe.id}>
-                {societe.nom}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="clientId" className="mb-1.5 block text-xs font-semibold text-muted">
-            Client*
-          </label>
-          <select
-            id="clientId"
-            name="clientId"
-            value={form.clientId || ""}
-            onChange={(e) => handleClientSelect(e.target.value)}
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          >
-            <option value="">-- Sélectionner un client --</option>
-            {filteredClients.map((client) => (
-              <option key={client.id} value={client.id}>
-                {client.prenom} {client.nom}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="chantierId" className="mb-1.5 block text-xs font-semibold text-muted">
-            Chantier (optionnel)
-          </label>
-          <select
-            id="chantierId"
-            name="chantierId"
-            value={form.chantierId ?? ""}
-            onChange={(e) => handleChantierSelect(e.target.value)}
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          >
-            <option value="">-- Aucun chantier --</option>
-            {filteredChantiers.map((chantier) => (
-              <option key={chantier.id} value={chantier.id}>
-                {chantier.nom}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="devis-montant-ht" className="mb-1.5 block text-xs font-semibold text-muted">
-            Montant HT (€)
-          </label>
-          <NumberInput
-            id="devis-montant-ht"
-            name="montantHT"
-            step={0.01}
-            min={0}
-            value={form.montantHT}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, montantHT: Number(e.target.value) }))
-            }
-            placeholder="1000.00"
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div>
-          <label htmlFor="devis-montant-tva" className="mb-1.5 block text-xs font-semibold text-muted">
-            TVA (€)
-          </label>
-          <NumberInput
-            id="devis-montant-tva"
-            name="montantTVA"
-            step={0.01}
-            min={0}
-            value={form.montantTVA}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, montantTVA: Number(e.target.value) }))
-            }
-            placeholder="200.00"
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div>
-          <label htmlFor="devis-montant-ttc" className="mb-1.5 block text-xs font-semibold text-muted">
-            Montant TTC (€)
-          </label>
-          <NumberInput
-            id="devis-montant-ttc"
-            name="montantTTC"
-            step={0.01}
-            min={0}
-            value={form.montantTTC}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, montantTTC: Number(e.target.value) }))
-            }
-            placeholder="1200.00"
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="devis-line-desc" className="mb-1.5 block text-xs font-semibold text-muted">
-            Description de la ligne
-          </label>
-          <textarea
-            id="devis-line-desc"
-            name="lineDescription"
-            value={lineDesc}
-            onChange={(e) => setLineDesc(e.target.value)}
-            placeholder="Ex: Prestation forfaitaire, installation électrique..."
-            rows={2}
-            className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
-          />
-        </div>
-        <div className="sm:col-span-2 flex justify-end gap-2">
-          {editingId && (
-            <button
-              type="button"
-              onClick={cancelEdit}
-              className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
-            >
-              Annuler
-            </button>
-          )}
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black disabled:opacity-70"
-          >
-            {saving ? "Sauvegarde…" : editingId ? "Mettre à jour" : "Créer"}
-          </button>
-        </div>
-      </form>
-
-      {error && (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-700/60 dark:bg-red-900/40 dark:text-red-100">
-          {error}
-        </div>
-      )}
-
-      <div className="mt-4 text-xs text-muted">
-        {loading ? "Chargement des devis…" : `Devis chargés : ${devis.length}`}
-      </div>
-
-      <div className="mt-4 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
-        {loading && devis.length === 0 ? (
-          <p className="py-4 text-muted">Chargement…</p>
-        ) : devis.length === 0 ? (
-          <p className="py-4 text-muted">Aucun devis enregistré.</p>
-        ) : (
-          devis.map((item) => {
-            const societe = societeById.get(item.societeId);
-            const client = clientById.get(item.clientId);
-            return (
-              <article
-                key={item.id}
-                className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
+        {/* Formulaire à gauche */}
+        <div className="md:col-span-1">
+          <h3 className="text-sm font-semibold text-foreground mb-3">
+            {editingId ? "Modifier le devis" : "Nouveau devis"}
+          </h3>
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            <div>
+              <label htmlFor="devis-numero" className="mb-1.5 block text-xs font-semibold text-muted">
+                Numéro de devis*
+              </label>
+              <input
+                id="devis-numero"
+                name="numero"
+                type="text"
+                value={form.numero}
+                onChange={(e) => setForm((f) => ({ ...f, numero: e.target.value }))}
+                placeholder="Ex: DEV-2026-0001"
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="devis-statut" className="mb-1.5 block text-xs font-semibold text-muted">
+                Statut
+              </label>
+              <select
+                id="devis-statut"
+                name="statut"
+                value={form.statut}
+                onChange={(e) => setForm((f) => ({ ...f, statut: e.target.value }))}
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
               >
-                <div className="space-y-1">
-                  <p className="font-semibold text-foreground">
-                    #{item.numero} — {item.statut}
-                  </p>
-                  <p className="text-xs text-muted">
-                    {societe?.nom ?? "Société inconnue"} •{" "}
-                    {client ? `${client.prenom} ${client.nom}` : "Client ?"}
-                  </p>
-                  <p className="text-xs text-muted">
-                    Emis le {dateFormatter.format(new Date(item.dateEmission))} •
-                    Expire le {dateFormatter.format(new Date(item.dateExpiration))}
-                  </p>
-                  <p className="text-sm font-semibold text-foreground">
-                    {item.montantTTC.toLocaleString("fr-FR", {
-                      style: "currency",
-                      currency: "EUR",
-                    })}
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => startEdit(item)}
-                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-foreground hover:-translate-y-px hover:shadow-sm dark:border-zinc-700"
+                <option value="BROUILLON">Brouillon</option>
+                <option value="ENVOYE">Envoyé</option>
+                <option value="SIGNE">Signé</option>
+                <option value="PERDU">Perdu</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="dateEmission" className="mb-1.5 block text-xs font-semibold text-muted">
+                Date d&apos;émission
+              </label>
+              <input
+                id="dateEmission"
+                name="dateEmission"
+                type="date"
+                value={form.dateEmission}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, dateEmission: e.target.value }))
+                }
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="dateExpiration" className="mb-1.5 block text-xs font-semibold text-muted">
+                Date d&apos;expiration
+              </label>
+              <input
+                id="dateExpiration"
+                name="dateExpiration"
+                type="date"
+                value={form.dateExpiration}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, dateExpiration: e.target.value }))
+                }
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="societeId" className="mb-1.5 block text-xs font-semibold text-muted">
+                Société*
+              </label>
+              <select
+                id="societeId"
+                name="societeId"
+                value={form.societeId || ""}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, societeId: Number(e.target.value) }))
+                }
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              >
+                <option value="">-- Sélectionner une société --</option>
+                {societes.map((societe) => (
+                  <option key={societe.id} value={societe.id}>
+                    {societe.nom}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="clientId" className="mb-1.5 block text-xs font-semibold text-muted">
+                Client*
+              </label>
+              <select
+                id="clientId"
+                name="clientId"
+                value={form.clientId || ""}
+                onChange={(e) => handleClientSelect(e.target.value)}
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              >
+                <option value="">-- Sélectionner un client --</option>
+                {filteredClients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.prenom} {client.nom}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="chantierId" className="mb-1.5 block text-xs font-semibold text-muted">
+                Chantier (optionnel)
+              </label>
+              <select
+                id="chantierId"
+                name="chantierId"
+                value={form.chantierId ?? ""}
+                onChange={(e) => handleChantierSelect(e.target.value)}
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              >
+                <option value="">-- Aucun chantier --</option>
+                {filteredChantiers.map((chantier) => (
+                  <option key={chantier.id} value={chantier.id}>
+                    {chantier.nom}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="devis-montant-ht" className="mb-1.5 block text-xs font-semibold text-muted">
+                Montant HT (€)
+              </label>
+              <NumberInput
+                id="devis-montant-ht"
+                name="montantHT"
+                step={0.01}
+                min={0}
+                value={form.montantHT}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, montantHT: Number(e.target.value) }))
+                }
+                placeholder="1000.00"
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="devis-montant-tva" className="mb-1.5 block text-xs font-semibold text-muted">
+                TVA (€)
+              </label>
+              <NumberInput
+                id="devis-montant-tva"
+                name="montantTVA"
+                step={0.01}
+                min={0}
+                value={form.montantTVA}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, montantTVA: Number(e.target.value) }))
+                }
+                placeholder="200.00"
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="devis-montant-ttc" className="mb-1.5 block text-xs font-semibold text-muted">
+                Montant TTC (€)
+              </label>
+              <NumberInput
+                id="devis-montant-ttc"
+                name="montantTTC"
+                step={0.01}
+                min={0}
+                value={form.montantTTC}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, montantTTC: Number(e.target.value) }))
+                }
+                placeholder="1200.00"
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div>
+              <label htmlFor="devis-line-desc" className="mb-1.5 block text-xs font-semibold text-muted">
+                Description de la ligne
+              </label>
+              <textarea
+                id="devis-line-desc"
+                name="lineDescription"
+                value={lineDesc}
+                onChange={(e) => setLineDesc(e.target.value)}
+                placeholder="Ex: Prestation forfaitaire, installation électrique..."
+                rows={2}
+                className="w-full rounded-lg border border-zinc-200 bg-white/70 px-3 py-2 text-sm text-foreground shadow-inner dark:border-zinc-700 dark:bg-zinc-900/60"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={cancelEdit}
+                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:-translate-y-px hover:shadow-md dark:border-zinc-700"
+                >
+                  Annuler
+                </button>
+              )}
+              <button
+                type="submit"
+                disabled={saving}
+                className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-px hover:shadow-md dark:bg-white dark:text-black disabled:opacity-70"
+              >
+                {saving ? "Sauvegarde…" : editingId ? "Mettre à jour" : "Créer"}
+              </button>
+            </div>
+          </form>
+
+          {error && (
+            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-700/60 dark:bg-red-900/40 dark:text-red-100">
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Liste des devis à droite */}
+        <div className="md:col-span-1 lg:col-span-2">
+          <h3 className="text-sm font-semibold text-foreground mb-3">
+            Liste des devis ({devis.length})
+          </h3>
+
+          <div className="text-xs text-muted mb-4">
+            {loading ? "Chargement des devis…" : `${devis.length} devis chargé${devis.length > 1 ? "s" : ""}`}
+          </div>
+
+          <div className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+            {loading && devis.length === 0 ? (
+              <p className="py-4 text-muted">Chargement…</p>
+            ) : devis.length === 0 ? (
+              <p className="py-4 text-muted">Aucun devis enregistré.</p>
+            ) : (
+              devis.map((item) => {
+                const societe = societeById.get(item.societeId);
+                const client = clientById.get(item.clientId);
+                return (
+                  <article
+                    key={item.id}
+                    className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    Modifier
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(item.id)}
-                    className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:-translate-y-px hover:shadow-sm dark:border-red-700/60 dark:text-red-100"
-                  >
-                    Supprimer
-                  </button>
-                </div>
-              </article>
-            );
-          })
-        )}
+                    <div className="space-y-1">
+                      <p className="font-semibold text-foreground">
+                        #{item.numero} — {item.statut}
+                      </p>
+                      <p className="text-xs text-muted">
+                        {societe?.nom ?? "Société inconnue"} •{" "}
+                        {client ? `${client.prenom} ${client.nom}` : "Client ?"}
+                      </p>
+                      <p className="text-xs text-muted">
+                        Emis le {dateFormatter.format(new Date(item.dateEmission))} •
+                        Expire le {dateFormatter.format(new Date(item.dateExpiration))}
+                      </p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {item.montantTTC.toLocaleString("fr-FR", {
+                          style: "currency",
+                          currency: "EUR",
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => startEdit(item)}
+                        className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-foreground hover:-translate-y-px hover:shadow-sm dark:border-zinc-700"
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(item.id)}
+                        className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:-translate-y-px hover:shadow-sm dark:border-red-700/60 dark:text-red-100"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  </article>
+                );
+              })
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );

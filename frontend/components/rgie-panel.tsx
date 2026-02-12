@@ -98,8 +98,8 @@ export function RgiePanel() {
   }, [theme, status, token]);
 
   return (
-    <section className="mx-auto mt-8 w-full max-w-5xl rounded-2xl border border-zinc-200/70 bg-white/60 p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="mx-auto mt-8 w-full max-w-5xl rounded-2xl border border-zinc-200/70 bg-white/60 p-4 sm:p-6 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-widest text-muted">
             MCP RGIE
@@ -155,9 +155,9 @@ export function RgiePanel() {
           data.map((regle) => (
             <article
               key={regle.id}
-              className="rounded-lg border border-zinc-200 bg-white/70 p-3 text-xs shadow-sm dark:border-zinc-700 dark:bg-zinc-900/60"
+              className="rounded-lg border border-zinc-200 bg-white/70 p-3 sm:p-4 text-xs shadow-sm dark:border-zinc-700 dark:bg-zinc-900/60"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <div className="font-medium text-foreground">
                   {!regle.rgie.verbatim.includes("synthétique") && regle.rgie.verbatim.length > 20 ? (
                     <div className="mb-1 text-sm">

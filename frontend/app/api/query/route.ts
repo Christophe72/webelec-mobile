@@ -7,6 +7,9 @@ import type { InstallationInput } from "@/lib/rgie/audit.schema";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const ALLOW_LOCAL_AI_FALLBACK =
+  process.env.WEBELEC_ALLOW_LOCAL_AI_FALLBACK === "true";
+
 const payloadSchema = z.object({
   task: z.string(),
   context: z.string().optional(),
@@ -54,6 +57,15 @@ export async function POST(req: Request) {
   ].filter(Boolean);
 
   if (!apiKey) {
+    if (!ALLOW_LOCAL_AI_FALLBACK) {
+      return NextResponse.json(
+        {
+          error:
+            "OPENAI_API_KEY manquant. Active WEBELEC_ALLOW_LOCAL_AI_FALLBACK=true pour le mode demo local.",
+        },
+        { status: 503 }
+      );
+    }
     const localResult = await localAuditor.run(
       task,
       [],

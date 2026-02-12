@@ -1,6 +1,10 @@
-"use client";
+import { notFound } from "next/navigation";
 
 export default function DebugEnvPage() {
+  if (process.env.NODE_ENV === "production") {
+    notFound();
+  }
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Debug Environment Variables</h1>
@@ -15,8 +19,8 @@ export default function DebugEnvPage() {
         )}
       </pre>
       <div className="mt-4 p-4 bg-green-100 rounded">
-        <p className="font-bold text-green-800">✓ Mode dev sans authentification activé!</p>
-        <p className="text-sm text-green-700">Tu peux naviguer librement dans l&apos;application.</p>
+        <p className="font-bold text-green-800">Page de diagnostic (dev uniquement)</p>
+        <p className="text-sm text-green-700">A ne pas exposer en production.</p>
       </div>
     </div>
   );

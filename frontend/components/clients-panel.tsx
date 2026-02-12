@@ -221,8 +221,8 @@ export function ClientsPanel() {
     : undefined;
 
   return (
-    <section className="w-full max-w-7xl p-6 mx-auto mt-8 border shadow-sm rounded-2xl border-zinc-200/70 bg-white/60 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-      <div className="flex items-center justify-between mb-6">
+    <section className="w-full max-w-7xl p-4 sm:p-6 mx-auto mt-8 border shadow-sm rounded-2xl border-zinc-200/70 bg-white/60 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <p className="text-xs tracking-widest uppercase text-gray-600 dark:text-gray-400">CRM</p>
           <h2 className="text-xl font-semibold">Clients</h2>
@@ -233,15 +233,15 @@ export function ClientsPanel() {
         <button
           type="button"
           onClick={loadData}
-          className="px-3 py-2 text-sm font-medium border rounded-lg border-zinc-200 text-foreground dark:border-zinc-700"
+          className="self-start px-3 py-2 text-sm font-medium border rounded-lg border-zinc-200 text-foreground dark:border-zinc-700 sm:self-auto"
         >
           Rafraîchir
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         {/* Formulaire à gauche */}
-        <div className="xl:col-span-1">
+        <div className="md:col-span-1">
           <h3 className="text-sm font-semibold text-foreground mb-3">
             {isEditing ? "Modifier le client" : "Nouveau client"}
           </h3>
@@ -346,7 +346,7 @@ export function ClientsPanel() {
         </div>
 
         {/* Liste des clients à droite */}
-        <div className="xl:col-span-2">
+        <div className="md:col-span-1 lg:col-span-2">
           <div className="mb-3">
             <h3 className="text-sm font-semibold text-foreground mb-2">
               Liste des clients
