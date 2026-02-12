@@ -13,6 +13,7 @@ import com.webelec.backend.security.JwtService;
 import com.webelec.backend.model.Client;
 import com.webelec.backend.service.FactureImportService;
 import com.webelec.backend.service.FactureService;
+import com.webelec.backend.service.PaiementService;
 import com.webelec.backend.service.PeppolService;
 import com.webelec.backend.security.UtilisateurDetailsService;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -50,17 +51,19 @@ class FactureControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    @MockitoBean
+    @MockBean
     private FactureService service;
-    @MockitoBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-    @MockitoBean
-    private JwtService jwtService;
-    @MockitoBean
+    @MockBean
     private FactureImportService importService;
-    @MockitoBean
+    @MockBean
     private PeppolService peppolService;
-    @MockitoBean
+    @MockBean
+    private PaiementService paiementService;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockBean
+    private JwtService jwtService;
+    @MockBean
     private UtilisateurDetailsService utilisateurDetailsService;
 
     @Test
@@ -75,7 +78,7 @@ class FactureControllerTest {
         req.setStatut("EN_ATTENTE");
         req.setSocieteId(1L);
         req.setClientId(2L);
-        
+
         // Ajout d'au moins une ligne valide
         com.webelec.backend.dto.FactureLigneRequest ligne = new com.webelec.backend.dto.FactureLigneRequest();
         ligne.setDescription("Test ligne facture");
@@ -83,10 +86,12 @@ class FactureControllerTest {
         ligne.setPrixUnitaire(new java.math.BigDecimal("1000.00"));
         ligne.setTotal(new java.math.BigDecimal("1000.00"));
         req.setLignes(java.util.Collections.singletonList(ligne));
-        
+
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
-        Facture facture = new Facture(1L, "FA-2025-001", LocalDate.of(2025, 12, 2), LocalDate.of(2025, 12, 31), new java.math.BigDecimal("1000.00"), new java.math.BigDecimal("210.00"), new java.math.BigDecimal("1210.00"), "EN_ATTENTE", societe, client);
+        Facture facture = new Facture(1L, "FA-2025-001", LocalDate.of(2025, 12, 2), LocalDate.of(2025, 12, 31),
+                new java.math.BigDecimal("1000.00"), new java.math.BigDecimal("210.00"),
+                new java.math.BigDecimal("1210.00"), "EN_ATTENTE", societe, client);
         Mockito.when(service.create(anyNonNull(Facture.class))).thenReturn(facture);
         mockMvc.perform(post("/api/factures")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -117,7 +122,7 @@ class FactureControllerTest {
         req.setStatut("VALIDE");
         req.setSocieteId(1L);
         req.setClientId(2L);
-        
+
         // Ajout d'au moins une ligne valide
         com.webelec.backend.dto.FactureLigneRequest ligne = new com.webelec.backend.dto.FactureLigneRequest();
         ligne.setDescription("Test ligne facture mise à jour");
@@ -125,10 +130,12 @@ class FactureControllerTest {
         ligne.setPrixUnitaire(new java.math.BigDecimal("1000.00"));
         ligne.setTotal(new java.math.BigDecimal("2000.00"));
         req.setLignes(java.util.Collections.singletonList(ligne));
-        
+
         Societe societe = Societe.builder().id(1L).nom("WebElec").build();
         Client client = Client.builder().id(2L).nom("Dupont").prenom("Marc").build();
-        Facture facture = new Facture(2L, "FA-2025-002", LocalDate.of(2025, 12, 3), LocalDate.of(2026, 1, 10), new java.math.BigDecimal("2000.00"), new java.math.BigDecimal("420.00"), new java.math.BigDecimal("2420.00"), "VALIDE", societe, client);
+        Facture facture = new Facture(2L, "FA-2025-002", LocalDate.of(2025, 12, 3), LocalDate.of(2026, 1, 10),
+                new java.math.BigDecimal("2000.00"), new java.math.BigDecimal("420.00"),
+                new java.math.BigDecimal("2420.00"), "VALIDE", societe, client);
         Mockito.when(service.update(Mockito.eq(2L), anyNonNull(Facture.class))).thenReturn(facture);
         mockMvc.perform(put("/api/factures/2")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -157,7 +164,7 @@ class FactureControllerTest {
         req.setStatut("EN_ATTENTE");
         req.setSocieteId(1L);
         req.setClientId(2L);
-        
+
         // Ajout d'au moins une ligne valide
         com.webelec.backend.dto.FactureLigneRequest ligne = new com.webelec.backend.dto.FactureLigneRequest();
         ligne.setDescription("Test ligne facture conflit");
@@ -165,8 +172,9 @@ class FactureControllerTest {
         ligne.setPrixUnitaire(new java.math.BigDecimal("1000.00"));
         ligne.setTotal(new java.math.BigDecimal("1000.00"));
         req.setLignes(java.util.Collections.singletonList(ligne));
-        
-        Mockito.when(service.create(anyNonNull(Facture.class))).thenThrow(new IllegalStateException("Numéro de facture déjà utilisé"));
+
+        Mockito.when(service.create(anyNonNull(Facture.class)))
+                .thenThrow(new IllegalStateException("Numéro de facture déjà utilisé"));
         mockMvc.perform(post("/api/factures")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(req)))
@@ -193,8 +201,8 @@ class FactureControllerTest {
         Mockito.when(importService.importFromCsv(anyNonNull(MultipartFile.class), eq(5L))).thenReturn(response);
 
         mockMvc.perform(multipart("/api/factures/import")
-                        .file(file)
-                        .param("societeId", "5"))
+                .file(file)
+                .param("societeId", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalRows").value(1))
                 .andExpect(jsonPath("$.successCount").value(1));
