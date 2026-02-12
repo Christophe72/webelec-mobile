@@ -99,6 +99,7 @@ export default function ChantierGallery({ chantierId }: Props) {
           {photos.map((photo) => {
             const photoUrl = buildPhotoUrl(photo.fileName);
             return (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={photo.id}
                 src={photoUrl}
@@ -113,9 +114,10 @@ export default function ChantierGallery({ chantierId }: Props) {
 
       {selected && (
         <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[60]"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-60"
           onClick={() => setSelected(null)}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={selected}
             alt="Photo chantier"

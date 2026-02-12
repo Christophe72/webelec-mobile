@@ -6,7 +6,7 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-2xl font-bold">Reglages</h1>
         <p className="app-muted text-sm">
-          Configuration de l'application et preferences utilisateur.
+          Configuration de l&apos;application et préférences utilisateur.
         </p>
       </div>
 
@@ -14,7 +14,7 @@ export default function SettingsPage() {
         <p className="font-semibold">Theme</p>
         <ThemeStatus />
         <p className="text-sm app-muted">
-          Le bouton dans la barre du haut applique ce theme a toute l'application.
+          Le bouton dans la barre du haut applique ce thème à toute l&apos;application.
         </p>
       </div>
     </div>
