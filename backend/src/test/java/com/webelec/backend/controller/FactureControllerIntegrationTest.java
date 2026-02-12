@@ -185,7 +185,7 @@ class FactureControllerIntegrationTest {
         mockMvc.perform(post("/api/factures/{id}/paiements", 99999L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

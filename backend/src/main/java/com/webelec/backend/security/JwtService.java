@@ -6,6 +6,7 @@ import com.webelec.backend.config.JwtProperties;
 import com.webelec.backend.model.Utilisateur;
 import com.webelec.backend.model.UtilisateurRole;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 /**
@@ -178,6 +180,7 @@ public class JwtService {
         Instant expiry = now.plus(validity);
         Map<String, Object> claims = buildClaims(utilisateur);
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(utilisateur.getEmail())
                 .issuer(properties.getIssuer())
                 .issuedAt(Date.from(now))
@@ -305,11 +308,23 @@ public class JwtService {
      * @throws io.jsonwebtoken.SignatureException si la signature ne correspond pas
      */
     public <T> T extractClaim(String token, Function<Claims, T> resolver) {
-        Claims claims = Jwts.parser()
-                .verifyWith(signingKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        if (token == null) {
+            throw new IllegalArgumentException("JWT token cannot be null");
+        }
+        if (token.isBlank()) {
+            throw new io.jsonwebtoken.JwtException("JWT token cannot be empty");
+        }
+        Claims claims;
+        try {
+            claims = Jwts.parser()
+                    .verifyWith(signingKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException ex) {
+            // Keep access to claims for expired tokens (used by validation and tests).
+            claims = ex.getClaims();
+        }
         return resolver.apply(claims);
     }
 
@@ -370,7 +385,7 @@ public class JwtService {
         }
 
         if (role != null) {
-            claims.put("role", role.canonicalName());
+            claims.put("role", role.authority());
         }
         if (societeId != null) {
             claims.put("societeId", societeId);

@@ -26,7 +26,7 @@ public class UserPreferences {
     private Long userId;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "preferences", columnDefinition = "jsonb")
+    @Column(name = "preferences")
     private JsonNode preferences;
 
     public UserPreferences() {

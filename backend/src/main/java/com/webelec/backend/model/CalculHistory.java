@@ -25,11 +25,11 @@ public class CalculHistory {
     private String calculatorType;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "inputs", columnDefinition = "jsonb", nullable = false)
+    @Column(name = "inputs", nullable = false)
     private JsonNode inputs;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "results", columnDefinition = "jsonb", nullable = false)
+    @Column(name = "results", nullable = false)
     private JsonNode results;
 
     @Column(name = "notes", length = 1024)
