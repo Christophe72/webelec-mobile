@@ -32,6 +32,9 @@ public class Chantier {
     @OneToMany(mappedBy = "chantier", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Intervention> interventions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "chantier", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Photo> photos = new ArrayList<>();
+
     public Chantier() {}
 
     public Chantier(Long id, String nom, String adresse, String description,
@@ -65,6 +68,8 @@ public class Chantier {
     public void setClient(Client client) { this.client = client; }
 
     public List<Intervention> getInterventions() { return interventions; }
+
+    public List<Photo> getPhotos() { return photos; }
 
     public static final class Builder {
         private Long id;
